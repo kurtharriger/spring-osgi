@@ -16,6 +16,7 @@
 
 package org.springframework.osgi.blueprint.config;
 
+import org.osgi.service.blueprint.container.CollapsedType;
 import org.osgi.service.blueprint.container.Converter;
 
 /**
@@ -26,11 +27,11 @@ import org.osgi.service.blueprint.container.Converter;
  */
 public class ComponentHolderConverter implements Converter {
 
-	public boolean canConvert(Object fromValue, Class toType) {
+	public boolean canConvert(Object fromValue, CollapsedType toType) {
 		return ComponentHolder.class.equals(toType);
 	}
 
-	public Object convert(Object fromValue, Class toType) throws Exception {
+	public Object convert(Object fromValue, CollapsedType toType) throws Exception {
 		ComponentHolder comp = new ComponentHolder();
 		comp.setProperty(fromValue);
 		return comp;

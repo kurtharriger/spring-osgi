@@ -22,6 +22,7 @@ import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventM
 import org.springframework.osgi.extender.internal.activator.ApplicationContextConfigurationFactory;
 import org.springframework.osgi.extender.internal.activator.ContextLoaderListener;
 import org.springframework.osgi.extender.internal.activator.OsgiContextProcessor;
+import org.springframework.osgi.extender.internal.activator.TypeCompatibilityChecker;
 import org.springframework.osgi.extender.internal.blueprint.activator.support.BlueprintConfigUtils;
 import org.springframework.osgi.extender.internal.blueprint.activator.support.BlueprintContainerConfig;
 import org.springframework.osgi.extender.internal.blueprint.activator.support.BlueprintExtenderConfiguration;
@@ -40,6 +41,7 @@ public class BlueprintLoaderListener extends ContextLoaderListener {
 	private volatile BlueprintListenerManager listenerManager;
 	private volatile Bundle bundle;
 	private volatile BlueprintContainerProcessor contextProcessor;
+	private volatile TypeCompatibilityChecker typeChecker;
 
 	@Override
 	public void start(BundleContext context) throws Exception {
@@ -47,6 +49,7 @@ public class BlueprintLoaderListener extends ContextLoaderListener {
 		this.dispatcher = new EventAdminDispatcher(context);
 		this.bundle = context.getBundle();
 		this.contextProcessor = new BlueprintContainerProcessor(dispatcher, listenerManager, bundle);
+		this.typeChecker = new BlueprintTypeCompatibilityChecker(bundle);
 
 		super.start(context);
 	}
@@ -75,6 +78,11 @@ public class BlueprintLoaderListener extends ContextLoaderListener {
 	@Override
 	protected OsgiContextProcessor createContextProcessor() {
 		return contextProcessor;
+	}
+
+	@Override
+	protected TypeCompatibilityChecker getTypeCompatibilityChecker() {
+		return typeChecker;
 	}
 
 	@Override

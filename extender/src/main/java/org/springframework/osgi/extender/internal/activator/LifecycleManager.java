@@ -56,7 +56,6 @@ import org.springframework.osgi.util.OsgiStringUtils;
  * Manager handling the startup/shutdown threading issues regarding OSGi contexts. Used by {@link ContextLoaderListener}
  * .
  * 
- * 
  * @author Costin Leau
  */
 class LifecycleManager implements DisposableBean {
@@ -108,10 +107,11 @@ class LifecycleManager implements DisposableBean {
 	private final ApplicationContextConfigurationFactory contextConfigurationFactory;
 
 	private final VersionMatcher versionMatcher;
+	private final TypeCompatibilityChecker typeChecker;
 
 	LifecycleManager(ExtenderConfiguration extenderConfiguration, VersionMatcher versionMatcher,
 			ApplicationContextConfigurationFactory appCtxCfgFactory, OsgiContextProcessor processor,
-			BundleContext context) {
+			TypeCompatibilityChecker checker, BundleContext context) {
 
 		this.versionMatcher = versionMatcher;
 		this.extenderConfiguration = extenderConfiguration;
@@ -126,6 +126,7 @@ class LifecycleManager implements DisposableBean {
 
 		this.contextCreator = extenderConfiguration.getContextCreator();
 		this.postProcessors = extenderConfiguration.getPostProcessors();
+		this.typeChecker = checker;
 
 		this.bundleContext = context;
 	}
@@ -183,6 +184,17 @@ class LifecycleManager implements DisposableBean {
 			log.debug("No application context created for bundle " + bundleString);
 			return;
 		}
+
+		if (typeChecker != null) {
+			if (!typeChecker.isTypeCompatible(localBundleContext)) {
+				log.info("Bundle " + OsgiStringUtils.nullSafeName(bundle) + " is not type compatible with extender "
+						+ OsgiStringUtils.nullSafeName(bundleContext.getBundle()) + "; ignoring bundle...");
+				return;
+			}
+		}
+
+		log.debug("Bundle " + OsgiStringUtils.nullSafeName(bundle) + " is type compatible with extender "
+				+ OsgiStringUtils.nullSafeName(bundleContext.getBundle()) + "; processing bundle...");
 
 		// create a dedicated hook for this application context
 		BeanFactoryPostProcessor processingHook =

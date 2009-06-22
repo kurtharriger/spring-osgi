@@ -16,7 +16,7 @@
 
 package org.springframework.osgi.blueprint.reflect;
 
-import org.osgi.service.blueprint.reflect.RefListMetadata;
+import org.osgi.service.blueprint.reflect.ReferenceListMetadata;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.osgi.service.importer.support.MemberType;
@@ -24,7 +24,7 @@ import org.springframework.osgi.service.importer.support.MemberType;
 /**
  * @author Costin Leau
  */
-class SpringRefListMetadata extends SpringServiceReferenceComponentMetadata implements RefListMetadata {
+class SpringRefListMetadata extends SpringServiceReferenceComponentMetadata implements ReferenceListMetadata {
 
 	private final int memberType;
 	private static final String MEMBER_TYPE_PROP = "memberType";

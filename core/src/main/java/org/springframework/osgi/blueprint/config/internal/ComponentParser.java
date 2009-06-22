@@ -73,7 +73,7 @@ public class ComponentParser {
 	public static final String COMPONENT_ID_ATTR = "component-id";
 	public static final String CONSTRUCTOR_ARG = "argument";
 	private static final String FACTORY_REF_ATTR = "factory-ref";
-	private static final String LAZY_INIT_ATTR = "initialization";
+	private static final String LAZY_INIT_ATTR = "activation";
 	private static final String LAZY_INIT_VALUE = "lazy";
 
 	public static final String NAMESPACE_URI = "http://www.osgi.org/xmlns/blueprint/v1.0.0";
