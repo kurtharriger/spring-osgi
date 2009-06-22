@@ -20,8 +20,12 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.osgi.service.blueprint.reflect.BeanMetadata;
+import org.osgi.service.blueprint.reflect.BeanProperty;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
+import org.osgi.service.blueprint.reflect.Metadata;
 import org.osgi.service.blueprint.reflect.RefMetadata;
+import org.osgi.service.blueprint.reflect.ReferenceListMetadata;
 import org.osgi.service.blueprint.reflect.ReferenceListener;
 import org.osgi.service.blueprint.reflect.ReferenceMetadata;
 import org.osgi.service.blueprint.reflect.ServiceReferenceMetadata;
@@ -94,6 +98,24 @@ public class ImporterMetadataTest extends BaseMetadataTest {
 		ServiceReferenceMetadata metadata = getReferenceMetadata("timeout");
 		assertTrue(metadata instanceof ReferenceMetadata);
 		assertEquals(1234, ((ReferenceMetadata) metadata).getTimeout());
+	}
+
+	public void testNestedMandatoryReference() throws Exception {
+		BeanMetadata metadata = (BeanMetadata) blueprintContainer.getComponentMetadata("nestedReference");
+		BeanProperty prop = (BeanProperty) metadata.getProperties().get(0);
+		Metadata value = prop.getValue();
+		assertTrue(value instanceof ReferenceMetadata);
+		ReferenceMetadata ref = (ReferenceMetadata) value;
+		assertEquals(1000, ref.getTimeout());
+	}
+	
+	public void testNestedMandatoryCollectionReference() throws Exception {
+		BeanMetadata metadata = (BeanMetadata) blueprintContainer.getComponentMetadata("nestedCollectionReference");
+		BeanProperty prop = (BeanProperty) metadata.getProperties().get(0);
+		Metadata value = prop.getValue();
+		assertTrue(value instanceof ReferenceListMetadata);
+		ReferenceListMetadata ref = (ReferenceListMetadata) value;
+		assertEquals(ReferenceListMetadata.USE_SERVICE_REFERENCE, ref.getMemberType());
 	}
 
 }

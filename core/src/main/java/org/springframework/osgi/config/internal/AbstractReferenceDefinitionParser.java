@@ -145,6 +145,8 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 
 	private static final String M = "m";
 
+	public static final String GENERATED_REF = "org.springframework.osgi.config.reference.generated";
+
 	// document defaults
 	protected OsgiDefaultsDefinition defaults = null;
 
@@ -161,7 +163,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition();
 
-		Class beanClass = getBeanClass(element);
+		Class<?> beanClass = getBeanClass(element);
 		Assert.notNull(beanClass);
 
 		if (beanClass != null) {
@@ -179,11 +181,10 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 		}
 		doParse(element, parserContext, builder);
 
-		// check whether the bean is mandatory (and if it is, make it top-level
-		// bean)
-
 		AbstractBeanDefinition def = builder.getBeanDefinition();
 
+		// check whether the bean is mandatory (and if it is, make it top-level
+		// bean)
 		if (parserContext.isNested()) {
 			String value = element.getAttribute(AbstractBeanDefinitionParser.ID_ATTRIBUTE);
 			value = (StringUtils.hasText(value) ? value + BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR : "");
@@ -191,15 +192,18 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 
 			BeanDefinitionHolder holder = new BeanDefinitionHolder(def, generatedName);
 			BeanDefinitionReaderUtils.registerBeanDefinition(holder, parserContext.getRegistry());
-			return createBeanReferenceDefinition(generatedName);
+			return createBeanReferenceDefinition(generatedName, def);
 		}
 
 		return def;
 	}
 
-	private AbstractBeanDefinition createBeanReferenceDefinition(String beanName) {
+	private AbstractBeanDefinition createBeanReferenceDefinition(String beanName, BeanDefinition actualDef) {
 		GenericBeanDefinition def = new GenericBeanDefinition();
 		def.setBeanClass(BeanReferenceFactoryBean.class);
+		def.setAttribute(GENERATED_REF, true);
+		def.setOriginatingBeanDefinition(actualDef);
+		def.setSynthetic(true);
 		MutablePropertyValues mpv = new MutablePropertyValues();
 		mpv.addPropertyValue(TARGET_BEAN_NAME_PROP, beanName);
 		def.setPropertyValues(mpv);

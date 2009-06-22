@@ -24,7 +24,7 @@ import org.springframework.osgi.service.importer.support.MemberType;
 /**
  * @author Costin Leau
  */
-class SpringRefListMetadata extends SpringServiceReferenceComponentMetadata implements ReferenceListMetadata {
+class SpringReferenceListMetadata extends SpringServiceReferenceComponentMetadata implements ReferenceListMetadata {
 
 	private final int memberType;
 	private static final String MEMBER_TYPE_PROP = "memberType";
@@ -35,15 +35,14 @@ class SpringRefListMetadata extends SpringServiceReferenceComponentMetadata impl
 	 * @param name
 	 * @param definition
 	 */
-	public SpringRefListMetadata(String name, BeanDefinition definition) {
+	public SpringReferenceListMetadata(String name, BeanDefinition definition) {
 		super(name, definition);
 
 		MemberType type = MemberType.SERVICE_OBJECT;
 
 		MutablePropertyValues pvs = beanDefinition.getPropertyValues();
 		if (pvs.contains(MEMBER_TYPE_PROP)) {
-			String value = (String) MetadataUtils.getValue(pvs, MEMBER_TYPE_PROP);
-			type = MemberType.valueOf(value);
+			type = (MemberType) MetadataUtils.getValue(pvs, MEMBER_TYPE_PROP);
 		}
 
 		memberType = type.ordinal() + 1;

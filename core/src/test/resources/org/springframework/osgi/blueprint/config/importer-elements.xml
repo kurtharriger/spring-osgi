@@ -31,4 +31,20 @@
 
 	<reference id="timeout" interface="java.lang.Cloneable"
 		timeout="1234" />
+		
+    
+    <!-- promoted beans should be hidden to the Blueprint API -->
+    <!--  the nested property should be reflected as a nested component rather then a reference to a top level bean -->
+    <bean id="nestedReference" class="org.springframework.osgi.blueprint.TestComponent" init-method="init">
+       <property name="propA">
+           <reference interface="java.io.Serializable" timeout="1000"/>
+       </property>
+    </bean>
+    
+     <bean id="nestedCollectionReference" class="org.springframework.osgi.blueprint.TestComponent" init-method="init">
+       <property name="propA">
+           <reference-list interface="java.io.Serializable" member-type="service-reference"/>
+       </property>
+    </bean>   		
+       		
 </blueprint>

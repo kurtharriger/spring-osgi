@@ -18,7 +18,6 @@
 package org.springframework.osgi.config.internal.util;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -46,10 +45,8 @@ public abstract class ParserUtils {
 
 	private static final AttributeCallback PROPERTY_CONV_ATTRS_CALLBACK = new ConventionsCallback();
 
-
 	/**
-	 * Generic attribute callback. Will parse the given callback array, w/o any
-	 * standard callback.
+	 * Generic attribute callback. Will parse the given callback array, w/o any standard callback.
 	 * 
 	 * @param element XML element
 	 * @param builder current bean definition builder
@@ -71,13 +68,9 @@ public abstract class ParserUtils {
 	}
 
 	/**
-	 * Dedicated parsing method that uses the following stack:
-	 * <ol>
-	 * <li>user given {@link AttributeCallback}s</li>
-	 * <li>{@link StandardAttributeCallback}</li>
-	 * <li>{@link PropertyRefAttributeCallback}</li>
-	 * <li>{@link ConventionCallback}</li>
-	 * </ol>
+	 * Dedicated parsing method that uses the following stack: <ol> <li>user given {@link AttributeCallback}s</li> <li>
+	 * {@link StandardAttributeCallback}</li> <li>{@link PropertyRefAttributeCallback}</li> <li>
+	 * {@link ConventionCallback}</li> </ol>
 	 * 
 	 * 
 	 * @param element XML element
@@ -111,8 +104,8 @@ public abstract class ParserUtils {
 	 * @param callback attribute callback, can be null
 	 */
 	public static void parseCustomAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback callback) {
-		AttributeCallback[] callbacks = (callback == null ? new AttributeCallback[0]
-				: new AttributeCallback[] { callback });
+		AttributeCallback[] callbacks =
+				(callback == null ? new AttributeCallback[0] : new AttributeCallback[] { callback });
 		parseCustomAttributes(element, builder, callbacks);
 	}
 
@@ -132,9 +125,8 @@ public abstract class ParserUtils {
 	}
 
 	/**
-	 * Utility method used for maintaining backwards compatibility by converting
-	 * Class objects to String (using their class names). Used by importer and
-	 * exporter parsing to set the 'interfaces' property.
+	 * Utility method used for maintaining backwards compatibility by converting Class objects to String (using their
+	 * class names). Used by importer and exporter parsing to set the 'interfaces' property.
 	 * 
 	 * @param parsedClasses collection of parsed classes
 	 * @return a collection of converted (if necessary) metadata
@@ -145,11 +137,10 @@ public abstract class ParserUtils {
 		for (Object clazz : parsedClasses) {
 			if (clazz instanceof TypedStringValue || clazz instanceof String) {
 				interfaces.add(clazz);
-			}
-			else {
+			} else {
 				// add adapter definition for bean references (which can be classes)
-				interfaces.add(BeanDefinitionBuilder.genericBeanDefinition(ToStringClassAdapter.class).addConstructorArgValue(
-					clazz).getBeanDefinition());
+				interfaces.add(BeanDefinitionBuilder.genericBeanDefinition(ToStringClassAdapter.class)
+						.addConstructorArgValue(clazz).getBeanDefinition());
 			}
 		}
 
