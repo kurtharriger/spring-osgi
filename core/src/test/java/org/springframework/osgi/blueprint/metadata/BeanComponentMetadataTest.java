@@ -25,7 +25,8 @@ import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.BeanProperty;
 import org.osgi.service.blueprint.reflect.CollectionMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
-import org.osgi.service.blueprint.reflect.Metadata;
+import org.osgi.service.blueprint.reflect.MapEntry;
+import org.osgi.service.blueprint.reflect.MapMetadata;
 import org.osgi.service.blueprint.reflect.NullMetadata;
 import org.osgi.service.blueprint.reflect.PropsMetadata;
 import org.osgi.service.blueprint.reflect.RefMetadata;
@@ -221,6 +222,38 @@ public class BeanComponentMetadataTest extends BaseMetadataTest {
 				System.out.println(meta.getType());
 				System.out.println(meta.getStringValue());
 			}
+		}
+	}
+
+	public void testNestedBeanProperties() throws Exception {
+		BeanMetadata localMetadata = getLocalMetadata("nestedBeanInitializing");
+		List<BeanProperty> props = localMetadata.getProperties();
+		BeanProperty a = props.get(0);
+		BeanMetadata meta = (BeanMetadata) a.getValue();
+		assertEquals(BeanMetadata.ACTIVATION_LAZY, meta.getActivation());
+		assertEquals(BeanMetadata.SCOPE_PROTOTYPE, meta.getScope());
+	}
+
+	public void testInnerMap() throws Exception {
+		BeanMetadata localMetadata = getLocalMetadata("compInnerMap");
+		List<BeanArgument> args = localMetadata.getArguments();
+		BeanArgument arg = args.get(0);
+		assertNull(arg.getValueType());
+		MapMetadata meta = (MapMetadata) arg.getValue();
+		List<MapEntry> entries = meta.getEntries();
+		MapEntry entry = entries.get(0);
+		BeanMetadata bm = (BeanMetadata) entry.getValue();
+		args = bm.getArguments();
+		for (BeanArgument arg1 : args) {
+			assertEquals(String.class.getName(), arg1.getValueType());
+		}
+
+		entry = entries.get(1);
+		bm = (BeanMetadata) entry.getValue();
+		List<BeanProperty> props = bm.getProperties();
+		for (BeanProperty beanProperty : props) {
+			ValueMetadata vm = (ValueMetadata) beanProperty.getValue();
+			assertNull(vm.getType());
 		}
 	}
 }

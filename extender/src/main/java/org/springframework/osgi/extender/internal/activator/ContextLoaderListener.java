@@ -316,7 +316,7 @@ public class ContextLoaderListener implements BundleActivator {
 		// initialize the configuration once namespace handlers have been detected
 		lifecycleManager =
 				new LifecycleManager(extenderConfiguration, versionMatcher, createContextConfigFactory(),
-						this.processor, bundleContext);
+						this.processor, getTypeCompatibilityChecker(), bundleContext);
 
 		// Step 3: discover the bundles that are started
 		// and require context creation
@@ -329,6 +329,10 @@ public class ContextLoaderListener implements BundleActivator {
 
 	protected OsgiContextProcessor createContextProcessor() {
 		return new NoOpOsgiContextProcessor();
+	}
+
+	protected TypeCompatibilityChecker getTypeCompatibilityChecker() {
+		return null;
 	}
 
 	protected String getManagedBundleExtenderVersionHeader() {

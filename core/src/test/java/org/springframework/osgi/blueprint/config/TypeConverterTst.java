@@ -77,7 +77,8 @@ public class TypeConverterTst extends TestCase {
 
 	public void testConversionService() throws Exception {
 		Converter cs = context.getBean("converter", Converter.class);
-		Object converted = cs.convert("1", Long.class);
+		// FIXME
+		Object converted = cs.convert("1", null);
 		assertNotNull(converted);
 		assertEquals(Long.valueOf("1"), converted);
 	}

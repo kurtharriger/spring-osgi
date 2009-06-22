@@ -17,11 +17,10 @@ package org.osgi.service.blueprint.reflect;
 
 /**
  * Service reference that binds to a collection of matching services from the
- * OSGi service registry. This is the <code>ref-list</code> or
- * <code>ref-set</code> element.
+ * OSGi service registry. This is the <code>reference-list</code> element.
  *
  */
-public interface RefListMetadata extends ServiceReferenceMetadata {
+public interface ReferenceListMetadata extends ServiceReferenceMetadata {
 
 	/**
 	 * Use the service objects to compare or include in the collection

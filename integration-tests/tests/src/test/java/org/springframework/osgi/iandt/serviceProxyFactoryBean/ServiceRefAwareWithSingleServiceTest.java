@@ -85,7 +85,7 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 		assertNotNull(refAware.getServiceReference());
 		assertNull(refAware.getServiceReference().getBundle());
 	}
-
+	
 	public void testServiceReferenceProperties() throws Exception {
 		long time = 1234;
 		Date date = new Date(time);

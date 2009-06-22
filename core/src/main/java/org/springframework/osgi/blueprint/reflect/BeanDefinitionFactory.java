@@ -24,7 +24,7 @@ import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.BeanProperty;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
-import org.osgi.service.blueprint.reflect.RefListMetadata;
+import org.osgi.service.blueprint.reflect.ReferenceListMetadata;
 import org.osgi.service.blueprint.reflect.ReferenceMetadata;
 import org.osgi.service.blueprint.reflect.ServiceMetadata;
 import org.osgi.service.blueprint.reflect.ServiceReferenceMetadata;
@@ -75,8 +75,8 @@ class BeanDefinitionFactory implements MetadataConstants {
 		}
 
 		if (metadata instanceof ServiceReferenceMetadata) {
-			if (metadata instanceof RefListMetadata) {
-				return buildReferenceCollection((RefListMetadata) metadata);
+			if (metadata instanceof ReferenceListMetadata) {
+				return buildReferenceCollection((ReferenceListMetadata) metadata);
 			}
 			if (metadata instanceof ReferenceMetadata) {
 				return buildReferenceProxy((ReferenceMetadata) metadata);
@@ -128,7 +128,7 @@ class BeanDefinitionFactory implements MetadataConstants {
 	}
 
 	private boolean getLazy(ComponentMetadata metadata) {
-		return (metadata.getInitialization() == ComponentMetadata.INITIALIZATION_LAZY ? true : false);
+		return (metadata.getActivation() == ComponentMetadata.ACTIVATION_LAZY ? true : false);
 	}
 
 	private AbstractBeanDefinition buildExporter(ServiceMetadata metadata) {
@@ -152,7 +152,7 @@ class BeanDefinitionFactory implements MetadataConstants {
 		return builder.getBeanDefinition();
 	}
 
-	private AbstractBeanDefinition buildReferenceCollection(RefListMetadata metadata) {
+	private AbstractBeanDefinition buildReferenceCollection(ReferenceListMetadata metadata) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(MULTI_SERVICE_IMPORTER_CLASS);
 		addServiceReferenceProperties(metadata, builder);
 		throw new UnsupportedOperationException("not implemented yet");

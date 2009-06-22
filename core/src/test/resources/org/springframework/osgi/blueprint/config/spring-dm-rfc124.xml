@@ -16,7 +16,7 @@
 	<bean id="foo" class="java.lang.Object" />
 	<!-- collection	-->
 	 
-	<ref-list id="list" interface="java.lang.Cloneable"/>
+	<reference-list id="list" interface="java.lang.Cloneable"/>
 	
 	<reference id="reference" interface="java.io.Serializable" />
 

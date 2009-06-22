@@ -13,27 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.osgi.extender.internal.activator;
 
-package org.springframework.osgi.blueprint.config;
-
-import org.osgi.service.blueprint.container.CollapsedType;
-import org.osgi.service.blueprint.container.Converter;
+import org.osgi.framework.BundleContext;
 
 /**
- * Taken from the TCK.
+ * Class used for checking type compatibility between the extender and the bundles it scans. Usually the checker is
+ * invoked after a bundle has been scanned and found suitable for parsing.
  * 
  * @author Costin Leau
  */
-public class AsianRegionCodeConverter implements Converter {
+public interface TypeCompatibilityChecker {
 
-	private Class<?> targetClass = RegionCode.class;
-
-	public boolean canConvert(Object fromValue, CollapsedType toType) {
-		return (fromValue instanceof String && targetClass.equals(toType));
-
-	}
-
-	public Object convert(Object fromValue, CollapsedType toType) throws Exception {
-		return new AsianRegionCode((String) fromValue);
-	}
+	boolean isTypeCompatible(BundleContext targetContext);
 }

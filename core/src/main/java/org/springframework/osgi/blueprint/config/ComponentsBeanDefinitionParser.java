@@ -46,8 +46,8 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 	private static final String BEAN = "bean";
 	static final String REFERENCE = "reference";
 	static final String SERVICE = "service";
-	static final String REF_LIST = "ref-list";
-	static final String REF_SET = "ref-set";
+	static final String REFERENCE_LIST = "reference-list";
+	static final String REFERENCE_SET = "reference-set";
 
 	public BeanDefinition parse(Element componentsRootElement, ParserContext parserContext) {
 		// re-initialize defaults
@@ -96,9 +96,9 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 			parseReferenceElement(ele, parserContext);
 		} else if (DomUtils.nodeNameEquals(ele, SERVICE)) {
 			parseServiceElement(ele, parserContext);
-		} else if (DomUtils.nodeNameEquals(ele, REF_LIST)) {
+		} else if (DomUtils.nodeNameEquals(ele, REFERENCE_LIST)) {
 			parseListElement(ele, parserContext);
-		} else if (DomUtils.nodeNameEquals(ele, REF_SET)) {
+		} else if (DomUtils.nodeNameEquals(ele, REFERENCE_SET)) {
 			parseSetElement(ele, parserContext);
 		} else if (DomUtils.nodeNameEquals(ele, TypeConverterBeanDefinitionParser.TYPE_CONVERTERS)) {
 			parseConvertersElement(ele, parserContext);

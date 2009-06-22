@@ -25,6 +25,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.osgi.blueprint.TestComponent;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -40,7 +41,6 @@ public class ComponentElementTest extends TestCase {
 	private static String SIMPLE = "simple";
 	private static String DEPENDS_ON = "depends-on";
 	private XmlBeanDefinitionReader reader;
-
 
 	protected void setUp() throws Exception {
 		context = new GenericApplicationContext();
@@ -94,5 +94,10 @@ public class ComponentElementTest extends TestCase {
 		assertNull(def.getBeanClassName());
 		assertEquals("getName", def.getFactoryMethodName());
 		assertEquals("thread", def.getFactoryBeanName());
+	}
+
+	public void tstSelfReferencePrototypeBean() throws Exception {
+		TestComponent cmpn = context.getBean("self-reference", TestComponent.class);
+		assertSame(cmpn, cmpn.getPropA());
 	}
 }

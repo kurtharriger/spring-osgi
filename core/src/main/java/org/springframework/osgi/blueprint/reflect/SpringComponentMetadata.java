@@ -37,6 +37,7 @@ public class SpringComponentMetadata implements ComponentMetadata {
 	private final String name;
 	protected final AbstractBeanDefinition beanDefinition;
 	private final List<String> dependsOn;
+	private final int activation;
 
 	// FIXME: allow rare-non abstract bean definition as well
 	public SpringComponentMetadata(String name, BeanDefinition definition) {
@@ -55,6 +56,9 @@ public class SpringComponentMetadata implements ComponentMetadata {
 			dependsOn = Collections.unmodifiableList(dependencies);
 		}
 
+		activation =
+				beanDefinition.isSingleton() ? (beanDefinition.isLazyInit() ? ACTIVATION_LAZY : ACTIVATION_EAGER)
+						: ACTIVATION_LAZY;
 	}
 
 	public BeanDefinition getBeanDefinition() {
@@ -69,7 +73,7 @@ public class SpringComponentMetadata implements ComponentMetadata {
 		return dependsOn;
 	}
 
-	public int getInitialization() {
-		return (beanDefinition.isLazyInit() ? INITIALIZATION_LAZY : INITIALIZATION_EAGER);
+	public int getActivation() {
+		return activation;
 	}
 }

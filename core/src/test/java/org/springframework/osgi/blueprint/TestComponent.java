@@ -37,6 +37,10 @@ public class TestComponent {
 		propA = arg;
 	}
 
+	public TestComponent(String str) {
+		this.propA = str;
+	}
+
 	public TestComponent(Object arg1, Object arg2) {
 		propA = arg1;
 		propB = arg2;

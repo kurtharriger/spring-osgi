@@ -35,7 +35,7 @@ public class BlueprintDefaultsDefinition extends OsgiDefaultsDefinition {
 	private static final String DEFAULT_TIMEOUT = "default-timeout";
 	private static final String DEFAULT_AVAILABILITY = "default-availability";
 	private static final String TIMEOUT_DEFAULT = "300000";
-	private static final String DEFAULT_INITIALIZATION = "default-initialization";
+	private static final String DEFAULT_INITIALIZATION = "default-activation";
 	private static final String LAZY_INITIALIZATION = "lazy";
 	private static final boolean INITIALIZATION_DEFAULT = false;
 

@@ -41,14 +41,14 @@ class BlueprintNamespaceHandler extends NamespaceHandlerSupport {
 		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.REFERENCE,
 				new BlueprintReferenceBeanDefinitionParser());
 
-		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.REF_LIST,
+		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.REFERENCE_LIST,
 				new BlueprintCollectionBeanDefinitionParser() {
 
 					protected CollectionType collectionType() {
 						return CollectionType.LIST;
 					}
 				});
-		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.REF_SET,
+		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.REFERENCE_SET,
 				new BlueprintCollectionBeanDefinitionParser() {
 
 					protected CollectionType collectionType() {

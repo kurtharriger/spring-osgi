@@ -19,8 +19,8 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
-import org.osgi.service.blueprint.reflect.RefListMetadata;
 import org.osgi.service.blueprint.reflect.RefMetadata;
+import org.osgi.service.blueprint.reflect.ReferenceListMetadata;
 import org.osgi.service.blueprint.reflect.ReferenceListener;
 import org.osgi.service.blueprint.reflect.ServiceReferenceMetadata;
 import org.osgi.service.blueprint.reflect.Target;
@@ -44,11 +44,11 @@ public class ImporterCollectionsMetadataTest extends BaseMetadataTest {
 	}
 
 	public void testSimpleList() throws Exception {
-		RefListMetadata metadata = (RefListMetadata) getReferenceMetadata("simpleList");
+		ReferenceListMetadata metadata = (ReferenceListMetadata) getReferenceMetadata("simpleList");
 	}
 
 	public void testListeners() throws Exception {
-		RefListMetadata metadata = (RefListMetadata) getReferenceMetadata("listeners");
+		ReferenceListMetadata metadata = (ReferenceListMetadata) getReferenceMetadata("listeners");
 		Collection<ReferenceListener> listeners = metadata.getReferenceListeners();
 		assertEquals(3, listeners.size());
 

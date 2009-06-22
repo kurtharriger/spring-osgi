@@ -28,7 +28,7 @@ import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Blueprint specific context creator. Picks up the RFC 124 locations instead of Spring DM's.
+ * Blueprint specific context creator. Picks up the Blueprint locations instead of Spring DM's.
  * 
  * @author Costin Leau
  * 
