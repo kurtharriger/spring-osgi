@@ -51,6 +51,13 @@ public class BeanComponentMetadataTest extends BaseMetadataTest {
 		return localMetadata;
 	}
 
+	public void testArgumentIndex() throws Exception {
+		BeanMetadata localMetadata = getLocalMetadata("idref");
+		List<BeanArgument> list = localMetadata.getArguments();
+		BeanArgument arg = list.get(0);
+		assertEquals(-1, arg.getIndex());
+	}
+
 	public void testConstructorArg() throws Exception {
 		BeanMetadata localMetadata = getLocalMetadata("constructor-arg");
 		assertEquals(Integer.class.getName(), localMetadata.getClassName());
