@@ -30,6 +30,7 @@ public class SimpleBeanArgument implements BeanArgument {
 	private final int index;
 	private final String typeName;
 	private final Metadata value;
+	private static final int UNSPECIFIED_INDEX = -1;
 
 	/**
 	 * Constructs a new <code>SimpleBeanArgument</code> instance.
@@ -38,16 +39,14 @@ public class SimpleBeanArgument implements BeanArgument {
 	 * @param typeName
 	 * @param value
 	 */
-	public SimpleBeanArgument(int index, String typeName, Metadata value) {
-		this.index = index;
-		this.typeName = typeName;
-		this.value = value;
-	}
-
 	public SimpleBeanArgument(int index, ValueHolder valueHolder) {
 		this.index = index;
 		this.typeName = valueHolder.getType();
 		this.value = ValueFactory.buildValue(MetadataUtils.getValue(valueHolder));
+	}
+
+	public SimpleBeanArgument(ValueHolder valueHolder) {
+		this(UNSPECIFIED_INDEX, valueHolder);
 	}
 
 	public int getIndex() {

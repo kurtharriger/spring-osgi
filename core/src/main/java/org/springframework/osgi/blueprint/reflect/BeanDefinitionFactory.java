@@ -110,9 +110,14 @@ class BeanDefinitionFactory implements MetadataConstants {
 		ConstructorArgumentValues cargs = builder.getRawBeanDefinition().getConstructorArgumentValues();
 
 		for (BeanArgument arg : beanArguments) {
-			Metadata value = arg.getValue();
-			cargs.addIndexedArgumentValue(arg.getIndex(), BeanMetadataElementFactory.buildBeanMetadata(value), arg
-					.getValueType());
+			int index = arg.getIndex();
+			Object val = BeanMetadataElementFactory.buildBeanMetadata(arg.getValue());
+			if (index > -1) {
+				cargs.addGenericArgumentValue(val, arg.getValueType());
+			} else {
+				cargs.addIndexedArgumentValue(index, val, arg.getValueType());
+			}
+
 		}
 
 		// add property values

@@ -72,9 +72,8 @@ abstract class MetadataUtils {
 			// followed by the generic arguments
 			List<ValueHolder> args = ctorValues.getGenericArgumentValues();
 			temp = new ArrayList<BeanArgument>(args.size());
-			for (int i = 0; i < args.size(); i++) {
-				ValueHolder arg = args.get(i);
-				temp.add(new SimpleBeanArgument(i, arg));
+			for (ValueHolder valueHolder : args) {
+				temp.add(new SimpleBeanArgument(valueHolder));
 			}
 		}
 
