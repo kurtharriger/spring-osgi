@@ -11,6 +11,10 @@ General
 
 Package org.springframework.osgi.config
 * improved further the definition of generated definitions to avoid IDE validation complains
+* promoted nested reference beans are excluded from autowiring
+
+Package org.springframework.osgi.context
+* fixed incorrect logging message regarding context service during shutdown
 
 
 Changes in version 1.2.0 final (2009-04-09)

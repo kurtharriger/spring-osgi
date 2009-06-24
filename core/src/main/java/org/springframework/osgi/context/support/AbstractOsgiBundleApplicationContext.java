@@ -355,7 +355,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * Unpublishes the application context OSGi service.
 	 */
 	private void unpublishContextAsOsgiService() {
-		if (!OsgiServiceUtils.unregisterService(serviceRegistration)) {
+		if (OsgiServiceUtils.unregisterService(serviceRegistration)) {
 			logger.info("Unpublishing application context OSGi service for bundle "
 					+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
 			serviceRegistration = null;
@@ -398,7 +398,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * 
 	 * @return returns an OSGi specific pattern resolver.
 	 */
-	protected ResourcePatternResolver createResourcePatternResolver() {
+	protected ResourcePatternResolver c() {
 		return new OsgiBundleResourcePatternResolver(getBundle());
 	}
 
