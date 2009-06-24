@@ -278,5 +278,4 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 	public void setTargetBeanName(String targetBeanName) {
 		this.targetBeanName = targetBeanName;
 	}
-
 }

@@ -76,9 +76,12 @@ public class EventTest extends BaseBlueprintIntegrationTest {
 			}
 
 			System.out.println(builder.toString());
+			if (event.getTopic().startsWith("org/osgi/service/blueprint/container/FAILURE")) {
+				failedBundles.put((Bundle) event.getProperty("bundle"), (Throwable) event.getProperty("exception"));
+			}
 		}
 	};
-	
+
 	@Override
 	protected void onSetUp() throws Exception {
 		startedBundles.clear();

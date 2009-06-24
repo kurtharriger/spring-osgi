@@ -349,7 +349,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 					+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
 			serviceRegistration = null;
 		} else {
-			if (!publishContextAsService)
+			if (publishContextAsService)
 				logger.info("Application Context service already unpublished");
 		}
 	}

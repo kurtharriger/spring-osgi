@@ -15,10 +15,27 @@
  */
 package org.springframework.osgi.blueprint.container.support;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
+import org.springframework.beans.propertyeditors.CustomCollectionEditor;
+import org.springframework.beans.propertyeditors.CustomMapEditor;
 
 /**
  * Registrar holding the specific Blueprint editors. This class is used by the Spring DM extender for all Blueprint
@@ -29,6 +46,30 @@ import org.springframework.beans.PropertyEditorRegistry;
 public class BlueprintEditorRegistrar implements PropertyEditorRegistrar {
 
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
+		// Date
 		registry.registerCustomEditor(Date.class, new DateEditor());
+		// Collection concrete types
+		registry.registerCustomEditor(Stack.class, new CustomCollectionEditor(Stack.class));
+		registry.registerCustomEditor(Vector.class, new CustomCollectionEditor(Vector.class));
+
+		registry.registerCustomEditor(HashSet.class, new CustomCollectionEditor(HashSet.class));
+		registry.registerCustomEditor(LinkedHashSet.class, new CustomCollectionEditor(LinkedHashSet.class));
+		registry.registerCustomEditor(TreeSet.class, new CustomCollectionEditor(TreeSet.class));
+
+		registry.registerCustomEditor(ArrayList.class, new CustomCollectionEditor(ArrayList.class));
+		registry.registerCustomEditor(LinkedList.class, new CustomCollectionEditor(LinkedList.class));
+
+		// Map concrete types
+		registry.registerCustomEditor(HashMap.class, new CustomMapEditor(HashMap.class));
+		registry.registerCustomEditor(LinkedHashMap.class, new CustomMapEditor(LinkedHashMap.class));
+		registry.registerCustomEditor(Hashtable.class, new CustomMapEditor(Hashtable.class));
+		registry.registerCustomEditor(TreeMap.class, new CustomMapEditor(TreeMap.class));
+		// JDK 5 types
+		registry.registerCustomEditor(ConcurrentMap.class, new CustomMapEditor(ConcurrentHashMap.class));
+		registry.registerCustomEditor(ConcurrentHashMap.class, new CustomMapEditor(ConcurrentHashMap.class));
+		registry.registerCustomEditor(Queue.class, new CustomCollectionEditor(LinkedList.class));
+
+		// Legacy types
+		registry.registerCustomEditor(Dictionary.class, new CustomMapEditor(Hashtable.class));
 	}
 }

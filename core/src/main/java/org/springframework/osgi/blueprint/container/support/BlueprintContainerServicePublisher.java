@@ -92,7 +92,7 @@ public class BlueprintContainerServicePublisher implements ApplicationListener<A
 		serviceProperties.put(Constants.BUNDLE_VERSION, version);
 		serviceProperties.put(BLUEPRINT_VERSION, version);
 
-		log.info("Publishing ModuleContext as OSGi service with properties " + serviceProperties);
+		log.info("Publishing BlueprintContainer as OSGi service with properties " + serviceProperties);
 
 		// export just the interface
 		String[] serviceNames = new String[] { BlueprintContainer.class.getName() };

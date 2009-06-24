@@ -189,6 +189,8 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 			String value = element.getAttribute(AbstractBeanDefinitionParser.ID_ATTRIBUTE);
 			value = (StringUtils.hasText(value) ? value + BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR : "");
 			String generatedName = generateBeanName(value, def, parserContext);
+			// make the bean lazy (since it is an inner bean initiallly)
+			def.setLazyInit(true);
 
 			BeanDefinitionHolder holder = new BeanDefinitionHolder(def, generatedName);
 			BeanDefinitionReaderUtils.registerBeanDefinition(holder, parserContext.getRegistry());
@@ -406,7 +408,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 		String generated = name;
 		int counter = 0;
 
-		while (registry.containsBeanDefinition(name)) {
+		while (registry.containsBeanDefinition(generated)) {
 			generated = name + BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR + counter;
 			counter++;
 		}

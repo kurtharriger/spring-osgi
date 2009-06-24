@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <description>
+        This tests the builtin conversions between set, list, and array with different combinations
+        of concrete and abstract collection classes.  All conversions are done using builtin
+        conversions (no type converters)
+    </description>
+
+    <bean id="setToCollection" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="collection">
+            <set>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="setToList" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="list">
+            <set>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="setToSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="set">
+            <set>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="setToSortedSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="sortedSet">
+            <set>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="setToStack" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="stack">
+            <set>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="setToHashSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="hashSet">
+            <set>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="setToLinkedHashSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="linkedHashSet">
+            <set>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="setToTreeSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="treeSet">
+            <set>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="setToArrayList" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="arrayList">
+            <set>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="setToLinkedList" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="linkedList">
+            <set>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="setToVector" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="vector">
+            <set>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="listToCollection" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="collection">
+            <list>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="listToList" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="list">
+            <list>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="listToSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="set">
+            <list>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="listToSortedSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="sortedSet">
+            <list>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="listToStack" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="stack">
+            <list>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="listToHashSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="hashSet">
+            <list>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="listTolinkedHashSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="linkedHashSet">
+            <list>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="listToTreeSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="treeSet">
+            <list>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="listToArrayList" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="arrayList">
+            <list>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="listToLinkedList" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="linkedList">
+            <list>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="listToVector" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="vector">
+            <list>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="arrayToCollection" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="collection">
+            <array>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="arrayToList" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="list">
+            <array>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="arrayToSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="set">
+            <array>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="arrayToSortedSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="sortedSet">
+            <array>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="arrayToStack" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="stack">
+            <array>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="arrayToHashSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="hashSet">
+            <array>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="arrayTolinkedHashSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="linkedHashSet">
+            <array>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="arrayToTreeSet" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="treeSet">
+            <array>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="arrayToArrayList" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="arrayList">
+            <array>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="arrayToLinkedList" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="linkedList">
+            <array>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="arrayToVector" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="vector">
+            <array>
+                <value>abc</value>
+                <value>def</value>
+                <value>def</value>
+            </array>
+        </property>
+    </bean>
+    
+        <bean id="mapToHashMap" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="hashMap">
+            <map>
+                <entry key="abc" value="1"/>
+                <entry key="def" value="2"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="mapToTreeMap" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="treeMap">
+            <map>
+                <entry key="abc" value="1"/>
+                <entry key="def" value="2"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="mapToHashtable" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="hashtable">
+            <map>
+                <entry key="abc" value="1"/>
+                <entry key="def" value="2"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="mapToDictionary" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="dictionary">
+            <map>
+                <entry key="abc" value="1"/>
+                <entry key="def" value="2"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="mapToSortedMap" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="sortedMap">
+            <map>
+                <entry key="abc" value="1"/>
+                <entry key="def" value="2"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="mapToConcurrentMap" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="concurrentMap">
+            <map>
+                <entry key="abc" value="1"/>
+                <entry key="def" value="2"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="mapToConcurrentHashMap" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="concurrentHashMap">
+            <map>
+                <entry key="abc" value="1"/>
+                <entry key="def" value="2"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="mapToQueue" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="queue">
+            <map>
+                <entry key="abc" value="1"/>
+                <entry key="def" value="2"/>
+            </map>
+        </property>
+    </bean>
+</blueprint>
