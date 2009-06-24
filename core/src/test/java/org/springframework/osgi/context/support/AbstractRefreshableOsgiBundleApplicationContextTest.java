@@ -93,6 +93,9 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 	}
 
 	public void testServicePublicationBetweenRefreshes() throws Exception {
+		// [0] = service registration
+		// [1] = service unregistration
+		
 		final int[] counters = new int[] { 0, 0 };
 
 		MockBundleContext mCtx = new MockBundleContext() {
@@ -118,7 +121,7 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 		assertEquals(counters[1], 0);
 
 		context.refresh();
-		assertEquals(counters[0], 1);
+		assertEquals(counters[0], 2);
 		assertEquals(counters[1], 1);
 	}
 }
