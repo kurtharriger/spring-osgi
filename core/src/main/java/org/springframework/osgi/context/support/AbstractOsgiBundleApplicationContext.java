@@ -398,7 +398,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * 
 	 * @return returns an OSGi specific pattern resolver.
 	 */
-	protected ResourcePatternResolver c() {
+	protected ResourcePatternResolver createResourcePatternResolver() {
 		return new OsgiBundleResourcePatternResolver(getBundle());
 	}
 
