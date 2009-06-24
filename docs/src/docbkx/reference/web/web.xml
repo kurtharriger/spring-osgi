@@ -69,7 +69,7 @@
     	<para>Just like with non-WAR bundles, Spring DM Web uses the <link linkend="extender-pattern">extender pattern</link> to detect and install WARs. However,
     	one crucial difference from the standard Spring DM <link linkend="bnd-app-ctx:extender">Extender</link> is that Spring DM will 
     	only trigger the install and uninstall of the WAR - the actual web application creation and thread management is delegated to the web container in 
-    	which the WAR is installed. That is, Spring DM Web <emphasis>only</emphasis> dictates when a WAR is deployer to and undeployed from a web container; 
+    	which the WAR is installed. That is, Spring DM Web <emphasis>only</emphasis> dictates when a WAR is deployed to and undeployed from a web container; 
     	it is up to the web container to create and manage the equivalent web application.    
     	</para> 
     	<para>To use Spring DM Web, install:
