@@ -242,13 +242,12 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 			DependencyServiceManager dl = createDependencyServiceListener(task);
 			dl.findServiceDependencies();
-
+			
 			// all dependencies are met, just go with stageTwo
 			if (dl.isSatisfied()) {
 				log.info("No outstanding OSGi service dependencies, completing initialization for " + getDisplayName());
 				stageTwo();
 			}
-
 			else {
 				// there are dependencies not met
 				// register a listener to look for them
@@ -277,7 +276,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 				}
 			}
 		} catch (Throwable e) {
-			fail(e);
+			fail(e, true);
 		}
 
 	}

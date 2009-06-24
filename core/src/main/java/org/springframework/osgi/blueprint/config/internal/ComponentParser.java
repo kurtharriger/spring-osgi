@@ -44,6 +44,7 @@ import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.ManagedSet;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.osgi.blueprint.config.internal.temp.InstanceEqualityRuntimeBeanReference;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -495,7 +496,7 @@ public class ComponentParser {
 			error("<ref> element contains empty target attribute", ele);
 			return null;
 		}
-		RuntimeBeanReference ref = new RuntimeBeanReference(refName);
+		RuntimeBeanReference ref = new InstanceEqualityRuntimeBeanReference(refName);
 		ref.setSource(parserContext.extractSource(ele));
 		return ref;
 	}

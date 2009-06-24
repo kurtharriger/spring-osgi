@@ -9,5 +9,6 @@
     -->
     
     <bean id="failingComponent" class="java.lang.Object" depends-on="missingComponent"/>
+    <foo invalid-xml/>
    
 </blueprint>

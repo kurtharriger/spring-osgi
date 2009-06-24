@@ -107,8 +107,9 @@ public class ImporterMetadataTest extends BaseMetadataTest {
 		assertTrue(value instanceof ReferenceMetadata);
 		ReferenceMetadata ref = (ReferenceMetadata) value;
 		assertEquals(1000, ref.getTimeout());
+		assertEquals(ReferenceMetadata.ACTIVATION_LAZY, ref.getActivation());
 	}
-	
+
 	public void testNestedMandatoryCollectionReference() throws Exception {
 		BeanMetadata metadata = (BeanMetadata) blueprintContainer.getComponentMetadata("nestedCollectionReference");
 		BeanProperty prop = (BeanProperty) metadata.getProperties().get(0);
@@ -116,6 +117,7 @@ public class ImporterMetadataTest extends BaseMetadataTest {
 		assertTrue(value instanceof ReferenceListMetadata);
 		ReferenceListMetadata ref = (ReferenceListMetadata) value;
 		assertEquals(ReferenceListMetadata.USE_SERVICE_REFERENCE, ref.getMemberType());
+		assertEquals(ReferenceMetadata.ACTIVATION_LAZY, ref.getActivation());
 	}
 
 }

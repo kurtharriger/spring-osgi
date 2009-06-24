@@ -33,6 +33,8 @@ import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegis
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
+import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
+import org.springframework.osgi.context.event.OsgiBundleContextRefreshedEvent;
 import org.springframework.osgi.extender.event.BootstrappingDependenciesEvent;
 import org.springframework.osgi.extender.event.BootstrappingDependenciesFailedEvent;
 import org.springframework.osgi.extender.internal.activator.OsgiContextProcessor;
@@ -154,6 +156,19 @@ public class BlueprintContainerProcessor implements
 							.getFailureCause());
 			listenerManager.blueprintEvent(failureEvent);
 			dispatcher.refreshFailure(failureEvent);
+			return;
+		}
+
+		if (evt instanceof OsgiBundleContextRefreshedEvent) {
+			postProcessRefresh((ConfigurableOsgiBundleApplicationContext) evt.getApplicationContext());
+			return;
+		}
+
+		if (evt instanceof OsgiBundleContextFailedEvent) {
+			OsgiBundleContextFailedEvent failureEvent = (OsgiBundleContextFailedEvent) evt;
+			postProcessRefreshFailure(((ConfigurableOsgiBundleApplicationContext) failureEvent.getApplicationContext()),
+					failureEvent.getFailureCause());
+			return;
 		}
 	}
 }
