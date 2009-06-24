@@ -19,6 +19,7 @@ package org.springframework.osgi.config.internal;
 
 import java.util.Locale;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -95,6 +96,7 @@ public class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
 				}
 			}
 		}
+		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 	}
 
 	protected Class getBeanClass(Element element) {

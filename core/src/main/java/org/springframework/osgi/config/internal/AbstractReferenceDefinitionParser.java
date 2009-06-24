@@ -170,6 +170,8 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 			builder.getRawBeanDefinition().setBeanClass(beanClass);
 		}
 
+		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+		
 		builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
 		if (parserContext.isNested()) {
 			// Inner bean definition must receive same scope as containing bean.
@@ -191,6 +193,8 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 			String generatedName = generateBeanName(value, def, parserContext);
 			// make the bean lazy (since it is an inner bean initiallly)
 			def.setLazyInit(true);
+			// disable autowiring for promoted bean
+			def.setAutowireCandidate(false);
 
 			BeanDefinitionHolder holder = new BeanDefinitionHolder(def, generatedName);
 			BeanDefinitionReaderUtils.registerBeanDefinition(holder, parserContext.getRegistry());

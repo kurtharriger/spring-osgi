@@ -85,6 +85,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 	}
 
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		// parse attributes
 		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback() {
 
