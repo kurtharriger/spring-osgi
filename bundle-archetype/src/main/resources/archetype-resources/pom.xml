@@ -177,7 +177,6 @@
                     <removeNullHeaders>true</removeNullHeaders>
                     <manifestHeaders><![CDATA[Bundle-ManifestVersion: 2
 Bundle-Name: ${artifactId}
-Bundle-Version: ${version}
 Bundle-SymbolicName: ${artifactId}
 Spring-DM-Version: ${pom.version}
 ]]></manifestHeaders> 
