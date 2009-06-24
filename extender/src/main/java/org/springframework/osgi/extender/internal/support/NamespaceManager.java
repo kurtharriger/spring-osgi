@@ -16,6 +16,8 @@
 
 package org.springframework.osgi.extender.internal.support;
 
+import java.util.Properties;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
@@ -24,6 +26,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
+import org.springframework.osgi.extender.internal.util.BundleUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
@@ -31,8 +34,7 @@ import org.springframework.util.Assert;
 import org.xml.sax.EntityResolver;
 
 /**
- * Support class that deals with namespace parsers discovered inside Spring
- * bundles.
+ * Support class that deals with namespace parsers discovered inside Spring bundles.
  * 
  * @author Costin Leau
  * 
@@ -49,8 +51,7 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	private NamespacePlugins namespacePlugins;
 
 	/**
-	 * ServiceRegistration object returned by OSGi when registering the
-	 * NamespacePlugins instance as a service
+	 * ServiceRegistration object returned by OSGi when registering the NamespacePlugins instance as a service
 	 */
 	private ServiceRegistration nsResolverRegistration, enResolverRegistration = null;
 
@@ -66,7 +67,6 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	private static final String SPRING_HANDLERS = "spring.handlers";
 
 	private static final String SPRING_SCHEMAS = "spring.schemas";
-
 
 	/**
 	 * Constructor.
@@ -84,8 +84,8 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	}
 
 	/**
-	 * If this bundle defines handler mapping or schema mapping resources, then
-	 * register it with the namespace plugin handler.
+	 * If this bundle defines handler mapping or schema mapping resources, then register it with the namespace plugin
+	 * handler.
 	 * 
 	 * <p/> This method considers only the bundle space and not the class space.
 	 * 
@@ -105,15 +105,13 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 			// check type compatibility between the bundle's and spring-extender's spring version
 			if (hasCompatibleNamespaceType(bundle)) {
 				addHandler(bundle);
-			}
-			else {
+			} else {
 				if (log.isDebugEnabled())
 					log.debug("Bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle)
 							+ "] declares namespace handlers but is not compatible with extender [" + extenderInfo
 							+ "]; ignoring...");
 			}
-		}
-		else {
+		} else {
 			// bundle declares only schemas, add it though the handlers might not be compatible...
 			if (hasSchemas)
 				addHandler(bundle);
@@ -124,8 +122,7 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 		try {
 			Class type = bundle.loadClass(NS_HANDLER_RESOLVER_CLASS_NAME);
 			return NamespaceHandlerResolver.class.equals(type);
-		}
-		catch (Throwable th) {
+		} catch (Throwable th) {
 			// if the interface is not wired, ignore the bundle
 			log.warn("Bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " cannot see class ["
 					+ NS_HANDLER_RESOLVER_CLASS_NAME + "]; ignoring its namespace handlers");
@@ -135,9 +132,8 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	}
 
 	/**
-	 * Add this bundle to those known to provide handler or schema mappings.
-	 * This method expects that the validity check (whatever that is) has been
-	 * already done.
+	 * Add this bundle to those known to provide handler or schema mappings. This method expects that the validity check
+	 * (whatever that is) has been already done.
 	 * 
 	 * @param bundle
 	 */
@@ -151,8 +147,7 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	}
 
 	/**
-	 * Remove this bundle from the set of those known to provide handler or
-	 * schema mappings.
+	 * Remove this bundle from the set of those known to provide handler or schema mappings.
 	 * 
 	 * @param bundle
 	 */
@@ -171,13 +166,20 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 		if (log.isDebugEnabled()) {
 			log.debug("Registering Spring NamespaceHandlerResolver and EntityResolver...");
 		}
+		Bundle bnd = BundleUtils.getDMCoreBundle(context);
+
+		Properties props = null;
+		if (bnd != null) {
+			props = new Properties();
+			props.setProperty(BundleUtils.DM_CORE_ID, "" + bnd.getBundleId());
+			props.setProperty(BundleUtils.DM_CORE_TS, "" + bnd.getLastModified());
+		}
 
 		nsResolverRegistration = context.registerService(new String[] { NamespaceHandlerResolver.class.getName() },
-			this.namespacePlugins, null);
+				this.namespacePlugins, props);
 
 		enResolverRegistration = context.registerService(new String[] { EntityResolver.class.getName() },
-			this.namespacePlugins, null);
-
+				this.namespacePlugins, props);
 	}
 
 	/**
