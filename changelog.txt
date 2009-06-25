@@ -17,6 +17,9 @@ Package org.springframework.osgi.context
 * fixed incorrect logging message regarding context service during shutdown
 * added support for schema handler filtering
 
+Package org.springframework.osgi.context
+* fixed incorrect transitive dependency between exporters and optional importers
+
 Package org.springframework.osgi.extender
 * added support for schema handler filtering
 

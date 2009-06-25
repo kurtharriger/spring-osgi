@@ -35,6 +35,8 @@ import org.springframework.core.ConcurrentMap;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterControllerUtils;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterInternalActions;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
+import org.springframework.osgi.service.importer.support.AbstractOsgiServiceImportFactoryBean;
+import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.internal.controller.ImporterControllerUtils;
@@ -46,9 +48,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Default implementation of {@link MandatoryServiceDependencyManager} which
- * determines the relationship between importers and exporters and unpublishes
- * exported service if they dependent, transitively, on imported OSGi services
+ * Default implementation of {@link MandatoryServiceDependencyManager} which determines the relationship between
+ * importers and exporters and unpublishes exported service if they dependent, transitively, on imported OSGi services
  * that are mandatory and cannot be satisfied.
  * 
  * <strong>Note:</strong> aimed for singleton beans only
@@ -68,7 +69,6 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 
 		private final Object exporter;
 		private final String exporterName;
-
 
 		private ImporterDependencyListener(Object exporter) {
 			this.exporter = exporter;
@@ -125,8 +125,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 
 				// if the importer goes down, simply shut down the exporter
 				stopExporter(exporter);
-			}
-			else {
+			} else {
 				if (trace) {
 					log.trace("Exporter [" + exporterName + "] removed; ignoring dependency ["
 							+ dependency.getBeanName() + "] update");
@@ -134,7 +133,6 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 			}
 		}
 	}
-
 
 	private static final Log log = LogFactory.getLog(DefaultMandatoryDependencyManager.class);
 
@@ -144,9 +142,8 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 	private static final Object VALUE = new Object();
 
 	/**
-	 * Importers on which an exporter depends. The exporter instance is used as
-	 * a key, while the value is represented by a list of importers name and
-	 * their status (up or down).
+	 * Importers on which an exporter depends. The exporter instance is used as a key, while the value is represented by
+	 * a list of importers name and their status (up or down).
 	 */
 	private final Map exporterToImporterDeps = CollectionFactory.createConcurrentMap(8);
 
@@ -161,7 +158,6 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 
 	/** owning bean factory */
 	private ConfigurableListableBeanFactory beanFactory;
-
 
 	public void addServiceExporter(Object exporter, String exporterBeanName) {
 		Assert.hasText(exporterBeanName);
@@ -194,9 +190,8 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 	}
 
 	/**
-	 * Discover all the importers for the given exporter. Since the importers
-	 * are already created before the exporter instance is created, this method
-	 * only does filtering based on the mandatory imports.
+	 * Discover all the importers for the given exporter. Since the importers are already created before the exporter
+	 * instance is created, this method only does filtering based on the mandatory imports.
 	 */
 	protected void discoverDependentImporterFor(String exporterBeanName, Object exporter) {
 
@@ -204,10 +199,10 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 
 		// determine exporters
 		String[] importerA = BeanFactoryUtils.getTransitiveDependenciesForBean(beanFactory, exporterBeanName, true,
-			OsgiServiceProxyFactoryBean.class);
+				OsgiServiceProxyFactoryBean.class);
 
 		String[] importerB = BeanFactoryUtils.getTransitiveDependenciesForBean(beanFactory, exporterBeanName, true,
-			OsgiServiceCollectionProxyFactoryBean.class);
+				OsgiServiceCollectionProxyFactoryBean.class);
 
 		String[] importerNames = StringUtils.concatenateStringArrays(importerA, importerB);
 
@@ -228,15 +223,14 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 				Object importer = beanFactory.getBean(importerNames[i]);
 
 				// create an importer -> exporter association
-				if (isSatisfied(importer)) {
+				if (isMandatory(importer)) {
 					dependingImporters.put(importer, importerNames[i]);
 					importerToName.putIfAbsent(importer, importerNames[i]);
 				}
 
 				else if (trace)
 					log.trace("Importer [" + importerNames[i] + "] is optional; skipping it");
-			}
-			else if (trace)
+			} else if (trace)
 				log.trace("Importer [" + importerNames[i] + "] is a non-singleton; ignoring it");
 		}
 
@@ -267,9 +261,10 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 			startExporter(exporter);
 
 			if (log.isDebugEnabled())
-				log.trace("Exporter [" + exporterToName.get(exporter) + "] started; all its dependencies are satisfied");
-		}
-		else {
+				log
+						.trace("Exporter [" + exporterToName.get(exporter)
+								+ "] started; all its dependencies are satisfied");
+		} else {
 			List unsatisfiedDependencies = new ArrayList(importers.size());
 
 			for (Iterator iterator = importers.entrySet().iterator(); iterator.hasNext();) {
@@ -341,5 +336,14 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 
 	private boolean isSatisfied(Object importer) {
 		return ImporterControllerUtils.getControllerFor(importer).isSatisfied();
+	}
+
+	private boolean isMandatory(Object importer) {
+		if (importer instanceof AbstractOsgiServiceImportFactoryBean) {
+			AbstractOsgiServiceImportFactoryBean imp = (AbstractOsgiServiceImportFactoryBean) importer;
+			return imp.getCardinality().isMandatory();
+		}
+
+		return false;
 	}
 }
