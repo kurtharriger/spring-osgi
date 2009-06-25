@@ -16,14 +16,11 @@
 
 package org.springframework.osgi.iandt.servicedependency;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.PropertyPermission;
 
 import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.PackagePermission;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.tccl.TCCLService;
