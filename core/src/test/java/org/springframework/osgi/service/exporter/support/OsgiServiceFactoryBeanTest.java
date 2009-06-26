@@ -438,13 +438,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		exporter.setTargetBeanName(beanName);
 		exporter.setInterfaces(new Class<?>[] { Serializable.class });
 		beanFactoryControl.replay();
-
-		try {
-			exporter.afterPropertiesSet();
-			fail("should have thrown validation exception for prototyped service factories");
-		} catch (IllegalArgumentException ex) {
-			// expected
-		}
+		exporter.afterPropertiesSet();
 	}
 
 	public void testNonSingletonServiceFactoryRegistration() throws Exception {

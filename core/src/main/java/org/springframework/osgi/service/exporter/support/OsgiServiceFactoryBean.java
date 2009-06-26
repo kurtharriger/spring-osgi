@@ -183,11 +183,11 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 				// lazily get the target class
 				targetClass = beanFactory.getType(targetBeanName);
 			}
-			
+
 			if (targetClass != null) {
 				if ((ServiceFactory.class.isAssignableFrom(targetClass)) && beanFactory.isPrototype(targetBeanName)) {
-					throw new IllegalArgumentException(
-							"Prototype ServiceFactories are not supported - consider making them singleton");
+					target = beanFactory.getBean(targetBeanName);
+					targetClass = target.getClass();
 				}
 			}
 
