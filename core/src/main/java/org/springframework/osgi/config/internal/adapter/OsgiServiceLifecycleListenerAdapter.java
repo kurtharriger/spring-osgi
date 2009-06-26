@@ -17,6 +17,7 @@
 package org.springframework.osgi.config.internal.adapter;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -33,23 +34,21 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * OsgiServiceLifecycleListener wrapper for custom beans, useful when custom
- * methods are being used.
+ * OsgiServiceLifecycleListener wrapper for custom beans, useful when custom methods are being used.
  * 
- * <p/> <strong>Note:</strong> To support cyclic injection, this adapter does
- * dependency lookup for the actual listener.
+ * <p/> <strong>Note:</strong> To support cyclic injection, this adapter does dependency lookup for the actual listener.
  * 
  * @author Costin Leau
  */
-public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListener, InitializingBean, BeanFactoryAware {
+public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListener, InitializingBean,
+		BeanFactoryAware {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceLifecycleListenerAdapter.class);
 
 	/**
-	 * Map of methods keyed by the first parameter which indicates the service
-	 * type expected.
+	 * Map of methods keyed by the first parameter which indicates the service type expected.
 	 */
-	private Map bindMethods, unbindMethods;
+	private Map<Class<?>, List<Method>> bindMethods, unbindMethods;
 
 	/**
 	 * anyName(ServiceReference reference) method signature.
@@ -73,11 +72,10 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 	/** init flag */
 	private boolean initialized;
 
-
 	public void afterPropertiesSet() {
 		Assert.notNull(beanFactory);
 		Assert.isTrue(target != null || StringUtils.hasText(targetBeanName),
-			"one of 'target' or 'targetBeanName' properties has to be set");
+				"one of 'target' or 'targetBeanName' properties has to be set");
 
 		if (target != null)
 			initialized = true;
@@ -97,7 +95,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 	 */
 	private void initialize() {
 
-		Class clazz = (target == null ? beanFactory.getType(targetBeanName) : target.getClass());
+		Class<?> clazz = (target == null ? beanFactory.getType(targetBeanName) : target.getClass());
 
 		isLifecycleListener = OsgiServiceLifecycleListener.class.isAssignableFrom(clazz);
 		if (isLifecycleListener)
@@ -108,13 +106,13 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 
 		if (StringUtils.hasText(bindMethod)) {
 			// determine methods using ServiceReference signature
-			bindReference = org.springframework.util.ReflectionUtils.findMethod(clazz, bindMethod,
-				new Class[] { ServiceReference.class });
+			bindReference =
+					org.springframework.util.ReflectionUtils.findMethod(clazz, bindMethod,
+							new Class[] { ServiceReference.class });
 
 			if (bindReference != null) {
 				org.springframework.util.ReflectionUtils.makeAccessible(bindReference);
-			}
-			else if (bindMethods.isEmpty()) {
+			} else if (bindMethods.isEmpty()) {
 				String beanName = (target == null ? "" : " bean [" + targetBeanName + "] ;");
 				throw new IllegalArgumentException("Custom bind method [" + bindMethod + "] not found on " + beanName
 						+ "class " + clazz);
@@ -124,13 +122,13 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 		unbindMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, unbindMethod);
 
 		if (StringUtils.hasText(unbindMethod)) {
-			unbindReference = org.springframework.util.ReflectionUtils.findMethod(clazz, unbindMethod,
-				new Class[] { ServiceReference.class });
+			unbindReference =
+					org.springframework.util.ReflectionUtils.findMethod(clazz, unbindMethod,
+							new Class[] { ServiceReference.class });
 
 			if (unbindReference != null) {
 				org.springframework.util.ReflectionUtils.makeAccessible(unbindReference);
-			}
-			else if (unbindMethods.isEmpty()) {
+			} else if (unbindMethods.isEmpty()) {
 				String beanName = (target == null ? "" : " bean [" + targetBeanName + "] ;");
 				throw new IllegalArgumentException("Custom unbind method [" + unbindMethod + "] not found on "
 						+ beanName + "class " + clazz);
@@ -160,7 +158,8 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 			if (trace)
 				log.trace("invoking listener custom method " + method);
 
-			ServiceReference ref = (service != null ? ((ImportedOsgiServiceProxy) service).getServiceReference() : null);
+			ServiceReference ref =
+					(service != null ? ((ImportedOsgiServiceProxy) service).getServiceReference() : null);
 
 			try {
 				ReflectionUtils.invokeMethod(method, target, new Object[] { ref });
@@ -176,7 +175,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 		}
 	}
 
-	public void bind(Object service, Map properties) throws Exception {
+	public void bind(Object service, Map<?, ?> properties) throws Exception {
 		boolean trace = log.isTraceEnabled();
 		if (trace)
 			log.trace("invoking bind method for service " + service + " with props=" + properties);
@@ -191,8 +190,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 
 			try {
 				((OsgiServiceLifecycleListener) target).bind(service, properties);
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				log.warn("standard bind method on [" + target.getClass().getName() + "] threw exception", ex);
 			}
 		}
@@ -201,7 +199,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 		invokeCustomServiceReferenceMethod(target, bindReference, service);
 	}
 
-	public void unbind(Object service, Map properties) throws Exception {
+	public void unbind(Object service, Map<?, ?> properties) throws Exception {
 		boolean trace = log.isTraceEnabled();
 		if (!initialized)
 			retrieveTarget();
@@ -215,8 +213,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 				log.trace("invoking listener interface methods");
 			try {
 				((OsgiServiceLifecycleListener) target).unbind(service, properties);
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				log.warn("standard unbind method on [" + target.getClass().getName() + "] threw exception", ex);
 			}
 		}

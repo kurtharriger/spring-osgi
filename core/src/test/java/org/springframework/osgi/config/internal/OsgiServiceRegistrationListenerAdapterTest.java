@@ -25,6 +25,9 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.ServiceFactory;
+import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.osgi.config.internal.adapter.OsgiServiceRegistrationListenerAdapter;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
@@ -164,10 +167,38 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 		}
 	}
 
+	protected static class ServiceFactoryListener {
+		public static int REG_CALLS = 0;
+
+		public static int UNREG_CALLS = 0;
+
+		public void registered(ServiceFactory service, Map serviceProperties) throws Exception {
+			ServiceFactoryListener.REG_CALLS++;
+		}
+
+		public void unregistered(ServiceFactory service, Map serviceProperties) throws Exception {
+			ServiceFactoryListener.UNREG_CALLS++;
+		}
+
+	}
+
+	protected static class ExtServiceFactoryListener extends ServiceFactoryListener {
+		public void registered(ExtendedServiceFactory service, Map serviceProperties) {
+			ServiceFactoryListener.REG_CALLS++;
+		}
+
+		public void unregistered(ExtendedServiceFactory service, Map serviceProperties) {
+			ServiceFactoryListener.UNREG_CALLS++;
+		}
+	}
+
+	protected static interface ExtendedServiceFactory extends ServiceFactory {
+	}
+
 	private OsgiServiceRegistrationListenerAdapter listener;
 
 	private Map props;
-	
+
 	private static final String BEAN_NAME = "bla";
 
 	protected void setUp() throws Exception {
@@ -176,6 +207,10 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 
 		CustomListener.REG_CALLS = 0;
 		CustomListener.UNREG_CALLS = 0;
+
+		ServiceFactoryListener.REG_CALLS = 0;
+		ServiceFactoryListener.UNREG_CALLS = 0;
+
 		CustomListener.REG_PROPS = new ArrayList();
 		CustomListener.UNREG_PROPS = new ArrayList();
 		props = new MapBasedDictionary(0);
@@ -217,8 +252,7 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 		try {
 			listener.afterPropertiesSet();
 			fail("should have thrown exception");
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
@@ -232,8 +266,7 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 		try {
 			listener.afterPropertiesSet();
 			fail("should have thrown exception");
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
@@ -249,8 +282,7 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 		try {
 			listener.afterPropertiesSet();
 			fail("should have thrown exception");
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 
@@ -348,8 +380,7 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	}
 
 	public void testExceptionOnCustomMethods() throws Exception {
-		listener = new OsgiServiceRegistrationListenerAdapter(
-			);
+		listener = new OsgiServiceRegistrationListenerAdapter();
 		listener.setTarget(new ExceptionCustomListener());
 		listener.setRegistrationMethod("myReg");
 		listener.setUnregistrationMethod("myUnreg");
@@ -435,15 +466,88 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 		assertEquals(0, JustListener.REG_CALLS);
 		assertEquals(1, JustListener.UNREG_CALLS);
 	}
-	
+
+	public void testServiceFactoryListener() throws Exception {
+		listener = new OsgiServiceRegistrationListenerAdapter();
+		listener.setTarget(new ServiceFactoryListener());
+		listener.setRegistrationMethod("registered");
+		listener.setUnregistrationMethod("unregistered");
+		listener.setBeanFactory(createMockBF());
+		listener.afterPropertiesSet();
+		Object service = new Object();
+		assertEquals(0, ServiceFactoryListener.REG_CALLS);
+		assertEquals(0, ServiceFactoryListener.UNREG_CALLS);
+
+		listener.registered(service, props);
+		listener.unregistered(service, props);
+
+		assertEquals(0, ServiceFactoryListener.REG_CALLS);
+		assertEquals(0, ServiceFactoryListener.UNREG_CALLS);
+
+		ServiceFactory factory = new MockServiceFactory();
+
+		listener.registered(factory, props);
+		listener.unregistered(factory, props);
+		assertEquals(1, ServiceFactoryListener.REG_CALLS);
+		assertEquals(1, ServiceFactoryListener.UNREG_CALLS);
+	}
+
+	public void testExtServiceFactoryListener() throws Exception {
+
+		listener = new OsgiServiceRegistrationListenerAdapter();
+		listener.setTarget(new ExtServiceFactoryListener());
+		listener.setRegistrationMethod("registered");
+		listener.setUnregistrationMethod("unregistered");
+		listener.setBeanFactory(createMockBF());
+		listener.afterPropertiesSet();
+		Object service = new Object();
+		assertEquals(0, ServiceFactoryListener.REG_CALLS);
+		assertEquals(0, ServiceFactoryListener.UNREG_CALLS);
+
+		listener.registered(service, props);
+		listener.unregistered(service, props);
+
+		assertEquals(0, ServiceFactoryListener.REG_CALLS);
+		assertEquals(0, ServiceFactoryListener.UNREG_CALLS);
+
+		ServiceFactory factory = new MockServiceFactory();
+
+		listener.registered(factory, props);
+		listener.unregistered(factory, props);
+
+		assertEquals(1, ServiceFactoryListener.REG_CALLS);
+		assertEquals(1, ServiceFactoryListener.UNREG_CALLS);
+
+		ServiceFactory extFactory = new MockExtendedServiceFactory();
+
+		listener.registered(extFactory, props);
+		listener.unregistered(extFactory, props);
+
+		assertEquals(3, ServiceFactoryListener.REG_CALLS);
+		assertEquals(3, ServiceFactoryListener.UNREG_CALLS);
+	}
+
 	private BeanFactory createMockBF() {
 		MockControl ctrl = MockControl.createNiceControl(BeanFactory.class);
 		BeanFactory cbf = (BeanFactory) ctrl.getMock();
 
-		//ctrl.expectAndReturn(cbf.getBean(BEAN_NAME), target);
-		//ctrl.expectAndReturn(cbf.getType(BEAN_NAME), target.getClass());
+		// ctrl.expectAndReturn(cbf.getBean(BEAN_NAME), target);
+		// ctrl.expectAndReturn(cbf.getType(BEAN_NAME), target.getClass());
 
 		ctrl.replay();
 		return cbf;
+	}
+
+	private class MockServiceFactory implements ServiceFactory {
+
+		public Object getService(Bundle bundle, ServiceRegistration registration) {
+			return null;
+		}
+
+		public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
+		}
+	}
+
+	private class MockExtendedServiceFactory extends MockServiceFactory implements ExtendedServiceFactory {
 	}
 }

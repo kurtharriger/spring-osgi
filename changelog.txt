@@ -13,7 +13,7 @@ General
 * generified classes (both public and internal)
 * updated archetype project to save locally the manifest generated during packaging
 * added new elements to spring-osgi schema
-* align various features with the OSGi 4.2 Blueprint spec
+* align various features with the OSGi r4.2 Blueprint spec
 
 Package org.springframework.osgi.bundle
 * deprecated BundleAction in favour of the BundleActionEnum enum 
@@ -26,7 +26,7 @@ Package org.springframework.osgi.compendium
 * added new custom destruction callback to managed service factory objects
 
 Package org.springframework.osgi.extender
-* added JavaBean cache initialization for known types to reduce the number of class lookups
+* added JavaBean cache initialization for known types to reduce the number of class lookups during startup
 
 Package org.springframework.osgi.service
 * improved serviceability by using NamedInheritableThreadLocal
@@ -41,9 +41,10 @@ Package org.springframework.osgi.service
 * deprecated ImportContextClassLoader in favour of ImportContextClassLoaderEnum
 * service collection can now contain service references instead of just service proxies
 * service exporter returns a 'safe' service registration that forbids unregistration
+* added new custom callback signature to service importer and exporter listeners
 
 Package org.springframework.osgi.mock
-* added OSGi 4.2 methods to the package
+* added specific OSGi r4.2 methods
 
 Package org.springframework.osgi.util
 * improved fallback mechanism for OSGi r4.1 features running in OSGi r4.0 platforms
