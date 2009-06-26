@@ -48,7 +48,6 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 
 		public static int UNBIND_CALLS = 0;
 
-
 		public void bind(Object service, Map properties) throws Exception {
 			BIND_CALLS++;
 		}
@@ -67,7 +66,6 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 		public static List BIND_SERVICES = new ArrayList();
 
 		public static List UNBIND_SERVICES = new ArrayList();
-
 
 		public void myBind(Object service, Map properties) {
 			BIND_CALLS++;
@@ -212,11 +210,25 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 		}
 	}
 
+	protected static class CustomServiceRefAndObjectWOMapListener {
+
+		private void myUnbind(ServiceReference ref) {
+			JustListener.UNBIND_CALLS++;
+		}
+
+		private void myBind(ServiceReference ref) {
+			JustListener.BIND_CALLS++;
+		}
+
+		private void myBind(Object obj) {
+			JustListener.BIND_CALLS++;
+		}
+
+	}
 
 	private OsgiServiceLifecycleListenerAdapter listener;
 
 	private static final String BEAN_NAME = "bla";
-
 
 	protected void setUp() throws Exception {
 		JustListener.BIND_CALLS = 0;
@@ -265,8 +277,7 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 		try {
 			listener.afterPropertiesSet();
 			fail("should have thrown exception");
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
@@ -281,8 +292,7 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 		try {
 			listener.afterPropertiesSet();
 			fail("should have thrown exception");
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
@@ -298,8 +308,7 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 		try {
 			listener.afterPropertiesSet();
 			fail("should have thrown exception");
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 
@@ -585,7 +594,24 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 		assertEquals(0, JustListener.BIND_CALLS);
 		assertEquals(1, JustListener.UNBIND_CALLS);
 	}
+	
+	
+	public void testCustomServiceRefAndObjectWOMapBind() throws Exception {
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(createMockBF(new CustomServiceRefAndObjectWOMapListener()));
+		listener.setTargetBeanName(BEAN_NAME);
+		listener.setBindMethod("myBind");
+		listener.afterPropertiesSet();
 
+		assertEquals(0, JustListener.BIND_CALLS);
+		assertEquals(0, JustListener.UNBIND_CALLS);
+
+		listener.bind(new ImportedOsgiServiceProxyMock(), null);
+
+		assertEquals(2, JustListener.BIND_CALLS);
+		assertEquals(0, JustListener.UNBIND_CALLS);
+	}
+	
 
 	private class ImportedOsgiServiceProxyMock implements ImportedOsgiServiceProxy {
 
@@ -597,7 +623,6 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 			return new StaticServiceReferenceProxy(new MockServiceReference());
 		}
 	}
-
 
 	private ConfigurableBeanFactory createMockBF(Object target) {
 		MockControl ctrl = MockControl.createNiceControl(ConfigurableBeanFactory.class);
