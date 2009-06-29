@@ -16,8 +16,8 @@
 
 package org.springframework.osgi.blueprint.config;
 
-import org.osgi.service.blueprint.container.CollapsedType;
 import org.osgi.service.blueprint.container.Converter;
+import org.osgi.service.blueprint.container.ReifiedType;
 import org.springframework.osgi.blueprint.TestComponent;
 
 /**
@@ -28,11 +28,11 @@ import org.springframework.osgi.blueprint.TestComponent;
  */
 public class TestComponentConverter implements Converter {
 
-	public boolean canConvert(Object fromValue, CollapsedType toType) {
+	public boolean canConvert(Object fromValue, ReifiedType toType) {
 		return TestComponent.class.equals(toType);
 	}
 
-	public Object convert(Object fromValue, CollapsedType toType) throws Exception {
+	public Object convert(Object fromValue, ReifiedType toType) throws Exception {
 		TestComponent comp = new TestComponent();
 		comp.setPropA(fromValue);
 		return comp;

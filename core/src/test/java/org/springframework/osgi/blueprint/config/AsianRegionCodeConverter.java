@@ -16,8 +16,8 @@
 
 package org.springframework.osgi.blueprint.config;
 
-import org.osgi.service.blueprint.container.CollapsedType;
 import org.osgi.service.blueprint.container.Converter;
+import org.osgi.service.blueprint.container.ReifiedType;
 
 /**
  * Taken from the TCK.
@@ -28,12 +28,12 @@ public class AsianRegionCodeConverter implements Converter {
 
 	private Class<?> targetClass = RegionCode.class;
 
-	public boolean canConvert(Object fromValue, CollapsedType toType) {
+	public boolean canConvert(Object fromValue, ReifiedType toType) {
 		return (fromValue instanceof String && targetClass.equals(toType));
 
 	}
 
-	public Object convert(Object fromValue, CollapsedType toType) throws Exception {
+	public Object convert(Object fromValue, ReifiedType toType) throws Exception {
 		return new AsianRegionCode((String) fromValue);
 	}
 }

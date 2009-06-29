@@ -19,9 +19,11 @@ package org.springframework.osgi.blueprint.config.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -41,10 +43,12 @@ import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.ManagedArray;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
+import org.springframework.beans.factory.support.ManagedProperties;
 import org.springframework.beans.factory.support.ManagedSet;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.blueprint.config.internal.temp.InstanceEqualityRuntimeBeanReference;
+import org.springframework.osgi.blueprint.config.internal.temp.OrderedManagedProperties;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -476,7 +480,7 @@ public class ComponentParser {
 			} else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.MAP_ELEMENT)) {
 				return parseMapElement(ele, bd);
 			} else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.PROPS_ELEMENT)) {
-				return parserContext.getDelegate().parsePropsElement(ele);
+				return parsePropsElement(ele);
 			}
 
 			// maybe it's a nested service/reference/ref-list/ref-set
@@ -718,6 +722,32 @@ public class ComponentParser {
 		}
 
 		return map;
+	}
+
+	/**
+	 * Parse a props element.
+	 */
+	public Properties parsePropsElement(Element propsEle) {
+		ManagedProperties props = new OrderedManagedProperties();
+		props.setSource(extractSource(propsEle));
+		props.setMergeEnabled(parseMergeAttribute(propsEle));
+
+		List propEles = DomUtils.getChildElementsByTagName(propsEle, BeanDefinitionParserDelegate.PROP_ELEMENT);
+		for (Iterator it = propEles.iterator(); it.hasNext();) {
+			Element propEle = (Element) it.next();
+			String key = propEle.getAttribute(BeanDefinitionParserDelegate.KEY_ATTRIBUTE);
+			// Trim the text value to avoid unwanted whitespace
+			// caused by typical XML formatting.
+			String value = DomUtils.getTextValue(propEle).trim();
+
+			TypedStringValue keyHolder = new TypedStringValue(key);
+			keyHolder.setSource(extractSource(propEle));
+			TypedStringValue valueHolder = new TypedStringValue(value);
+			valueHolder.setSource(extractSource(propEle));
+			props.put(keyHolder, valueHolder);
+		}
+
+		return props;
 	}
 
 	private boolean parseMergeAttribute(Element element) {

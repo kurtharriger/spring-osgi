@@ -77,6 +77,7 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 		return Collections.unmodifiableSet(components);
 	}
 
+	@SuppressWarnings("unchecked")
 	public Collection<?> getMetadata(Class type) {
 		return getComponentMetadata(type);
 	}
@@ -115,9 +116,5 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 		}
 
 		return beanFactory;
-	}
-
-	public int getCompliance() {
-		return BlueprintCompliance.STRICT.ordinal() + 1;
 	}
 }

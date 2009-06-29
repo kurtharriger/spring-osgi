@@ -19,11 +19,11 @@ import java.util.Comparator;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
+import org.springframework.osgi.service.importer.support.MemberType;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 
 /**
- * Ordered list similar to a SortedSet with the difference, that it accepts
- * duplicates.
+ * Ordered list similar to a SortedSet with the difference, that it accepts duplicates.
  * 
  * @see Comparable
  * @see Comparator
@@ -42,13 +42,13 @@ public class OsgiServiceSortedList extends OsgiServiceList {
 	 * @param classLoader
 	 */
 	public OsgiServiceSortedList(Filter filter, BundleContext context, ClassLoader classLoader,
-			ServiceProxyCreator proxyCreator) {
-		this(filter, context, classLoader, null, proxyCreator);
+			ServiceProxyCreator proxyCreator, MemberType memberType) {
+		this(filter, context, classLoader, null, proxyCreator, memberType);
 	}
 
 	public OsgiServiceSortedList(Filter filter, BundleContext context, ClassLoader classLoader, Comparator comparator,
-			ServiceProxyCreator proxyCreator) {
-		super(filter, context, classLoader, proxyCreator);
+			ServiceProxyCreator proxyCreator, MemberType memberType) {
+		super(filter, context, classLoader, proxyCreator, memberType);
 		this.comparator = comparator;
 	}
 
