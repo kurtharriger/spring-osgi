@@ -139,16 +139,9 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 
-		if (MemberType.SERVICE_OBJECT.equals(memberType)) {
-			// create shared proxy creator (reused for each new service
-			// joining the collection)
-			proxyCreator =
-					new StaticServiceProxyCreator(getInterfaces(), getAopClassLoader(), getBeanClassLoader(),
-							getBundleContext(), getImportContextClassLoader(), greedyProxying,
-							isUseBlueprintExceptions());
-		} else {
-			proxyCreator = null;
-		}
+		proxyCreator =
+				new StaticServiceProxyCreator(getInterfaces(), getAopClassLoader(), getBeanClassLoader(),
+						getBundleContext(), getImportContextClassLoader(), greedyProxying, isUseBlueprintExceptions());
 	}
 
 	/**
@@ -189,23 +182,27 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 
 		if (CollectionType.LIST.equals(collectionType)) {
 			collection =
-					(comparator == null ? new OsgiServiceList(filter, bundleContext, classLoader, proxyCreator)
-							: new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator, proxyCreator));
+					(comparator == null ? new OsgiServiceList(filter, bundleContext, classLoader, proxyCreator,
+							memberType) : new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator,
+							proxyCreator, memberType));
 			delegate = Collections.unmodifiableList((List) collection);
 		} else if (CollectionType.SET.equals(collectionType)) {
 			collection =
-					(comparator == null ? new OsgiServiceSet(filter, bundleContext, classLoader, proxyCreator)
-							: new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator, proxyCreator));
+					(comparator == null ? new OsgiServiceSet(filter, bundleContext, classLoader, proxyCreator,
+							memberType) : new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator,
+							proxyCreator, memberType));
 
 			delegate = Collections.unmodifiableSet((Set) collection);
 		} else if (CollectionType.SORTED_LIST.equals(collectionType)) {
-			collection = new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator, proxyCreator);
+			collection =
+					new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator, proxyCreator, memberType);
 
 			delegate = Collections.unmodifiableList((List) collection);
 		}
 
 		else if (CollectionType.SORTED_SET.equals(collectionType)) {
-			collection = new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator, proxyCreator);
+			collection =
+					new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator, proxyCreator, memberType);
 			delegate = Collections.unmodifiableSortedSet((SortedSet) collection);
 		}
 

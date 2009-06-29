@@ -19,18 +19,16 @@ import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
+import org.springframework.osgi.service.importer.support.MemberType;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
-
 
 /**
  * 
- * OSGi service dynamic collection - allows iterating while the underlying
- * storage is being shrunk/expanded. This collection is read-only - its content
- * is being retrieved dynamically from the OSGi platform.
+ * OSGi service dynamic collection - allows iterating while the underlying storage is being shrunk/expanded. This
+ * collection is read-only - its content is being retrieved dynamically from the OSGi platform.
  * 
- * <p/> This collection and its iterators are thread-safe. That is, multiple
- * threads can access the collection. However, since the collection is
- * read-only, it cannot be modified by the client.
+ * <p/> This collection and its iterators are thread-safe. That is, multiple threads can access the collection. However,
+ * since the collection is read-only, it cannot be modified by the client.
  * 
  * @author Costin Leau
  * 
@@ -38,8 +36,8 @@ import org.springframework.osgi.service.importer.support.internal.aop.ServicePro
 public class OsgiServiceSet extends OsgiServiceCollection implements Set {
 
 	public OsgiServiceSet(Filter filter, BundleContext context, ClassLoader classLoader,
-			ServiceProxyCreator proxyCreator) {
-		super(filter, context, classLoader, proxyCreator);
+			ServiceProxyCreator proxyCreator, MemberType memberType) {
+		super(filter, context, classLoader, proxyCreator, memberType);
 	}
 
 	protected DynamicCollection createInternalDynamicStorage() {

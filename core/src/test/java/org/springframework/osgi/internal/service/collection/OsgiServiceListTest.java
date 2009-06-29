@@ -18,6 +18,7 @@ package org.springframework.osgi.internal.service.collection;
 import java.util.Date;
 import java.util.ListIterator;
 
+import org.springframework.osgi.service.importer.support.MemberType;
 import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceCollection;
 import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceList;
 
@@ -36,7 +37,7 @@ public class OsgiServiceListTest extends AbstractOsgiCollectionTest {
 
 	OsgiServiceCollection createCollection() {
 		return new OsgiServiceList(null, context, getClass().getClassLoader(), createProxyCreator(new Class<?>[] {
-				Wrapper.class, Comparable.class }));
+				Wrapper.class, Comparable.class }), MemberType.SERVICE_OBJECT);
 	}
 
 	protected void tearDown() throws Exception {

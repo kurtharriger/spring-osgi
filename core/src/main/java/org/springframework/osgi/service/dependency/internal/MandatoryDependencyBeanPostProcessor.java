@@ -41,7 +41,7 @@ public class MandatoryDependencyBeanPostProcessor implements BeanFactoryAware, B
 	private ConfigurableBeanFactory beanFactory;
 
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		if (bean instanceof OsgiServiceFactoryBean) {
+		if (bean instanceof OsgiServiceFactoryBean && beanFactory.containsLocalBean(beanName)) {
 			manager.addServiceExporter(bean, beanName);
 		}
 		return bean;
@@ -73,7 +73,7 @@ public class MandatoryDependencyBeanPostProcessor implements BeanFactoryAware, B
 	}
 
 	public void postProcessBeforeDestruction(Object bean, String beanName) throws BeansException {
-		if (bean instanceof OsgiServiceFactoryBean) {
+		if (bean instanceof OsgiServiceFactoryBean && beanFactory.containsLocalBean(beanName)) {
 			manager.removeServiceExporter(bean, beanName);
 		}
 	}

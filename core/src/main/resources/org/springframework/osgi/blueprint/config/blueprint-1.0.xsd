@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
     /*
-    * $Revision: 7441 $
+    * $Revision: 7488 $
     *
     * Copyright (c) OSGi Alliance (2008, 2009). All Rights Reserved.
     *
@@ -293,7 +293,7 @@
                 <xsd:attribute name="activation" use="prohibited"/>
                 <xsd:attribute name="class" type="Tclass" />
                 <xsd:attribute name="init-method" type="Tmethod" />
-                <xsd:attribute name="destroy-method" type="Tmethod"/>
+                <xsd:attribute name="destroy-method" use="prohibited"/>
                 <xsd:attribute name="factory-method" type="Tmethod" />
                 <xsd:attribute name="factory-ref" type="Tidref" />
                 <xsd:attribute name="scope" fixed="prototype" type="Tscope"/>
@@ -411,7 +411,7 @@
                 <xsd:attribute name="id" use="prohibited"/>
                 <xsd:attribute name="depends-on" type="TdependsOn" use="optional"/>
                 <xsd:attribute name="activation" use="prohibited"/>
-                <xsd:attribute name="interface" type="Tclass" use="required"/>
+                <xsd:attribute name="interface" type="Tclass" use="optional"/>
                 <xsd:attribute name="filter" type="xsd:normalizedString" use="optional"/>
                 <xsd:attribute name="component-name" type="Tidref" use="optional"/>
                 <xsd:attribute name="availability" type="Tavailability" use="optional"/>
@@ -473,7 +473,7 @@
                 <xsd:attribute name="id" use="prohibited"/>
                 <xsd:attribute name="depends-on" type="TdependsOn" use="optional"/>
                 <xsd:attribute name="activation" use="prohibited"/>
-                <xsd:attribute name="interface" type="Tclass" use="required"/>
+                <xsd:attribute name="interface" type="Tclass" use="optional"/>
                 <xsd:attribute name="filter" type="xsd:normalizedString" use="optional"/>
                 <xsd:attribute name="component-name" type="Tidref" use="optional"/>
                 <xsd:attribute name="availability" type="Tavailability" use="optional"/>
@@ -500,7 +500,7 @@
                     <xsd:group ref="serviceReferenceElements"/>
                 </xsd:sequence>
 
-                <xsd:attribute name="interface" use="required" type="Tclass" />
+                <xsd:attribute name="interface" use="optional" type="Tclass" />
                 <xsd:attribute name="filter" use="optional" type="xsd:normalizedString">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -577,7 +577,7 @@
         <xsd:sequence>
             <xsd:group ref="targetComponent" minOccurs="0"/>
         </xsd:sequence>
-        <xsd:attribute name="ref" type="xsd:NMTOKEN" use="optional" />
+        <xsd:attribute name="ref" type="Tidref" use="optional" />
         <xsd:attribute name="bind-method" type="Tmethod" use="optional" />
         <xsd:attribute name="unbind-method" type="Tmethod" use="optional" />
     </xsd:complexType>
@@ -764,7 +764,6 @@
             <xsd:group ref="targetComponent" minOccurs="0"/>
         </xsd:sequence>
         <xsd:attribute name="ref" type="Tidref" use="optional" />
-        <!--  ### why are there both required? -->
         <xsd:attribute name="registration-method" type="Tmethod" use="optional" />
         <xsd:attribute name="unregistration-method" type="Tmethod" use="optional" />
     </xsd:complexType>

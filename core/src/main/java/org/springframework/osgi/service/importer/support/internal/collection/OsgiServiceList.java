@@ -23,6 +23,7 @@ import java.util.RandomAccess;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
+import org.springframework.osgi.service.importer.support.MemberType;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 
 /**
@@ -102,8 +103,8 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 	protected List storage;
 
 	public OsgiServiceList(Filter filter, BundleContext context, ClassLoader classLoader,
-			ServiceProxyCreator proxyCreator) {
-		super(filter, context, classLoader, proxyCreator);
+			ServiceProxyCreator proxyCreator, MemberType memberType) {
+		super(filter, context, classLoader, proxyCreator, memberType);
 	}
 
 	protected DynamicCollection createInternalDynamicStorage() {

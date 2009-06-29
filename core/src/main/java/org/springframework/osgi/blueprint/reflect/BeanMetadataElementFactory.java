@@ -39,6 +39,7 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.ManagedProperties;
 import org.springframework.beans.factory.support.ManagedSet;
+import org.springframework.osgi.blueprint.config.internal.temp.OrderedManagedProperties;
 
 /**
  * Adapter between OSGi's Blueprint {@link Value} and Spring {@link BeanMetadataElement}.
@@ -143,7 +144,7 @@ class BeanMetadataElementFactory {
 			PropsMetadata propertiesValue = (PropsMetadata) value;
 
 			List<MapEntry> entries = propertiesValue.getEntries();
-			ManagedProperties managedProperties = new ManagedProperties();
+			ManagedProperties managedProperties = new OrderedManagedProperties();
 
 			for (MapEntry mapEntry : entries) {
 				managedProperties.put(BeanMetadataElementFactory.buildBeanMetadata(mapEntry.getKey()),

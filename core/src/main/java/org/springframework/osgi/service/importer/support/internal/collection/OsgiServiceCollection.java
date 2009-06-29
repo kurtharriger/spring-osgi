@@ -38,6 +38,7 @@ import org.springframework.osgi.service.importer.DefaultOsgiServiceDependency;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
+import org.springframework.osgi.service.importer.support.MemberType;
 import org.springframework.osgi.service.importer.support.internal.aop.ProxyPlusCallback;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
@@ -159,9 +160,11 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 					EventResult state = new EventResult();
 					state.proxy = proxy;
 
+					Object value =
+							(useServiceReferences ? proxy.getServiceReference().getTargetServiceReference() : proxy);
 					// let the dynamic collection decide if the service
 					// is added or not (think set, sorted set)
-					if (services.add(proxy)) {
+					if (services.add(value)) {
 						state.collectionModified = true;
 						// check if the list was empty before adding something to it
 						state.shouldInformStateListeners = (services.size() == 1);
@@ -184,48 +187,12 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 					EventResult state = new EventResult();
 					state.proxy = ppc.proxy;
 					// remove service proxy
-					state.collectionModified = services.remove(ppc.proxy);
-					// invalidate it
+					Object value =
+							(useServiceReferences ? ppc.proxy.getServiceReference().getTargetServiceReference()
+									: ppc.proxy);
+					state.collectionModified = services.remove(value);
+					// invalidate the proxy
 					invalidateProxy(ppc);
-					// check if the list is empty
-					state.shouldInformStateListeners = (services.isEmpty());
-
-					return state;
-				}
-			}
-
-			return EventResult.DEFAULT;
-		}
-	}
-
-	private class ServiceReferenceListener extends BaseListener {
-
-		@Override
-		protected EventResult addService(Long serviceId, ServiceReference ref) {
-			synchronized (services) {
-				if (!servicesIdMap.containsKey(serviceId)) {
-					EventResult state = new EventResult();
-					if (services.add(ref)) {
-						state.collectionModified = true;
-						// check if the list was empty before adding something to it
-						state.shouldInformStateListeners = (services.size() == 1);
-						servicesIdMap.put(serviceId, VALUE);
-					}
-					return state;
-				}
-				return EventResult.DEFAULT;
-			}
-		}
-
-		@Override
-		protected EventResult removeService(Long serviceId, ServiceReference ref) {
-			synchronized (services) {
-				// remove service id / VALUE association
-				if (servicesIdMap.remove(serviceId) != null) {
-					EventResult state = new EventResult();
-					state.proxy = ref;
-					// remove service proxy
-					state.collectionModified = services.remove(ref);
 					// check if the list is empty
 					state.shouldInformStateListeners = (services.isEmpty());
 
@@ -267,8 +234,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	private static final Log log = LogFactory.getLog(OsgiServiceCollection.class);
 
 	private static final Log PUBLIC_LOGGER =
-			LogFactory
-					.getLog("org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean");
+			LogFactory.getLog("org.springframework.osgi.service.importer."
+					+ "support.OsgiServiceCollectionProxyFactoryBean");
 
 	// map of services
 	// NOTE: this collection is protected by the 'serviceProxies' lock.
@@ -309,13 +276,11 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	/** event source (importer) name */
 	private String sourceName;
 
-	/** generate proxies or use service references */
-	private final boolean generateProxies;
-
-	private final static ProxyPlusCallback VALUE = new ProxyPlusCallback(null, null);
+	/** use references instead of instances inside the collection */
+	private final boolean useServiceReferences;
 
 	public OsgiServiceCollection(Filter filter, BundleContext context, ClassLoader classLoader,
-			ServiceProxyCreator proxyCreator) {
+			ServiceProxyCreator proxyCreator, MemberType memberType) {
 		Assert.notNull(classLoader, "ClassLoader is required");
 		Assert.notNull(context, "context is required");
 
@@ -324,8 +289,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		this.classLoader = classLoader;
 
 		this.proxyCreator = proxyCreator;
-		generateProxies = (proxyCreator != null);
-		listener = (generateProxies ? new ServiceInstanceListener() : new ServiceReferenceListener());
+		this.useServiceReferences = MemberType.SERVICE_REFERENCE.equals(memberType);
+		listener = new ServiceInstanceListener();
 	}
 
 	public void afterPropertiesSet() {
@@ -357,28 +322,20 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 		synchronized (services) {
 
-			if (generateProxies) {
-				// unwrap and destroy proxies
-				for (Object item : services) {
-					ImportedOsgiServiceProxy serviceProxy = (ImportedOsgiServiceProxy) item;
-					ServiceReference ref = serviceProxy.getServiceReference();
+			// unwrap and destroy proxies
+			for (Object item : services) {
+				ImportedOsgiServiceProxy serviceProxy = (ImportedOsgiServiceProxy) item;
+				ServiceReference ref = serviceProxy.getServiceReference();
 
-					// get first the destruction callback
-					ProxyPlusCallback ppc =
-							(ProxyPlusCallback) servicesIdMap.get((Long) ref.getProperty(Constants.SERVICE_ID));
-					listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, ref));
+				// get first the destruction callback
+				ProxyPlusCallback ppc =
+						(ProxyPlusCallback) servicesIdMap.get((Long) ref.getProperty(Constants.SERVICE_ID));
+				listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, ref));
 
-					try {
-						ppc.destructionCallback.destroy();
-					} catch (Exception ex) {
-						log.error("Exception occurred while destroying proxy " + ppc.proxy, ex);
-					}
-				}
-			} else {
-				// pass the service reference directly
-				for (Object item : services) {
-					ServiceReference ref = (ServiceReference) item;
-					listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, ref));
+				try {
+					ppc.destructionCallback.destroy();
+				} catch (Exception ex) {
+					log.error("Exception occurred while destroying proxy " + ppc.proxy, ex);
 				}
 			}
 
