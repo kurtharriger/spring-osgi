@@ -15,6 +15,8 @@
  */
 package org.springframework.osgi.iandt.importer;
 
+import java.awt.Shape;
+import java.awt.geom.Area;
 import java.util.Date;
 import java.util.List;
 
@@ -36,10 +38,9 @@ public class CollectionTest extends BaseIntegrationTest {
 
 		Listener listener = applicationContext.getBean("listener", Listener.class);
 		assertEquals(0, listener.bind.size());
-		Date date = new Date(123);
-		bundleContext.registerService(date.getClass().getName(), date, null);
+		Shape shape = new Area();
+		bundleContext.registerService(Shape.class.getName(), shape, null);
 		System.out.println("List is " + list);
 		assertEquals(1, listener.bind.size());
-
 	}
 }
