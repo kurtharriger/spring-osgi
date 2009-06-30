@@ -7,7 +7,7 @@
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd"
 	osgi:default-timeout="10" osgi:default-cardinality="0..X">
 
-	<list id="reference-list" interface="java.util.Date" member-type="service-reference" availability="optional">
+	<list id="reference-list" interface="java.awt.Shape" member-type="service-reference" availability="optional">
 		<listener bind-method="bind" unbind-method="unbind" ref="listener"/>
 	</list>
  
