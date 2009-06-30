@@ -180,7 +180,7 @@ public class BlueprintConfigUtils {
 	 * Returns the location headers (if any) specified by the Blueprint-Bundle header (if available). The returned
 	 * Strings can be sent to a {@link org.springframework.core.io.ResourceLoader} for loading the configurations.
 	 * 
-	 * Different from {@link ConfigUtils#getLocationsFromHeader(String, String)} since , is used for separating clauses
+	 * Different from {@link ConfigUtils#getLocationsFromHeader(String, String)} since "," is used for separating clauses
 	 * while ; is used inside a clause to allow parameters or directives besides paths.
 	 * 
 	 * @param headers bundle headers

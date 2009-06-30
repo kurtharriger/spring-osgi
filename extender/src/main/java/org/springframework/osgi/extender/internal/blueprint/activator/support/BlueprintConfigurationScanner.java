@@ -16,20 +16,31 @@
 
 package org.springframework.osgi.extender.internal.blueprint.activator.support;
 
-import java.util.Enumeration;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.extender.support.scanning.ConfigurationScanner;
 import org.springframework.osgi.io.OsgiBundleResource;
+import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Dedication {@link ConfigurationScanner scanner} implementation suitable for RFC 124 files.
+ * Dedication {@link ConfigurationScanner scanner} implementation suitable for Blueprint bundles.
  * 
  * @author Costin Leau
- * 
  */
 public class BlueprintConfigurationScanner implements ConfigurationScanner {
+
+	/** logger */
+	private static final Log log = LogFactory.getLog(BlueprintConfigurationScanner.class);
 
 	private static final String CONTEXT_DIR = "OSGI-INF/blueprint/";
 
@@ -39,19 +50,70 @@ public class BlueprintConfigurationScanner implements ConfigurationScanner {
 	public static final String DEFAULT_CONFIG = OsgiBundleResource.BUNDLE_URL_PREFIX + CONTEXT_DIR + CONTEXT_FILES;
 
 	public String[] getConfigurations(Bundle bundle) {
+		String bundleName = OsgiStringUtils.nullSafeName(bundle);
+
+		boolean trace = log.isTraceEnabled();
+		boolean debug = log.isDebugEnabled();
+
+		if (debug)
+			log.debug("Scanning bundle " + bundleName + " for blueprint configurations...");
+
 		String[] locations = BlueprintConfigUtils.getBlueprintHeaderLocations(bundle.getHeaders());
 
 		// if no location is specified in the header, try the defaults
 		if (ObjectUtils.isEmpty(locations)) {
-			// check the default locations if the manifest doesn't provide any info
-			Enumeration defaultConfig = bundle.findEntries(CONTEXT_DIR, CONTEXT_FILES, false);
-			if (defaultConfig != null && defaultConfig.hasMoreElements()) {
-				return new String[] { DEFAULT_CONFIG };
-			} else {
-				return new String[0];
+			if (trace) {
+				log.trace("Bundle " + bundleName + " has no declared locations; trying default " + DEFAULT_CONFIG);
 			}
-		} else {
-			return locations;
+			locations = new String[] { DEFAULT_CONFIG };
 		}
+
+		String[] configs = findValidBlueprintConfigs(bundle, locations);
+		if (debug)
+			log.debug("Discovered in bundle" + bundleName + " blueprint configurations=" + Arrays.toString(configs));
+		return configs;
+	}
+
+	/**
+	 * Checks if the given bundle contains existing configurations. The absolute paths are returned without performing
+	 * any checks.
+	 * 
+	 * @return
+	 */
+	private String[] findValidBlueprintConfigs(Bundle bundle, String[] locations) {
+		List<String> configs = new ArrayList<String>(locations.length);
+		ResourcePatternResolver loader = new OsgiBundleResourcePatternResolver(bundle);
+
+		boolean debug = log.isDebugEnabled();
+		for (String location : locations) {
+			if (isAbsolute(location)) {
+				configs.add(location);
+			}
+			// resolve the location to check if it's present
+			else {
+				try {
+					String loc = location;
+					if (loc.endsWith("/"))
+						loc = loc + "*.xml";
+					Resource[] resources = loader.getResources(loc);
+					if (!ObjectUtils.isEmpty(resources)) {
+						for (Resource resource : resources) {
+							if (resource.exists()) {
+								configs.add(location);
+								break;
+							}
+						}
+					}
+				} catch (IOException ex) {
+					if (debug)
+						log.debug("Cannot resolve location " + location, ex);
+				}
+			}
+		}
+		return (String[]) configs.toArray(new String[configs.size()]);
+	}
+
+	private boolean isAbsolute(String location) {
+		return !(location.endsWith("/") || location.contains("*"));
 	}
 }
