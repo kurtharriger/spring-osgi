@@ -35,6 +35,7 @@ import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.config.TypedStringValue;
+import org.springframework.beans.factory.parsing.BeanEntry;
 import org.springframework.beans.factory.parsing.ConstructorArgumentEntry;
 import org.springframework.beans.factory.parsing.ParseState;
 import org.springframework.beans.factory.parsing.PropertyEntry;
@@ -125,8 +126,8 @@ public class ComponentParser {
 	}
 
 	/**
-	 * Parses the supplied <code>&lt;component&gt;</code> element. May return <code>null</code> if there were errors
-	 * during parse. Errors are reported to the {@link org.springframework.beans.factory.parsing.ProblemReporter}.
+	 * Parses the supplied <code>&lt;bean&gt;</code> element. May return <code>null</code> if there were errors during
+	 * parse. Errors are reported to the {@link org.springframework.beans.factory.parsing.ProblemReporter}.
 	 */
 	private BeanDefinitionHolder parseComponentDefinitionElement(Element ele, BeanDefinition containingBean) {
 
@@ -158,40 +159,7 @@ public class ComponentParser {
 			}
 		}
 
-		String className = null;
-
-		// extract class attribute
-		if (ele.hasAttribute(BeanDefinitionParserDelegate.CLASS_ATTRIBUTE)) {
-			className = ele.getAttribute(BeanDefinitionParserDelegate.CLASS_ATTRIBUTE).trim();
-		}
-
-		AbstractBeanDefinition beanDefinition = null;
-
-		try {
-			// create definition
-			beanDefinition =
-					BeanDefinitionReaderUtils.createBeanDefinition(null, className, parserContext.getReaderContext()
-							.getBeanClassLoader());
-
-			// parse attributes
-			parseAttributes(ele, beanName, beanDefinition);
-
-			// parse description
-			beanDefinition.setDescription(DomUtils.getChildElementValueByTagName(ele,
-					BeanDefinitionParserDelegate.DESCRIPTION_ELEMENT));
-
-			parseConstructorArgElements(ele, beanDefinition);
-			parsePropertyElements(ele, beanDefinition);
-
-			beanDefinition.setResource(parserContext.getReaderContext().getResource());
-			beanDefinition.setSource(extractSource(ele));
-
-		} catch (ClassNotFoundException ex) {
-			error("Bean class [" + className + "] not found", ele, ex);
-		} catch (NoClassDefFoundError err) {
-			error("Class that bean class [" + className + "] depends on not found", ele, err);
-		}
-
+		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
 			if (!StringUtils.hasText(beanName)) {
 				try {
@@ -219,6 +187,57 @@ public class ComponentParser {
 				}
 			}
 			return new BeanDefinitionHolder(beanDefinition, beanName);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Parse the bean definition itself, without regard to name or aliases. May return <code>null</code> if problems
+	 * occured during the parse of the bean definition.
+	 */
+	public AbstractBeanDefinition parseBeanDefinitionElement(Element ele, String beanName, BeanDefinition containingBean) {
+
+		this.parseState.push(new BeanEntry(beanName));
+
+		String className = null;
+		if (ele.hasAttribute(BeanDefinitionParserDelegate.CLASS_ATTRIBUTE)) {
+			className = ele.getAttribute(BeanDefinitionParserDelegate.CLASS_ATTRIBUTE).trim();
+		}
+
+		try {
+			AbstractBeanDefinition beanDefinition =
+					BeanDefinitionReaderUtils.createBeanDefinition(null, className, parserContext.getReaderContext()
+							.getBeanClassLoader());
+
+			// parse attributes
+			parseAttributes(ele, beanName, beanDefinition);
+
+			// inner beans get a predefined scope in RFC 124
+			if (containingBean != null) {
+				beanDefinition.setLazyInit(true);
+				beanDefinition.setScope(BeanDefinition.SCOPE_PROTOTYPE);
+			}
+
+			// parse description
+			beanDefinition.setDescription(DomUtils.getChildElementValueByTagName(ele,
+					BeanDefinitionParserDelegate.DESCRIPTION_ELEMENT));
+
+			parseConstructorArgElements(ele, beanDefinition);
+			parsePropertyElements(ele, beanDefinition);
+
+			beanDefinition.setResource(parserContext.getReaderContext().getResource());
+			beanDefinition.setSource(extractSource(ele));
+
+			return beanDefinition;
+		} catch (ClassNotFoundException ex) {
+			error("Bean class [" + className + "] not found", ele, ex);
+		} catch (NoClassDefFoundError err) {
+			error("Class that bean class [" + className + "] depends on not found", ele, err);
+		} catch (Throwable ex) {
+			error("Unexpected failure during bean definition parsing", ele, ex);
+		} finally {
+			this.parseState.pop();
 		}
 
 		return null;

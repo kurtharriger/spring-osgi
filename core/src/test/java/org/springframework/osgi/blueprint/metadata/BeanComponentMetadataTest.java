@@ -237,8 +237,8 @@ public class BeanComponentMetadataTest extends BaseMetadataTest {
 		List<BeanProperty> props = localMetadata.getProperties();
 		BeanProperty a = props.get(0);
 		BeanMetadata meta = (BeanMetadata) a.getValue();
-		assertEquals(BeanMetadata.ACTIVATION_LAZY, meta.getActivation());
 		assertEquals(BeanMetadata.SCOPE_PROTOTYPE, meta.getScope());
+		assertEquals(BeanMetadata.ACTIVATION_LAZY, meta.getActivation());
 	}
 
 	public void testInnerMap() throws Exception {
