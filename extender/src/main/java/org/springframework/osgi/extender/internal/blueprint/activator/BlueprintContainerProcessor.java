@@ -95,7 +95,7 @@ public class BlueprintContainerProcessor implements
 		// create the ModuleContext adapter
 		final BlueprintContainer blueprintContainer = new SpringBlueprintContainer(context, bundleContext);
 		// add service publisher
-		context.addApplicationListener(new BlueprintContainerServicePublisher(blueprintContainer));
+		context.addApplicationListener(new BlueprintContainerServicePublisher(blueprintContainer, bundleContext));
 		// add moduleContext bean
 		context.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
 
@@ -166,8 +166,9 @@ public class BlueprintContainerProcessor implements
 
 		if (evt instanceof OsgiBundleContextFailedEvent) {
 			OsgiBundleContextFailedEvent failureEvent = (OsgiBundleContextFailedEvent) evt;
-			postProcessRefreshFailure(((ConfigurableOsgiBundleApplicationContext) failureEvent.getApplicationContext()),
-					failureEvent.getFailureCause());
+			postProcessRefreshFailure(
+					((ConfigurableOsgiBundleApplicationContext) failureEvent.getApplicationContext()), failureEvent
+							.getFailureCause());
 			return;
 		}
 	}
