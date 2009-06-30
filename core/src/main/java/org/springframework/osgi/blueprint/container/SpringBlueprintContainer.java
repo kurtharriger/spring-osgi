@@ -106,10 +106,6 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 		return metadata;
 	}
 
-	public BundleContext getBundleContext() {
-		return this.bundleContext;
-	}
-
 	private ConfigurableListableBeanFactory getBeanFactory() {
 		if (beanFactory == null) {
 			beanFactory = applicationContext.getBeanFactory();

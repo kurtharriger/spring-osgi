@@ -64,9 +64,9 @@ public class BlueprintContainerServicePublisher implements ApplicationListener<A
 	 * @param blueprintContainer
 	 * @param bundleContext
 	 */
-	public BlueprintContainerServicePublisher(BlueprintContainer blueprintContainer) {
+	public BlueprintContainerServicePublisher(BlueprintContainer blueprintContainer, BundleContext bundleContext) {
 		this.blueprintContainer = blueprintContainer;
-		this.bundleContext = blueprintContainer.getBundleContext();
+		this.bundleContext = bundleContext;
 	}
 
 	public void onApplicationEvent(ApplicationContextEvent event) {
