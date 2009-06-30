@@ -30,7 +30,7 @@ public abstract class ServiceListTst extends ServiceCollectionTest {
 
 	protected Collection createCollection() {
 		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
-		OsgiServiceList col = new OsgiServiceList(null, bundleContext, classLoader, null);
+		OsgiServiceList col = new OsgiServiceList(null, bundleContext, classLoader, null, null);
 		col.setRequiredAtStartup(false);
 		// col.setInterfaces(new Class<?>[] { Date.class });
 		col.afterPropertiesSet();

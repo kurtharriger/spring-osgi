@@ -46,7 +46,7 @@ abstract class ServiceCollectionTest extends BaseIntegrationTest {
 		BundleDelegatingClassLoader classLoader =
 				BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
 
-		OsgiServiceCollection collection = new OsgiServiceCollection(null, bundleContext, classLoader, null);
+		OsgiServiceCollection collection = new OsgiServiceCollection(null, bundleContext, classLoader, null, null);
 		ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 		try {
 			Thread.currentThread().setContextClassLoader(classLoader);

@@ -7,7 +7,6 @@
 
 	<description>Configuration with sub-elements</description>
 
-
 	<bean id="char" class="java.lang.Character">
 		<argument type="char" value="\u0000" />
 	</bean>
@@ -135,7 +134,6 @@
 	<bean id="compZeroLengthString" class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA" value="" />
 	</bean>
-
 	<!--
 		<bean id="dateConstructor"
 		class="org.springframework.osgi.blueprint.DateConstructor"> <argument
@@ -234,7 +232,7 @@
 		</argument>
 	</bean>
 
-	<!-- Injection of an URL array -->
+	
 	<bean id="compURLArray" factory-method="makeInstance"
 		class="org.springframework.osgi.blueprint.ConstructorInjectionStaticFactory">
 		<argument>
@@ -279,5 +277,5 @@
             </map>
         </argument>
     </bean>
- 
+
 </blueprint>
