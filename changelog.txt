@@ -18,6 +18,9 @@ General
 Package org.springframework.osgi.bundle
 * deprecated BundleAction in favour of the BundleActionEnum enum 
 
+Package org.springframework.osgi.config
+* fixed race condition affecting configuration defaults in concurrent startups
+
 Package org.springframework.osgi.context
 * improved serviceability by using NamedThreadLocal
 * added class loader aware default Class/Class[] property editors

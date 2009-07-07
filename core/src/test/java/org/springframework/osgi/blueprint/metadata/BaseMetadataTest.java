@@ -46,14 +46,7 @@ public abstract class BaseMetadataTest extends TestCase {
 	protected MockBundleContext bundleContext;
 
 	protected void setUp() throws Exception {
-		bundleContext = new MockBundleContext() {
-
-			@Override
-			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
-				return null;
-			}
-		};
-
+		bundleContext = new MockBundleContext();
 		applicationContext = new GenericApplicationContext();
 		applicationContext.setClassLoader(getClass().getClassLoader());
 		applicationContext.getBeanFactory().addBeanPostProcessor(new BundleContextAwareProcessor(bundleContext));
