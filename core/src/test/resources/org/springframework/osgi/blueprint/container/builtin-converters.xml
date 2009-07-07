@@ -408,4 +408,20 @@
             </map>
         </property>
     </bean>
+    
+    <bean id="propertiesInjection" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+    	<property name="properties">
+    		<value>
+    		Name= Rex
+			Organization =OSGi Alliance
+			Nationality    :    China
+			Language: \u4e2d\u6587, English
+			Graduated=Shanghai Jiao Tong University
+			#key is the word before the first whitespace - "Major"
+			Major Computer Science
+			!Gender should be a String ""
+			Gender
+			</value>
+    	</property>
+    </bean>
 </blueprint>

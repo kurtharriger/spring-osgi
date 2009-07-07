@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.osgi.config.internal.util;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -23,30 +22,22 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 /**
- * Standard attribute callback. Deals with ID, DEPENDS-ON and LAZY-INIT
- * attribute.
- * 
  * @author Costin Leau
  */
-public class StandardAttributeCallback implements AttributeCallback {
+public class BlueprintAttributeCallback implements AttributeCallback {
+
+	private static final String ACTIVATION_ATTR = "activation";
+	private static final String LAZY_ACTIVATION = "lazy";
 
 	public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 		String name = attribute.getLocalName();
+		String value = attribute.getValue();
 
-		if (BeanDefinitionParserDelegate.ID_ATTRIBUTE.equals(name)) {
+		if (ACTIVATION_ATTR.equals(name) && StringUtils.hasText(value) && LAZY_ACTIVATION.equalsIgnoreCase(value)) {
+			builder.setLazyInit(true);
 			return false;
 		}
 
-		if (BeanDefinitionParserDelegate.DEPENDS_ON_ATTRIBUTE.equals(name)) {
-			builder.getBeanDefinition().setDependsOn(
-				(StringUtils.tokenizeToStringArray(attribute.getValue(),
-					BeanDefinitionParserDelegate.BEAN_NAME_DELIMITERS)));
-			return false;
-		}
-		if (BeanDefinitionParserDelegate.LAZY_INIT_ATTRIBUTE.equals(name)) {
-			builder.setLazyInit(Boolean.valueOf(attribute.getValue()));
-			return false;
-		}
 		return true;
 	}
 }

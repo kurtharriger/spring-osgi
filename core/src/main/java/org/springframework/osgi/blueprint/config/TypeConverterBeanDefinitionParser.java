@@ -29,7 +29,7 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.osgi.blueprint.config.internal.ComponentParser;
+import org.springframework.osgi.blueprint.config.internal.BlueprintParser;
 import org.springframework.osgi.blueprint.config.internal.ParsingUtils;
 import org.springframework.osgi.blueprint.container.CoverterPropertyEditorRegistrar;
 import org.springframework.util.xml.DomUtils;
@@ -56,7 +56,7 @@ public class TypeConverterBeanDefinitionParser extends AbstractBeanDefinitionPar
 		BeanDefinitionBuilder registrarDefinitionBuilder =
 				BeanDefinitionBuilder.genericBeanDefinition(CoverterPropertyEditorRegistrar.class);
 
-		List<Element> components = DomUtils.getChildElementsByTagName(element, ComponentParser.BEAN);
+		List<Element> components = DomUtils.getChildElementsByTagName(element, BlueprintParser.BEAN);
 		List<Element> componentRefs =
 				DomUtils.getChildElementsByTagName(element, BeanDefinitionParserDelegate.REF_ELEMENT);
 
@@ -64,12 +64,12 @@ public class TypeConverterBeanDefinitionParser extends AbstractBeanDefinitionPar
 
 		// add components
 		for (Element component : components) {
-			converterList.add(ComponentParser.parsePropertySubElement(parserContext, component,
+			converterList.add(BlueprintParser.parsePropertySubElement(parserContext, component,
 					registrarDefinitionBuilder.getBeanDefinition()));
 		}
 		// followed by bean references
 		for (Element componentRef : componentRefs) {
-			converterList.add(ComponentParser.parsePropertySubElement(parserContext, componentRef,
+			converterList.add(BlueprintParser.parsePropertySubElement(parserContext, componentRef,
 					registrarDefinitionBuilder.getBeanDefinition()));
 		}
 		// add the list to the registrar definition

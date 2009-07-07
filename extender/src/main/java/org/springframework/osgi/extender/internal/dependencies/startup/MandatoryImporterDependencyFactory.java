@@ -27,10 +27,12 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.SmartFactoryBean;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
 import org.springframework.osgi.service.importer.DefaultOsgiServiceDependency;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
+import org.springframework.osgi.service.importer.support.Availability;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.util.StringUtils;
@@ -45,39 +47,54 @@ public class MandatoryImporterDependencyFactory implements OsgiServiceDependency
 	public Collection<OsgiServiceDependency> getServiceDependencies(BundleContext bundleContext,
 			ConfigurableListableBeanFactory beanFactory) throws BeansException, InvalidSyntaxException, BundleException {
 
-		String[] singleBeans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
-			OsgiServiceProxyFactoryBean.class, true, false);
+		String[] singleBeans =
+				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory, OsgiServiceProxyFactoryBean.class,
+						true, false);
 
-		String[] collectionBeans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
-			OsgiServiceCollectionProxyFactoryBean.class, true, false);
+		String[] collectionBeans =
+				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
+						OsgiServiceCollectionProxyFactoryBean.class, true, false);
 
 		String[] beans = StringUtils.concatenateStringArrays(singleBeans, collectionBeans);
 
 		List<OsgiServiceDependency> beansCollections = new ArrayList<OsgiServiceDependency>(beans.length);
 
 		for (int i = 0; i < beans.length; i++) {
-			String beanName = (beans[i].startsWith(BeanFactory.FACTORY_BEAN_PREFIX) ? beans[i]
-					: BeanFactory.FACTORY_BEAN_PREFIX + beans[i]);
+			if (!isLazy(beanFactory, beans[i])) {
 
-			SmartFactoryBean<?> reference = beanFactory.getBean(beanName, SmartFactoryBean.class);
+				String beanName =
+						(beans[i].startsWith(BeanFactory.FACTORY_BEAN_PREFIX) ? beans[i]
+								: BeanFactory.FACTORY_BEAN_PREFIX + beans[i]);
 
-			OsgiServiceDependency dependency;
-			if (reference instanceof OsgiServiceProxyFactoryBean) {
-				OsgiServiceProxyFactoryBean importer = (OsgiServiceProxyFactoryBean) reference;
+				SmartFactoryBean<?> reference = beanFactory.getBean(beanName, SmartFactoryBean.class);
 
-				dependency = new DefaultOsgiServiceDependency(beanName, importer.getUnifiedFilter(),
-					importer.getCardinality().isMandatory());
+				OsgiServiceDependency dependency;
+				if (reference instanceof OsgiServiceProxyFactoryBean) {
+					OsgiServiceProxyFactoryBean importer = (OsgiServiceProxyFactoryBean) reference;
+
+					dependency =
+							new DefaultOsgiServiceDependency(beanName, importer.getUnifiedFilter(),
+									Availability.MANDATORY.equals(importer.getAvailability()));
+				} else {
+					OsgiServiceCollectionProxyFactoryBean importer = (OsgiServiceCollectionProxyFactoryBean) reference;
+
+					dependency =
+							new DefaultOsgiServiceDependency(beanName, importer.getUnifiedFilter(),
+									Availability.MANDATORY.equals(importer.getAvailability()));
+				}
+
+				beansCollections.add(dependency);
 			}
-			else {
-				OsgiServiceCollectionProxyFactoryBean importer = (OsgiServiceCollectionProxyFactoryBean) reference;
-
-				dependency = new DefaultOsgiServiceDependency(beanName, importer.getUnifiedFilter(),
-					importer.getCardinality().isMandatory());
-			}
-
-			beansCollections.add(dependency);
 		}
 
 		return beansCollections;
+	}
+
+	private boolean isLazy(ConfigurableListableBeanFactory beanFactory, String beanName) {
+		String name = (beanName.startsWith(BeanFactory.FACTORY_BEAN_PREFIX) ? beanName.substring(1) : beanName);
+		if (beanFactory.containsBeanDefinition(name)) {
+			return beanFactory.getBeanDefinition(name).isLazyInit();
+		}
+		return false;
 	}
 }

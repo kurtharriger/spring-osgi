@@ -70,10 +70,10 @@ import org.w3c.dom.NodeList;
  * 
  * @author Costin Leau
  */
-public class ComponentParser {
+public class BlueprintParser {
 
 	/** logger */
-	private static final Log log = LogFactory.getLog(ComponentParser.class);
+	private static final Log log = LogFactory.getLog(BlueprintParser.class);
 
 	public static final String BEAN = "bean";
 	public static final String COMPONENT_ID_ATTR = "component-id";
@@ -91,7 +91,7 @@ public class ComponentParser {
 	private ParserContext parserContext;
 	private BlueprintDefaultsDefinition defaults;
 
-	public ComponentParser() {
+	public BlueprintParser() {
 		this(null, null);
 	}
 
@@ -100,12 +100,12 @@ public class ComponentParser {
 	 * 
 	 * @param parserContext
 	 */
-	private ComponentParser(ParserContext parserContext) {
+	private BlueprintParser(ParserContext parserContext) {
 		this(null, null);
 		this.parserContext = parserContext;
 	}
 
-	public ComponentParser(ParseState parseState, Collection<String> usedNames) {
+	public BlueprintParser(ParseState parseState, Collection<String> usedNames) {
 		this.parseState = (parseState != null ? parseState : new ParseState());
 		this.usedNames = (usedNames != null ? usedNames : new LinkedHashSet<String>());
 	}
@@ -433,15 +433,15 @@ public class ComponentParser {
 	}
 
 	public static Object parsePropertySubElement(ParserContext parserContext, Element ele, BeanDefinition bd) {
-		return new ComponentParser(parserContext).parsePropertySubElement(ele, bd, null);
+		return new BlueprintParser(parserContext).parsePropertySubElement(ele, bd, null);
 	}
 
 	public static Map<?, ?> parsePropertyMapElement(ParserContext parserContext, Element ele, BeanDefinition bd) {
-		return new ComponentParser(parserContext).parseMapElement(ele, bd);
+		return new BlueprintParser(parserContext).parseMapElement(ele, bd);
 	}
 
 	public static Set<?> parsePropertySetElement(ParserContext parserContext, Element ele, BeanDefinition bd) {
-		return new ComponentParser(parserContext).parseSetElement(ele, bd);
+		return new BlueprintParser(parserContext).parseSetElement(ele, bd);
 	}
 
 	/**

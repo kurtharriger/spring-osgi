@@ -33,17 +33,17 @@ public class BlueprintServiceDefinitionParser extends ServiceBeanDefinitionParse
 
 	@Override
 	protected Map<?, ?> parsePropertyMapElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
-		return ComponentParser.parsePropertyMapElement(context, beanDef, beanDefinition);
+		return BlueprintParser.parsePropertyMapElement(context, beanDef, beanDefinition);
 	}
 
 	@Override
 	protected Set<?> parsePropertySetElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
-		return ComponentParser.parsePropertySetElement(context, beanDef, beanDefinition);
+		return BlueprintParser.parsePropertySetElement(context, beanDef, beanDefinition);
 	}
 
 	@Override
 	protected Object parsePropertySubElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
-		return ComponentParser.parsePropertySubElement(context, beanDef, beanDefinition);
+		return BlueprintParser.parsePropertySubElement(context, beanDef, beanDefinition);
 	}
 
 	@Override

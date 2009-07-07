@@ -29,6 +29,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
+import org.springframework.beans.propertyeditors.ClassArrayEditor;
+import org.springframework.beans.propertyeditors.ClassEditor;
 import org.springframework.beans.propertyeditors.CustomMapEditor;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.util.Assert;
@@ -49,12 +51,11 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 			"/org/springframework/osgi/context/support/internal/default-property-editors.properties";
 
 	private final Map<Class<?>, Class<? extends PropertyEditor>> editors;
+	private final ClassLoader userClassLoader;
 
-	OsgiPropertyEditorRegistrar() {
-		this(OsgiPropertyEditorRegistrar.class.getClassLoader());
-	}
+	OsgiPropertyEditorRegistrar(ClassLoader userClassLoader) {
+		this.userClassLoader = userClassLoader;
 
-	OsgiPropertyEditorRegistrar(ClassLoader classLoader) {
 		// load properties
 		Properties editorsConfig = new Properties();
 		try {
@@ -68,13 +69,15 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 			log.trace("Loaded property editors configuration " + editorsConfig);
 		editors = new LinkedHashMap<Class<?>, Class<? extends PropertyEditor>>(editorsConfig.size());
 
-		createEditors(classLoader, editorsConfig);
+		createEditors(editorsConfig);
 	}
 
 	@SuppressWarnings("unchecked")
-	private void createEditors(ClassLoader classLoader, Properties configuration) {
+	private void createEditors(Properties configuration) {
 
 		boolean trace = log.isTraceEnabled();
+		// load properties using this class class loader
+		ClassLoader classLoader = getClass().getClassLoader();
 
 		for (Map.Entry<Object, Object> entry : configuration.entrySet()) {
 			// key represents type
@@ -106,5 +109,7 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 
 		// register non-externalized types
 		registry.registerCustomEditor(Dictionary.class, new CustomMapEditor(Hashtable.class));
+		registry.registerCustomEditor(Class.class, new ClassEditor(userClassLoader));
+		registry.registerCustomEditor(Class[].class, new ClassArrayEditor(userClassLoader));
 	}
 }

@@ -24,6 +24,7 @@ import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Properties;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -36,6 +37,7 @@ import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.propertyeditors.CustomCollectionEditor;
 import org.springframework.beans.propertyeditors.CustomMapEditor;
+import org.springframework.beans.propertyeditors.PropertiesEditor;
 
 /**
  * Registrar holding the specific Blueprint editors. This class is used by the Spring DM extender for all Blueprint
@@ -64,6 +66,8 @@ public class BlueprintEditorRegistrar implements PropertyEditorRegistrar {
 		registry.registerCustomEditor(LinkedHashMap.class, new CustomMapEditor(LinkedHashMap.class));
 		registry.registerCustomEditor(Hashtable.class, new CustomMapEditor(Hashtable.class));
 		registry.registerCustomEditor(TreeMap.class, new CustomMapEditor(TreeMap.class));
+		registry.registerCustomEditor(Properties.class, new PropertiesEditor());
+
 		// JDK 5 types
 		registry.registerCustomEditor(ConcurrentMap.class, new CustomMapEditor(ConcurrentHashMap.class));
 		registry.registerCustomEditor(ConcurrentHashMap.class, new CustomMapEditor(ConcurrentHashMap.class));

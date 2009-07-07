@@ -112,11 +112,11 @@ public class ParsingUtils {
 	}
 
 	public static boolean isRFC124Namespace(Node node) {
-		return (ComponentParser.NAMESPACE_URI.equals(node.getNamespaceURI()));
+		return (BlueprintParser.NAMESPACE_URI.equals(node.getNamespaceURI()));
 	}
 
 	public static boolean isRFC124Namespace(String namespaceURI) {
-		return (ComponentParser.NAMESPACE_URI.equals(namespaceURI));
+		return (BlueprintParser.NAMESPACE_URI.equals(namespaceURI));
 	}
 
 	/**

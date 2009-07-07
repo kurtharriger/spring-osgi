@@ -24,7 +24,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.blueprint.config.internal.BlueprintCollectionBeanDefinitionParser;
 import org.springframework.osgi.blueprint.config.internal.BlueprintReferenceBeanDefinitionParser;
 import org.springframework.osgi.blueprint.config.internal.BlueprintServiceDefinitionParser;
-import org.springframework.osgi.blueprint.config.internal.ComponentParser;
+import org.springframework.osgi.blueprint.config.internal.BlueprintParser;
 import org.springframework.osgi.blueprint.config.internal.ParsingUtils;
 import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.util.xml.DomUtils;
@@ -38,7 +38,7 @@ import org.w3c.dom.NodeList;
  * 
  * @author Costin Leau
  */
-class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
+class BlueprintBeanDefinitionParser implements BeanDefinitionParser {
 
 	static final String BLUEPRINT = "blueprint";
 
@@ -66,7 +66,7 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 					ParsingUtils.decorateAndRegister(ele, holder, parserContext);
 				}
 				// handle own components
-				else if (ComponentParser.NAMESPACE_URI.equals(namespaceUri)) {
+				else if (BlueprintParser.NAMESPACE_URI.equals(namespaceUri)) {
 					parseTopLevelElement(ele, parserContext);
 				}
 				// leave the delegate to find a parser for it
@@ -114,7 +114,7 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 	 * @param parserContext
 	 */
 	protected void parseComponentElement(Element ele, ParserContext parserContext) {
-		BeanDefinitionHolder holder = new ComponentParser().parseAsHolder(ele, parserContext);
+		BeanDefinitionHolder holder = new BlueprintParser().parseAsHolder(ele, parserContext);
 		ParsingUtils.decorateAndRegister(ele, holder, parserContext);
 	}
 

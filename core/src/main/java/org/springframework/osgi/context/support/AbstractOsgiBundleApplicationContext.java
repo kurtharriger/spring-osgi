@@ -33,6 +33,8 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
+import org.springframework.beans.propertyeditors.ClassArrayEditor;
+import org.springframework.beans.propertyeditors.ClassEditor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
@@ -287,7 +289,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * @param beanFactory beanFactory used for registration.
 	 */
 	private void registerPropertyEditors(ConfigurableListableBeanFactory beanFactory) {
-		beanFactory.addPropertyEditorRegistrar(new OsgiPropertyEditorRegistrar());
+		beanFactory.addPropertyEditorRegistrar(new OsgiPropertyEditorRegistrar(getClassLoader()));
 	}
 
 	private void cleanOsgiBundleScope(ConfigurableListableBeanFactory beanFactory) {
