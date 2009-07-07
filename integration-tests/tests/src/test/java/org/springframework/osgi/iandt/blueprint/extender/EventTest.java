@@ -54,7 +54,7 @@ public class EventTest extends BaseBlueprintIntegrationTest {
 				break;
 
 			case BlueprintEvent.FAILURE:
-				failedBundles.put(event.getBundle(), event.getException());
+				failedBundles.put(event.getBundle(), event.getCause());
 				break;
 
 			default:

@@ -101,6 +101,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 					break;
 				case (ServiceEvent.UNREGISTERING):
+					// listeners should be called before the service is removed from the collection
 					state = removeService(serviceId, ref);
 
 					// TODO: should this be part of the lock also?
