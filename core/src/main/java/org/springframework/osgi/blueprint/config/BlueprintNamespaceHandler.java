@@ -20,7 +20,7 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.osgi.blueprint.config.internal.BlueprintCollectionBeanDefinitionParser;
 import org.springframework.osgi.blueprint.config.internal.BlueprintReferenceBeanDefinitionParser;
 import org.springframework.osgi.blueprint.config.internal.BlueprintServiceDefinitionParser;
-import org.springframework.osgi.blueprint.config.internal.ComponentParser;
+import org.springframework.osgi.blueprint.config.internal.BlueprintParser;
 import org.springframework.osgi.service.importer.support.CollectionType;
 
 /**
@@ -32,23 +32,23 @@ import org.springframework.osgi.service.importer.support.CollectionType;
 class BlueprintNamespaceHandler extends NamespaceHandlerSupport {
 
 	public void init() {
-		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.BLUEPRINT, new ComponentsBeanDefinitionParser());
-		registerBeanDefinitionParser(ComponentParser.BEAN, new ComponentBeanDefinitionParser());
+		registerBeanDefinitionParser(BlueprintBeanDefinitionParser.BLUEPRINT, new BlueprintBeanDefinitionParser());
+		registerBeanDefinitionParser(BlueprintParser.BEAN, new BlueprintBeanBeanDefinitionParser());
 		registerBeanDefinitionParser(TypeConverterBeanDefinitionParser.TYPE_CONVERTERS,
 				new TypeConverterBeanDefinitionParser());
 
 		// Spring DM constructs
-		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.REFERENCE,
+		registerBeanDefinitionParser(BlueprintBeanDefinitionParser.REFERENCE,
 				new BlueprintReferenceBeanDefinitionParser());
 
-		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.REFERENCE_LIST,
+		registerBeanDefinitionParser(BlueprintBeanDefinitionParser.REFERENCE_LIST,
 				new BlueprintCollectionBeanDefinitionParser() {
 
 					protected CollectionType collectionType() {
 						return CollectionType.LIST;
 					}
 				});
-		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.REFERENCE_SET,
+		registerBeanDefinitionParser(BlueprintBeanDefinitionParser.REFERENCE_SET,
 				new BlueprintCollectionBeanDefinitionParser() {
 
 					protected CollectionType collectionType() {
@@ -56,6 +56,6 @@ class BlueprintNamespaceHandler extends NamespaceHandlerSupport {
 					}
 				});
 
-		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.SERVICE, new BlueprintServiceDefinitionParser());
+		registerBeanDefinitionParser(BlueprintBeanDefinitionParser.SERVICE, new BlueprintServiceDefinitionParser());
 	}
 }

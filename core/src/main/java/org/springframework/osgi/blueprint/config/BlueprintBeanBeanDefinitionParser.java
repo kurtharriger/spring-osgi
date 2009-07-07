@@ -19,17 +19,17 @@ package org.springframework.osgi.blueprint.config;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.osgi.blueprint.config.internal.ComponentParser;
+import org.springframework.osgi.blueprint.config.internal.BlueprintParser;
 import org.w3c.dom.Element;
 
 /**
  * @author Costin Leau
  * 
  */
-public class ComponentBeanDefinitionParser implements BeanDefinitionParser {
+public class BlueprintBeanBeanDefinitionParser implements BeanDefinitionParser {
 
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
-		ComponentParser parser = new ComponentParser();
+		BlueprintParser parser = new BlueprintParser();
 		return parser.parse(element, parserContext);
 	}
 }

@@ -21,7 +21,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 /**
- * Wrapper callback used for parsing attributes (one at a time) that have are
+ * Wrapper callback used for parsing attributes (one at a time) that are
  * non standard (ID, LAZY-INIT, DEPENDS-ON).
  * 
  * @author Costin Leau

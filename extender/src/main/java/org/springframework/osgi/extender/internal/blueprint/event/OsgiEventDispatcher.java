@@ -86,6 +86,7 @@ class OsgiEventDispatcher implements EventDispatcher, BlueprintConstants {
 
 		Throwable th = event.getException();
 		props.put(EXCEPTION, th);
+		props.put(CAUSE, th);
 		props.put(EXCEPTION_CLASS, th.getClass().getName());
 		String msg = th.getMessage();
 		props.put(EXCEPTION_MESSAGE, (msg != null ? msg : ""));

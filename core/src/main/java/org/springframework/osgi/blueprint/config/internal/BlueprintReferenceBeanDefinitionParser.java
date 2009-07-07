@@ -52,12 +52,12 @@ public class BlueprintReferenceBeanDefinitionParser extends ReferenceBeanDefinit
 
 	@Override
 	protected Set<?> parsePropertySetElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
-		return ComponentParser.parsePropertySetElement(context, beanDef, beanDefinition);
+		return BlueprintParser.parsePropertySetElement(context, beanDef, beanDefinition);
 	}
 
 	@Override
 	protected Object parsePropertySubElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
-		return ComponentParser.parsePropertySubElement(context, beanDef, beanDefinition);
+		return BlueprintParser.parsePropertySubElement(context, beanDef, beanDefinition);
 	}
 
 	@Override

@@ -18,6 +18,7 @@
 package org.springframework.osgi.config.internal.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -40,9 +41,8 @@ import org.w3c.dom.NamedNodeMap;
 public abstract class ParserUtils {
 
 	private static final AttributeCallback STANDARD_ATTRS_CALLBACK = new StandardAttributeCallback();
-
+	private static final AttributeCallback BLUEPRINT_ATTRS_CALLBACK = new BlueprintAttributeCallback();
 	private static final AttributeCallback PROPERTY_REF_ATTRS_CALLBACK = new PropertyRefAttributeCallback();
-
 	private static final AttributeCallback PROPERTY_CONV_ATTRS_CALLBACK = new ConventionsCallback();
 
 	/**
@@ -68,10 +68,10 @@ public abstract class ParserUtils {
 	}
 
 	/**
-	 * Dedicated parsing method that uses the following stack: <ol> <li>user given {@link AttributeCallback}s</li> <li>
-	 * {@link StandardAttributeCallback}</li> <li>{@link PropertyRefAttributeCallback}</li> <li>
-	 * {@link ConventionCallback}</li> </ol>
+	 * Dedicated parsing method that uses the following stack:
 	 * 
+	 * <ol> <li>user given {@link AttributeCallback}s</li> <li>{@link StandardAttributeCallback}</li> <li>
+	 * {@link PropertyRefAttributeCallback}</li> <li>{@link ConventionCallback}</li> </ol> </pre>
 	 * 
 	 * @param element XML element
 	 * @param builder current bean definition builder
@@ -85,9 +85,8 @@ public abstract class ParserUtils {
 			CollectionUtils.mergeArrayIntoCollection(callbacks, list);
 		// add standard callback
 		list.add(STANDARD_ATTRS_CALLBACK);
-		// add property ref
+		list.add(BLUEPRINT_ATTRS_CALLBACK);
 		list.add(PROPERTY_REF_ATTRS_CALLBACK);
-		// add convention
 		list.add(PROPERTY_CONV_ATTRS_CALLBACK);
 
 		AttributeCallback[] cbacks = (AttributeCallback[]) list.toArray(new AttributeCallback[list.size()]);
