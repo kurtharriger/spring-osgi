@@ -196,7 +196,7 @@ public class BlueprintParser {
 	 * Parse the bean definition itself, without regard to name or aliases. May return <code>null</code> if problems
 	 * occured during the parse of the bean definition.
 	 */
-	public AbstractBeanDefinition parseBeanDefinitionElement(Element ele, String beanName, BeanDefinition containingBean) {
+	private AbstractBeanDefinition parseBeanDefinitionElement(Element ele, String beanName, BeanDefinition containingBean) {
 
 		this.parseState.push(new BeanEntry(beanName));
 

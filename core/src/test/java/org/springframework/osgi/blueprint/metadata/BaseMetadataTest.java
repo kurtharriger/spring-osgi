@@ -18,6 +18,8 @@ package org.springframework.osgi.blueprint.metadata;
 
 import junit.framework.TestCase;
 
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -28,6 +30,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
 import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
+import org.springframework.osgi.context.support.PublicBlueprintDocumentLoader;
 import org.springframework.osgi.mock.MockBundleContext;
 
 /**
@@ -43,7 +46,13 @@ public abstract class BaseMetadataTest extends TestCase {
 	protected MockBundleContext bundleContext;
 
 	protected void setUp() throws Exception {
-		bundleContext = new MockBundleContext();
+		bundleContext = new MockBundleContext() {
+
+			@Override
+			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
+				return null;
+			}
+		};
 
 		applicationContext = new GenericApplicationContext();
 		applicationContext.setClassLoader(getClass().getClassLoader());
@@ -55,6 +64,7 @@ public abstract class BaseMetadataTest extends TestCase {
 			}
 		});
 		reader = new XmlBeanDefinitionReader(applicationContext);
+		reader.setDocumentLoader(new PublicBlueprintDocumentLoader());
 		reader.loadBeanDefinitions(new ClassPathResource(getConfig(), getClass()));
 		applicationContext.refresh();
 		blueprintContainer = new SpringBlueprintContainer(applicationContext, bundleContext);

@@ -19,6 +19,7 @@ package org.springframework.osgi.blueprint.config.internal;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.config.internal.OsgiDefaultsDefinition;
 import org.springframework.osgi.config.internal.util.ReferenceParsingUtil;
+import org.springframework.osgi.service.importer.support.Availability;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -51,16 +52,17 @@ public class BlueprintDefaultsDefinition extends OsgiDefaultsDefinition {
 	public BlueprintDefaultsDefinition(Document doc, ParserContext parserContext) {
 		super(doc, parserContext);
 		Element root = doc.getDocumentElement();
-		String timeout = root.getAttributeNS(BLUEPRINT_NS, DEFAULT_TIMEOUT);
+		String timeout = getAttribute(root, BLUEPRINT_NS, DEFAULT_TIMEOUT);
 		setTimeout(StringUtils.hasText(timeout) ? timeout.trim() : TIMEOUT_DEFAULT);
 
-		String availability = root.getAttributeNS(BLUEPRINT_NS, DEFAULT_AVAILABILITY);
+		String availability = getAttribute(root, BLUEPRINT_NS, DEFAULT_AVAILABILITY);
 		if (StringUtils.hasText(availability)) {
-			setAvailability(ReferenceParsingUtil.determineAvailability(availability));
+			Availability avail = ReferenceParsingUtil.determineAvailability(availability);
+			setAvailability(avail);
 		}
 
 		// default initialization
-		String initialization = root.getAttributeNS(BLUEPRINT_NS, DEFAULT_INITIALIZATION);
+		String initialization = getAttribute(root, BLUEPRINT_NS, DEFAULT_INITIALIZATION);
 		defaultInitialization =
 				(StringUtils.hasText(initialization) ? initialization.trim().equalsIgnoreCase(LAZY_INITIALIZATION)
 						: INITIALIZATION_DEFAULT);

@@ -90,11 +90,12 @@ public abstract class CollectionBeanDefinitionParser extends AbstractReferenceDe
 	 * 
 	 * Add support for 'greedy-proxying' attribute.
 	 */
-	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks) {
+	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks,
+			OsgiDefaultsDefinition defaults) {
 		// add timeout callback
 		CollectionAttributeCallback greedyProxyingCallback = new CollectionAttributeCallback();
 		super.parseAttributes(element, builder, ParserUtils.mergeCallbacks(callbacks,
-				new AttributeCallback[] { greedyProxyingCallback }));
+				new AttributeCallback[] { greedyProxyingCallback }), defaults);
 	}
 
 	protected void parseNestedElements(Element element, ParserContext context, BeanDefinitionBuilder builder) {

@@ -41,6 +41,7 @@ import org.springframework.osgi.config.internal.adapter.OsgiServiceLifecycleList
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
 import org.springframework.osgi.config.internal.util.ReferenceParsingUtil;
+import org.springframework.osgi.service.importer.support.Availability;
 import org.springframework.osgi.service.importer.support.ImportContextClassLoaderEnum;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -85,7 +86,9 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 			}
 
 			if (AVAILABILITY.equals(name)) {
-				builder.addPropertyValue(AVAILABILITY_PROP, ReferenceParsingUtil.determineAvailability(value));
+				Availability avail = ReferenceParsingUtil.determineAvailability(value);
+				System.out.println("Setting availability to " + avail + " based on attribute value " + value);
+				builder.addPropertyValue(AVAILABILITY_PROP, avail);
 				return false;
 			}
 
@@ -147,9 +150,6 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 
 	public static final String GENERATED_REF = "org.springframework.osgi.config.reference.generated";
 
-	// document defaults
-	protected OsgiDefaultsDefinition defaults = null;
-
 	/**
 	 * Get OSGi defaults (in case they haven't been resolved).
 	 * 
@@ -171,7 +171,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 		}
 
 		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-		
+
 		builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
 		if (parserContext.isNested()) {
 			// Inner bean definition must receive same scope as containing bean.
@@ -219,13 +219,11 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
 		ReferenceParsingUtil.checkAvailabilityAndCardinalityDuplication(element, AVAILABILITY, CARDINALITY, context);
 
-		if (defaults == null) {
-			defaults = resolveDefaults(element.getOwnerDocument(), context);
-		}
+		OsgiDefaultsDefinition defaults = resolveDefaults(element.getOwnerDocument(), context);
 
 		AttributeCallback callback = new ReferenceAttributesCallback();
 
-		parseAttributes(element, builder, new AttributeCallback[] { callback });
+		parseAttributes(element, builder, new AttributeCallback[] { callback }, defaults);
 
 		if (!isCardinalitySpecified(builder)) {
 			applyDefaultCardinality(builder, defaults);
@@ -259,7 +257,8 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	 * @param builder
 	 * @param callbacks
 	 */
-	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks) {
+	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks,
+			OsgiDefaultsDefinition defaults) {
 		ParserUtils.parseCustomAttributes(element, builder, callbacks);
 	}
 

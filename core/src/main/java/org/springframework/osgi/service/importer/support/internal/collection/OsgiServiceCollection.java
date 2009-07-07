@@ -42,6 +42,7 @@ import org.springframework.osgi.service.importer.support.MemberType;
 import org.springframework.osgi.service.importer.support.internal.aop.ProxyPlusCallback;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
+import org.springframework.osgi.service.importer.support.internal.exception.BlueprintExceptionFactory;
 import org.springframework.osgi.service.importer.support.internal.util.OsgiServiceBindingUtils;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.util.Assert;
@@ -246,7 +247,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	 */
 	protected DynamicCollection<Object> services;
 
-	private boolean serviceRequiredAtStartup = true;
+	private volatile boolean serviceRequiredAtStartup = true;
 
 	private final Filter filter;
 
@@ -278,6 +279,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 	/** use references instead of instances inside the collection */
 	private final boolean useServiceReferences;
+
+	private volatile boolean useBlueprintExceptions = false;
 
 	public OsgiServiceCollection(Filter filter, BundleContext context, ClassLoader classLoader,
 			ServiceProxyCreator proxyCreator, MemberType memberType) {
@@ -324,8 +327,14 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 			// unwrap and destroy proxies
 			for (Object item : services) {
-				ImportedOsgiServiceProxy serviceProxy = (ImportedOsgiServiceProxy) item;
-				ServiceReference ref = serviceProxy.getServiceReference();
+				ServiceReference ref;
+
+				if (!useServiceReferences) {
+					ImportedOsgiServiceProxy serviceProxy = (ImportedOsgiServiceProxy) item;
+					ref = serviceProxy.getServiceReference().getTargetServiceReference();
+				} else {
+					ref = (ServiceReference) item;
+				}
 
 				// get first the destruction callback
 				ProxyPlusCallback ppc =
@@ -349,7 +358,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	 */
 	protected void mandatoryServiceCheck() {
 		if (serviceRequiredAtStartup && services.isEmpty())
-			throw new ServiceUnavailableException(filter);
+			throw (useBlueprintExceptions ? BlueprintExceptionFactory.createServiceUnavailableException(filter)
+					: new ServiceUnavailableException(filter));
 	}
 
 	public boolean isSatisfied() {
@@ -462,5 +472,9 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		synchronized (lock) {
 			this.stateListeners = stateListeners;
 		}
+	}
+
+	public void setUseBlueprintExceptions(boolean useBlueprintExceptions) {
+		this.useBlueprintExceptions = useBlueprintExceptions;
 	}
 }
