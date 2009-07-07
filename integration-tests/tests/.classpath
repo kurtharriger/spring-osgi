@@ -41,6 +41,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/annotation.dependencies/2.0.0-m1-SNAPSHOT/annotation.dependencies-2.0.0-m1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/annotation.proxy/2.0.0-m1-SNAPSHOT/annotation.proxy-2.0.0-m1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/component.scan.bundle/2.0.0-m1-SNAPSHOT/component.scan.bundle-2.0.0-m1-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/rfc124/api/2.0.0-m1-SNAPSHOT/api-2.0.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/blueprint/api/2.0.0-m1-SNAPSHOT/api-2.0.0-m1-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/test-classes"/>
 </classpath>
