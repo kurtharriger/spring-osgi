@@ -84,7 +84,7 @@ class OsgiEventDispatcher implements EventDispatcher, BlueprintConstants {
 	public void refreshFailure(BlueprintEvent event) {
 		Dictionary<String, Object> props = init(event);
 
-		Throwable th = event.getException();
+		Throwable th = event.getCause();
 		props.put(EXCEPTION, th);
 		props.put(CAUSE, th);
 		props.put(EXCEPTION_CLASS, th.getClass().getName());

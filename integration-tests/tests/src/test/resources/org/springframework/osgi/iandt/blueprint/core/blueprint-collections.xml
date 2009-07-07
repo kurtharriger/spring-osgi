@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    default-availability="optional" default-timeout="300">
+
+    <description>
+        This is a checker for basic reference list validation, but with the availability specified via the default.
+    </description>
+
+    <bean id="listener" class="org.springframework.osgi.iandt.blueprint.core.Listener"/>
+
+
+    <!-- This gets both a ServiceManager and a reference collection injected -->
+   
+   <bean id="bean" class="org.springframework.osgi.iandt.blueprint.core.InitBean" init-method="init">
+       <property name="list">
+           <reference-list interface="java.awt.Shape" member-type="service-object">
+               <description>Testing descriptions also</description>
+               <reference-listener bind-method="bind" unbind-method="unbind" ref="listener"/>
+           </reference-list>
+       </property>
+       <property name="bundleContext" ref="bundleContext"/>
+   </bean>
+</blueprint>

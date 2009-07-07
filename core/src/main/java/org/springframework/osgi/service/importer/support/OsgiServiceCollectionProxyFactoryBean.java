@@ -215,6 +215,7 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 		collection.setStateListeners(stateListeners);
 		collection.setServiceImporter(this);
 		collection.setServiceImporterName(getBeanName());
+		collection.setUseBlueprintExceptions(isUseBlueprintExceptions());
 		collection.afterPropertiesSet();
 
 		proxy = delegate;

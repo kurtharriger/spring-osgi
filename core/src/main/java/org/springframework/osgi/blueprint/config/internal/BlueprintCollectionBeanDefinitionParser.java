@@ -23,6 +23,8 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.config.internal.CollectionBeanDefinitionParser;
 import org.springframework.osgi.config.internal.OsgiDefaultsDefinition;
+import org.springframework.osgi.config.internal.util.AttributeCallback;
+import org.springframework.osgi.config.internal.util.ParserUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -37,6 +39,16 @@ public abstract class BlueprintCollectionBeanDefinitionParser extends Collection
 	@Override
 	protected OsgiDefaultsDefinition resolveDefaults(Document document, ParserContext parserContext) {
 		return new BlueprintDefaultsDefinition(document, parserContext);
+	}
+
+	@Override
+	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks,
+			OsgiDefaultsDefinition defaults) {
+
+		// add BlueprintAttr Callback
+		AttributeCallback blueprintCallback = new BlueprintReferenceAttributeCallback();
+		super.parseAttributes(element, builder, ParserUtils.mergeCallbacks(
+				new AttributeCallback[] { blueprintCallback }, callbacks), defaults);
 	}
 
 	@Override

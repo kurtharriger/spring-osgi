@@ -63,11 +63,12 @@ public class ReferenceBeanDefinitionParser extends AbstractReferenceDefinitionPa
 		return OsgiServiceProxyFactoryBean.class;
 	}
 
-	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks) {
+	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks,
+			OsgiDefaultsDefinition defaults) {
 		// add timeout callback
 		TimeoutAttributeCallback timeoutCallback = new TimeoutAttributeCallback();
 		super.parseAttributes(element, builder, ParserUtils.mergeCallbacks(callbacks,
-				new AttributeCallback[] { timeoutCallback }));
+				new AttributeCallback[] { timeoutCallback }), defaults);
 
 		// look for defaults
 		if (!timeoutCallback.isTimeoutSpecified) {

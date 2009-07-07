@@ -51,19 +51,19 @@ public class OsgiDefaultsDefinition {
 		ReferenceParsingUtil.checkAvailabilityAndCardinalityDuplication(root, DEFAULT_AVAILABILITY,
 				DEFAULT_CARDINALITY, parserContext);
 
-		String timeout = root.getAttributeNS(OSGI_NS, DEFAULT_TIMEOUT);
+		String timeout = getAttribute(root, OSGI_NS, DEFAULT_TIMEOUT);
 
 		if (StringUtils.hasText(timeout)) {
 			setTimeout(timeout);
 		}
 
-		String availability = root.getAttributeNS(OSGI_NS, DEFAULT_AVAILABILITY);
+		String availability = getAttribute(root, OSGI_NS, DEFAULT_AVAILABILITY);
 
 		if (StringUtils.hasText(availability)) {
 			setAvailability(ReferenceParsingUtil.determineAvailability(availability));
 		}
 
-		String cardinality = root.getAttributeNS(OSGI_NS, DEFAULT_CARDINALITY);
+		String cardinality = getAttribute(root, OSGI_NS, DEFAULT_CARDINALITY);
 
 		if (StringUtils.hasText(cardinality)) {
 			setAvailability(ReferenceParsingUtil.determineAvailabilityFromCardinality(cardinality));
@@ -84,5 +84,10 @@ public class OsgiDefaultsDefinition {
 
 	protected void setAvailability(Availability availability) {
 		this.availability = availability;
+	}
+
+	protected String getAttribute(Element root, String ns, String attributeName) {
+		String value = root.getAttributeNS(ns, attributeName);
+		return (!StringUtils.hasText(value) ? root.getAttribute(attributeName) : value);
 	}
 }

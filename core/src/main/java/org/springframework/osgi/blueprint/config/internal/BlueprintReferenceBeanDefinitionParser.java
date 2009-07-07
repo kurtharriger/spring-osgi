@@ -42,12 +42,13 @@ public class BlueprintReferenceBeanDefinitionParser extends ReferenceBeanDefinit
 	}
 
 	@Override
-	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks) {
+	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks,
+			OsgiDefaultsDefinition defaults) {
 
 		// add BlueprintAttr Callback
 		AttributeCallback blueprintCallback = new BlueprintReferenceAttributeCallback();
 		super.parseAttributes(element, builder, ParserUtils.mergeCallbacks(
-				new AttributeCallback[] { blueprintCallback }, callbacks));
+				new AttributeCallback[] { blueprintCallback }, callbacks), defaults);
 	}
 
 	@Override
@@ -64,6 +65,7 @@ public class BlueprintReferenceBeanDefinitionParser extends ReferenceBeanDefinit
 	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
 		super.doParse(element, context, builder);
 		builder.addPropertyValue("useBlueprintExceptions", true);
+		builder.addPropertyValue("sticky", true);
 	}
 
 	@Override
