@@ -198,7 +198,7 @@ public class BlueprintConfigUtils {
 		}
 
 		// empty header specified
-		if (header.isEmpty()) {
+		if (header.length() == 0) {
 			return new String[0];
 		}
 
