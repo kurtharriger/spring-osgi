@@ -32,6 +32,7 @@ import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.internal.ClassUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Base class for importing OSGi services. Provides the common properties and contracts between importers.
@@ -106,10 +107,32 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 			log.trace("Unified classes=" + ObjectUtils.nullSafeToString(interfaces) + " and filter=[" + filter
 					+ "]  in=[" + filterWithClasses + "]");
 
-		// add the serviceBeanName constraint
-		String filterWithServiceBeanName =
-				OsgiFilterUtils.unifyFilter(OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY,
-						new String[] { serviceBeanName }, filterWithClasses);
+		// add the serviceBeanName/Blueprint component name constraint
+		String nameFilter;
+		if (StringUtils.hasText(serviceBeanName)) {
+			StringBuilder nsFilter = new StringBuilder("(|(");
+			nsFilter.append(OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY);
+			nsFilter.append("=");
+			nsFilter.append(serviceBeanName);
+			nsFilter.append(")(");
+			nsFilter.append(OsgiServicePropertiesResolver.BLUEPRINT_COMP_NAME);
+			nsFilter.append("=");
+			nsFilter.append(serviceBeanName);
+			nsFilter.append("))");
+			nameFilter = nsFilter.toString();
+		} else {
+			nameFilter = null;
+		}
+
+		String filterWithServiceBeanName = filterWithClasses;
+		if (nameFilter != null) {
+			StringBuilder finalFilter = new StringBuilder();
+			finalFilter.append("(&");
+			finalFilter.append(filterWithClasses);
+			finalFilter.append(nameFilter);
+			finalFilter.append(")");
+			filterWithServiceBeanName = finalFilter.toString();
+		}
 
 		if (trace)
 			log.trace("Unified serviceBeanName [" + ObjectUtils.nullSafeToString(serviceBeanName) + "] and filter=["

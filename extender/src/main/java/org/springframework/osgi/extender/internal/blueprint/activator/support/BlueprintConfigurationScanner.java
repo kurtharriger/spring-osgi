@@ -61,11 +61,17 @@ public class BlueprintConfigurationScanner implements ConfigurationScanner {
 		String[] locations = BlueprintConfigUtils.getBlueprintHeaderLocations(bundle.getHeaders());
 
 		// if no location is specified in the header, try the defaults
-		if (ObjectUtils.isEmpty(locations)) {
+		if (locations == null) {
 			if (trace) {
 				log.trace("Bundle " + bundleName + " has no declared locations; trying default " + DEFAULT_CONFIG);
 			}
 			locations = new String[] { DEFAULT_CONFIG };
+		} else {
+			// check whether the header is empty
+			if (ObjectUtils.isEmpty(locations)) {
+				log.info("Bundle " + bundleName + " has an empty blueprint header - ignoring bundle...");
+			}
+			return locations;
 		}
 
 		String[] configs = findValidBlueprintConfigs(bundle, locations);

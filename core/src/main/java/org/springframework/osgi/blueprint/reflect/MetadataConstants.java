@@ -29,9 +29,11 @@ import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactory
 interface MetadataConstants {
 
 	// common properties shared across the metadata factories
-	static final Class<?> EXPORTER_CLASS = OsgiServiceFactoryBean.class;
-	static final Class<?> SINGLE_SERVICE_IMPORTER_CLASS = OsgiServiceProxyFactoryBean.class;
-	static final Class<?> MULTI_SERVICE_IMPORTER_CLASS = OsgiServiceCollectionProxyFactoryBean.class;
+	static final Class<OsgiServiceFactoryBean> EXPORTER_CLASS = OsgiServiceFactoryBean.class;
+	static final Class<OsgiServiceProxyFactoryBean> SINGLE_SERVICE_IMPORTER_CLASS = OsgiServiceProxyFactoryBean.class;
+	static final Class<OsgiServiceCollectionProxyFactoryBean> MULTI_SERVICE_IMPORTER_CLASS =
+			OsgiServiceCollectionProxyFactoryBean.class;
+	static final Class<EnvironmentManagerFactoryBean> ENV_FB_CLASS = EnvironmentManagerFactoryBean.class;
 
 	// component metadata attribute holder (for spring bean definitions)
 	static final String SPRING_DM_PREFIX = "spring.osgi.";
@@ -51,7 +53,7 @@ interface MetadataConstants {
 	static String IMPORTER_FILTER_PROP = "filter";
 	static String IMPORTER_CARDINALITY_PROP = "cardinality";
 
-	// single importer 
+	// single importer
 	static String IMPORTER_BEAN_NAME_PROP = "serviceBeanName";
 	static String IMPORTER_TIMEOUT_PROP = "timeout";
 

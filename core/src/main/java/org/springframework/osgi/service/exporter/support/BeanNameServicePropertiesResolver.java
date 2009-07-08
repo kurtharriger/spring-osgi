@@ -31,13 +31,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link OsgiServicePropertiesResolver} that creates a service property set
- * with the following properties:
- * <ul>
- * <li>Bundle-SymbolicName=&lt;bundle symbolic name&gt;</li>
- * <li>Bundle-Version=&lt;bundle version&gt;</li>
- * <li>org.springframework.osgi.bean.name="&lt;bean name&gt;</li>
- * </ul>
+ * {@link OsgiServicePropertiesResolver} that creates a service property set with the following properties: <ul>
+ * <li>Bundle-SymbolicName=&lt;bundle symbolic name&gt;</li> <li>Bundle-Version=&lt;bundle version&gt;</li>
+ * <li>org.springframework.osgi.bean.name="&lt;bean name&gt;</li> </ul>
  * 
  * 
  * @author Adrian Colyer
@@ -51,9 +47,6 @@ public class BeanNameServicePropertiesResolver implements OsgiServicePropertiesR
 		InitializingBean {
 
 	private BundleContext bundleContext;
-	// FIXME: should these be externalized or not
-	private static final String BLUEPRINT_COMP_NAME = "osgi.service.blueprint.compname";
-
 
 	public Map getServiceProperties(String beanName) {
 		Map p = new MapBasedDictionary();
