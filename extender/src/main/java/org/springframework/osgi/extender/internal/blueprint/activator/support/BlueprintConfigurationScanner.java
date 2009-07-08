@@ -70,10 +70,11 @@ public class BlueprintConfigurationScanner implements ConfigurationScanner {
 			// check whether the header is empty
 			if (ObjectUtils.isEmpty(locations)) {
 				log.info("Bundle " + bundleName + " has an empty blueprint header - ignoring bundle...");
+				return new String[0];
 			}
-			return locations;
 		}
 
+		System.out.println("About to validate locations " + Arrays.toString(locations));
 		String[] configs = findValidBlueprintConfigs(bundle, locations);
 		if (debug)
 			log.debug("Discovered in bundle" + bundleName + " blueprint configurations=" + Arrays.toString(configs));
@@ -92,21 +93,29 @@ public class BlueprintConfigurationScanner implements ConfigurationScanner {
 
 		boolean debug = log.isDebugEnabled();
 		for (String location : locations) {
+			System.out.println("Looking at location " + location);
 			if (isAbsolute(location)) {
 				configs.add(location);
+				System.out.println("Location " + location + " is absolute; adding it to the list");
 			}
 			// resolve the location to check if it's present
 			else {
 				try {
 					String loc = location;
-					if (loc.endsWith("/"))
+					if (loc.endsWith("/")) {
+						System.out.println("Location " + loc + " is a folder; looking for xml files in it...");
 						loc = loc + "*.xml";
+					}
 					Resource[] resources = loader.getResources(loc);
+					System.out.println("Retrieved locations for location " + loc + " = " + Arrays.toString(resources));
 					if (!ObjectUtils.isEmpty(resources)) {
 						for (Resource resource : resources) {
 							if (resource.exists()) {
-								configs.add(location);
-								break;
+								String value = resource.getURL().toString();
+								if (debug)
+									log.debug("Found location " + value);
+								System.out.println("Found location " + value);
+								configs.add(value);
 							}
 						}
 					}

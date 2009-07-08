@@ -42,20 +42,22 @@ public class BlueprintContainerCreator implements OsgiApplicationContextCreator 
 			throws Exception {
 		Bundle bundle = bundleContext.getBundle();
 		ApplicationContextConfiguration config = new BlueprintContainerConfig(bundle);
+		String bundleName = OsgiStringUtils.nullSafeNameAndSymName(bundle);
 		if (log.isTraceEnabled())
-			log.trace("Created configuration " + config + " for bundle "
-					+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
+			log.trace("Created configuration " + config + " for bundle " + bundleName);
 
 		// it's not a spring bundle, ignore it
 		if (!config.isSpringPoweredBundle()) {
+			if (log.isDebugEnabled())
+				log.debug("No blueprint configuration found in bundle " + bundleName + "; ignoring it...");
 			return null;
 		}
 
 		log.info("Discovered configurations " + ObjectUtils.nullSafeToString(config.getConfigurationLocations())
-				+ " in bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "]");
+				+ " in bundle [" + bundleName + "]");
 
-		DelegatedExecutionOsgiBundleApplicationContext sdoac = new OsgiBundleXmlApplicationContext(config
-				.getConfigurationLocations());
+		DelegatedExecutionOsgiBundleApplicationContext sdoac =
+				new OsgiBundleXmlApplicationContext(config.getConfigurationLocations());
 		sdoac.setBundleContext(bundleContext);
 		sdoac.setPublishContextAsService(config.isPublishContextAsService());
 
