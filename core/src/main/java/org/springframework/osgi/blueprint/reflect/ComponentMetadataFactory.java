@@ -21,8 +21,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 
 /**
- * Internal class used for adapting Spring's bean definition to OSGi Blueprint
- * metadata. Used by {@link MetadataFactory} which acts as a facade.
+ * Internal class used for adapting Spring's bean definition to OSGi Blueprint metadata. Used by {@link MetadataFactory}
+ * which acts as a facade.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
@@ -58,6 +58,10 @@ class ComponentMetadataFactory implements MetadataConstants {
 			return new SpringReferenceListMetadata(name, beanDefinition);
 		}
 
+		if (isEnvironmentManager(beanDefinition)) {
+			return new EnvironmentManagerMetadata(name);
+		}
+
 		return new SpringBeanMetadata(name, beanDefinition);
 	}
 
@@ -71,6 +75,10 @@ class ComponentMetadataFactory implements MetadataConstants {
 
 	private static boolean isCollectionImporter(BeanDefinition beanDefinition) {
 		return checkBeanDefinitionClassCompatibility(beanDefinition, MULTI_SERVICE_IMPORTER_CLASS);
+	}
+
+	private static boolean isEnvironmentManager(BeanDefinition beanDefinition) {
+		return checkBeanDefinitionClassCompatibility(beanDefinition, ENV_FB_CLASS);
 	}
 
 	private static boolean checkBeanDefinitionClassCompatibility(BeanDefinition definition, Class<?> clazz) {

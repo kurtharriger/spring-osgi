@@ -100,13 +100,14 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 					}
 
 					break;
-				case (ServiceEvent.UNREGISTERING):
-					// listeners should be called before the service is removed from the collection
-					state = removeService(serviceId, ref);
 
-					// TODO: should this be part of the lock also?
+				case (ServiceEvent.UNREGISTERING):
+
+					state = canRemoveService(serviceId, ref);
+
 					if (state.collectionModified) {
 						OsgiServiceBindingUtils.callListenersUnbind(context, state.proxy, ref, listeners);
+						state = removeService(serviceId, ref);
 
 						if (serviceRequiredAtStartup && state.shouldInformStateListeners)
 							notifyUnsatisfiedStateListeners();
@@ -147,6 +148,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 		protected abstract EventResult addService(Long id, ServiceReference reference);
 
+		protected abstract EventResult canRemoveService(Long serviceId, ServiceReference ref);
+
 		protected abstract EventResult removeService(Long id, ServiceReference reference);
 	}
 
@@ -179,11 +182,29 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		}
 
 		@Override
-		protected EventResult removeService(Long serviceId, ServiceReference ref) {
+		protected EventResult canRemoveService(Long serviceId, ServiceReference ref) {
+			synchronized (services) {
+				ProxyPlusCallback ppc = servicesIdMap.get(serviceId);
 
+				if (ppc != null) {
+					EventResult state = new EventResult();
+					state.proxy = ppc.proxy;
+					Object value =
+							(useServiceReferences ? ppc.proxy.getServiceReference().getTargetServiceReference()
+									: ppc.proxy);
+					state.collectionModified = services.contains(value);
+
+					return state;
+				}
+			}
+			return EventResult.DEFAULT;
+		}
+
+		@Override
+		protected EventResult removeService(Long serviceId, ServiceReference ref) {
 			synchronized (services) {
 				// remove service id / proxy association
-				ProxyPlusCallback ppc = (ProxyPlusCallback) servicesIdMap.remove(serviceId);
+				ProxyPlusCallback ppc = servicesIdMap.remove(serviceId);
 
 				if (ppc != null) {
 					EventResult state = new EventResult();

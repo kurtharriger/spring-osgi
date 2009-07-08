@@ -25,6 +25,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.container.BlueprintEvent;
 import org.osgi.service.blueprint.container.BlueprintListener;
@@ -170,6 +171,7 @@ public class ExtenderBootstrapTest extends BaseBlueprintIntegrationTest {
 					+ bundle.getLocation());
 		}
 	}
+
 
 	private void installTestBundle() throws Exception {
 		Resource bundleResource =

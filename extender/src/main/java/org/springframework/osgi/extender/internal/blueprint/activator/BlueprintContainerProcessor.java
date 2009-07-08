@@ -27,9 +27,14 @@ import org.osgi.service.blueprint.container.BlueprintEvent;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.osgi.blueprint.container.BlueprintConverter;
 import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
 import org.springframework.osgi.blueprint.container.support.BlueprintContainerServicePublisher;
 import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
+import org.springframework.osgi.blueprint.reflect.EnvironmentManagerFactoryBean;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
@@ -91,7 +96,7 @@ public class BlueprintContainerProcessor implements
 	}
 
 	public void preProcessRefresh(final ConfigurableOsgiBundleApplicationContext context) {
-		BundleContext bundleContext = context.getBundleContext();
+		final BundleContext bundleContext = context.getBundleContext();
 		// create the ModuleContext adapter
 		final BlueprintContainer blueprintContainer = new SpringBlueprintContainer(context, bundleContext);
 		// add service publisher
@@ -99,28 +104,52 @@ public class BlueprintContainerProcessor implements
 		// add moduleContext bean
 		context.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
 
-			private static final String BLUEPRINT_CONTAINER_BEAN_NAME = "blueprintContainer";
-			private static final String BLUEPRINT_EXTENDER_BEAN_NAME = "blueprintExtenderBundle";
-			private static final String CONVERTER_BEAN_NAME = "converter";
+			private static final String BLUEPRINT_BUNDLE = "blueprintBundle";
+			private static final String BLUEPRINT_BUNDLE_CONTEXT = "blueprintBundleContext";
+			private static final String BLUEPRINT_CONTAINER = "blueprintContainer";
+			private static final String BLUEPRINT_EXTENDER = "blueprintExtenderBundle";
+			private static final String BLUEPRINT_CONVERTER = "blueprintConverter";
 
 			public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 				// lazy logger evaluation
 				Log logger = LogFactory.getLog(context.getClass());
 
+				if (beanFactory instanceof BeanDefinitionRegistry) {
+					logger.warn("Environmental beans will be registered as singletons instead "
+							+ "of usual bean definitions since beanFactory " + beanFactory
+							+ " is not a BeanDefinitionRegistry");
+				}
+
 				// add blueprint container bean
-				addPredefinedBean(beanFactory, BLUEPRINT_CONTAINER_BEAN_NAME, blueprintContainer, logger);
-				// add extender bundle
-				addPredefinedBean(beanFactory, BLUEPRINT_EXTENDER_BEAN_NAME, extenderBundle, logger);
+				addPredefinedBlueprintBean(beanFactory, BLUEPRINT_BUNDLE, bundleContext.getBundle(), logger);
+				addPredefinedBlueprintBean(beanFactory, BLUEPRINT_BUNDLE_CONTEXT, bundleContext, logger);
+				addPredefinedBlueprintBean(beanFactory, BLUEPRINT_CONTAINER, blueprintContainer, logger);
+				// addPredefinedBlueprintBean(beanFactory, BLUEPRINT_EXTENDER, extenderBundle, logger);
+				addPredefinedBlueprintBean(beanFactory, BLUEPRINT_CONVERTER, new BlueprintConverter(), logger);
 
 				// add Blueprint built-in converters
 				beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
 			}
 
-			private void addPredefinedBean(ConfigurableListableBeanFactory beanFactory, String beanName, Object value,
-					Log logger) {
+			private void addPredefinedBlueprintBean(ConfigurableListableBeanFactory beanFactory, String beanName,
+					Object value, Log logger) {
 				if (!beanFactory.containsLocalBean(beanName)) {
 					logger.debug("Registering pre-defined bean named " + beanName);
-					beanFactory.registerSingleton(beanName, value);
+					if (beanFactory instanceof BeanDefinitionRegistry) {
+						BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
+
+						GenericBeanDefinition def = new GenericBeanDefinition();
+						def.setBeanClass(EnvironmentManagerFactoryBean.class);
+						ConstructorArgumentValues cav = new ConstructorArgumentValues();
+						cav.addIndexedArgumentValue(0, value);
+						def.setConstructorArgumentValues(cav);
+						def.setLazyInit(false);
+						registry.registerBeanDefinition(beanName, def);
+
+					} else {
+						beanFactory.registerSingleton(beanName, value);
+					}
+
 				} else {
 					logger.warn("A bean named " + beanName
 							+ " already exists; aborting registration of the predefined value...");

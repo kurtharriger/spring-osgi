@@ -180,14 +180,27 @@ public class BlueprintConfigUtils {
 	 * Returns the location headers (if any) specified by the Blueprint-Bundle header (if available). The returned
 	 * Strings can be sent to a {@link org.springframework.core.io.ResourceLoader} for loading the configurations.
 	 * 
-	 * Different from {@link ConfigUtils#getLocationsFromHeader(String, String)} since "," is used for separating clauses
-	 * while ; is used inside a clause to allow parameters or directives besides paths.
+	 * Different from {@link ConfigUtils#getLocationsFromHeader(String, String)} since "," is used for separating
+	 * clauses while ; is used inside a clause to allow parameters or directives besides paths.
+	 * 
+	 * Since the presence of the header, disables any processing this method will return null if the header is not
+	 * specified, an empty array if it's empty (disabled) or a populated array otherwise.
 	 * 
 	 * @param headers bundle headers
 	 * @return array of locations specified (if any)
 	 */
 	public static String[] getBlueprintHeaderLocations(Dictionary headers) {
 		String header = getBlueprintHeader(headers);
+
+		// no header specified
+		if (header == null) {
+			return null;
+		}
+
+		// empty header specified
+		if (header.isEmpty()) {
+			return new String[0];
+		}
 
 		List<String> ctxEntries = new ArrayList<String>(4);
 		if (StringUtils.hasText(header)) {

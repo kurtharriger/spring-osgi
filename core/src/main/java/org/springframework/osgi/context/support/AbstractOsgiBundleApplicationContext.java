@@ -89,8 +89,6 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 
 	private static final String EXPORTER_IMPORTER_DEPENDENCY_MANAGER =
 			"org.springframework.osgi.service.dependency.internal.MandatoryDependencyBeanPostProcessor";
-	private static final String BLUEPRINT_BUNDLE = "blueprintBundle";
-	private static final String BLUEPRINT_BUNDLE_CONTEXT = "blueprintBundleContext";
 
 	/** OSGi bundle - determined from the BundleContext */
 	private Bundle bundle;
@@ -231,10 +229,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		// add predefined beans
 		// bundleContext
 		addPredefinedBean(beanFactory, BUNDLE_CONTEXT_BEAN_NAME, this.bundleContext);
-		addPredefinedBean(beanFactory, BLUEPRINT_BUNDLE_CONTEXT, this.bundleContext);
-
 		addPredefinedBean(beanFactory, BUNDLE_BEAN_NAME, this.bundle);
-		addPredefinedBean(beanFactory, BLUEPRINT_BUNDLE, this.bundle);
 
 		// register property editors
 		registerPropertyEditors(beanFactory);
