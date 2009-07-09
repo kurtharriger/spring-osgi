@@ -33,8 +33,10 @@ import org.springframework.util.StringUtils;
 /**
  * {@link OsgiServicePropertiesResolver} that creates a service property set with the following properties: <ul>
  * <li>Bundle-SymbolicName=&lt;bundle symbolic name&gt;</li> <li>Bundle-Version=&lt;bundle version&gt;</li>
- * <li>org.springframework.osgi.bean.name="&lt;bean name&gt;</li> </ul>
+ * <li>org.springframework.osgi.bean.name="&lt;bean name&gt;</li> <li>osgi.service.blueprint.compname="&lt;bean
+ * name&gt;</li> </ul>
  * 
+ * If the name is null/empty, the keys that refer to it will not be created.
  * 
  * @author Adrian Colyer
  * @author Hal Hildebrand
@@ -50,8 +52,10 @@ public class BeanNameServicePropertiesResolver implements OsgiServicePropertiesR
 
 	public Map getServiceProperties(String beanName) {
 		Map p = new MapBasedDictionary();
-		p.put(BEAN_NAME_PROPERTY_KEY, beanName);
-		p.put(BLUEPRINT_COMP_NAME, beanName);
+		if (StringUtils.hasText(beanName)) {
+			p.put(BEAN_NAME_PROPERTY_KEY, beanName);
+			p.put(BLUEPRINT_COMP_NAME, beanName);
+		}
 
 		String name = getSymbolicName();
 		if (StringUtils.hasLength(name)) {

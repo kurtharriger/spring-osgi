@@ -62,6 +62,7 @@
     <module>jdk.proxy.bundle</module>
     <module>extender.listener.bundle</module>
     <module>namespace.own.consumer.bundle</module>
+    <module>proxy.listener</module>
     <module>web.bundles</module>
     <module>jdk5</module>
     <!-- lazy bundles -->

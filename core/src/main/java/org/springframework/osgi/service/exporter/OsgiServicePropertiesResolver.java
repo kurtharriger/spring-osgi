@@ -44,7 +44,7 @@ public interface OsgiServicePropertiesResolver {
 
 	/**
 	 * Returns a map containing the service properties associated with the given Spring managed bean identified by its
-	 * name.
+	 * name. The name can be null (for example if nested beans are exported).
 	 * 
 	 * @param beanName Spring managed bean name
 	 * @return map containing the service properties

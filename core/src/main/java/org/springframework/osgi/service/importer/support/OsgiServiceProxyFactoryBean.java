@@ -16,7 +16,6 @@
 
 package org.springframework.osgi.service.importer.support;
 
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,8 +38,6 @@ import org.springframework.osgi.service.importer.support.internal.controller.Imp
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
 import org.springframework.osgi.service.importer.support.internal.support.RetryTemplate;
 import org.springframework.osgi.util.internal.ClassUtils;
-import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
 
 /**
  * OSGi (single) service importer. This implementation creates a managed OSGi service proxy that handles the OSGi
@@ -93,6 +90,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 
 	/** proxy infrastructure hook exposed to allow clean up */
 	private Runnable destructionCallback;
+	private Runnable initializationCallback;
 
 	/** application publisher */
 	private ApplicationEventPublisher applicationEventPublisher;
@@ -106,7 +104,6 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	private volatile boolean mandatory = true;
 
 	private volatile boolean sticky = false;
-
 	private final Object monitor = new Object();
 
 	public OsgiServiceProxyFactoryBean() {
@@ -122,42 +119,13 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * Returns the managed proxy type. If the proxy is not created when this method is invoked, the method will try to
-	 * create a composite interface (if only interfaces are specified) or null otherwise.
-	 */
-	public Class<?> getObjectType() {
-		synchronized (monitor) {
-			if (proxy != null) {
-				return proxy.getClass();
-			}
-			// no proxy defined, try to create a composite interface
-			Class<?>[] intfs = getInterfaces();
-			if (!ObjectUtils.isEmpty(intfs)) {
-				for (int index = 0; index < intfs.length; index++) {
-					// concrete class found, need to create an actual proxy
-					if (!intfs[index].isInterface()) {
-						return null;
-					}
-				}
-				Class<?>[] cls = (Class[]) ObjectUtils.addObjectToArray(intfs, ImportedOsgiServiceProxy.class);
-				return Proxy.getProxyClass(getAopClassLoader(), cls);
-			}
-		}
-
-		// unable to determine the type, returning null
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
 	 * Returns a managed proxy to the best matching OSGi service.
 	 */
 	public Object getObject() {
 		return super.getObject();
 	}
 
-	Object createProxy() {
+	Object createProxy(boolean lazyProxy) {
 		if (log.isDebugEnabled())
 			log.debug("Creating a single service proxy ...");
 
@@ -212,11 +180,26 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 
 		lookupAdvice.setProxy(proxy);
 		// start the lookup only after the proxy has been assembled
-		lookupAdvice.afterPropertiesSet();
+		if (!lazyProxy) {
+			lookupAdvice.afterPropertiesSet();
+		} else {
+			initializationCallback = new Runnable() {
+
+				public void run() {
+					lookupAdvice.afterPropertiesSet();
+				}
+			};
+		}
 
 		return proxy;
 	}
 
+	@Override
+	Runnable getProxyInitializer() {
+		return initializationCallback;
+	}
+
+	@Override
 	Runnable getProxyDestructionCallback() {
 		synchronized (monitor) {
 			return destructionCallback;

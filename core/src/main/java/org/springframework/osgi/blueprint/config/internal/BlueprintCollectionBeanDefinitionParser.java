@@ -65,6 +65,7 @@ public abstract class BlueprintCollectionBeanDefinitionParser extends Collection
 	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
 		super.doParse(element, context, builder);
 		builder.addPropertyValue("useBlueprintExceptions", true);
+		builder.addPropertyValue("blueprintCompliant", true);
 	}
 
 	@Override

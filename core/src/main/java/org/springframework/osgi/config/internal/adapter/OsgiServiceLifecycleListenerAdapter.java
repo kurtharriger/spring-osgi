@@ -97,6 +97,8 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 
 		Class<?> clazz = (target == null ? beanFactory.getType(targetBeanName) : target.getClass());
 
+		Assert.notNull(clazz, "listener " + targetBeanName + " class type cannot be determined");
+
 		isLifecycleListener = OsgiServiceLifecycleListener.class.isAssignableFrom(clazz);
 		if (isLifecycleListener)
 			if (log.isDebugEnabled())
@@ -140,6 +142,19 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 			throw new IllegalArgumentException("target object needs to implement "
 					+ OsgiServiceLifecycleListener.class.getName()
 					+ " or custom bind/unbind methods have to be specified");
+
+		if (log.isTraceEnabled()) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("Discovered bind methods=");
+			builder.append(bindMethods.values());
+			builder.append(", bind ServiceReference=");
+			builder.append(bindReference);
+			builder.append("\nunbind methods=");
+			builder.append(unbindMethods.values());
+			builder.append(", unbind ServiceReference=");
+			builder.append(unbindReference);
+			log.trace(builder.toString());
+		}
 	}
 
 	/**
@@ -175,7 +190,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 		}
 	}
 
-	public void bind(Object service, Map<?, ?> properties) throws Exception {
+	public void bind(Object service, Map properties) throws Exception {
 		boolean trace = log.isTraceEnabled();
 		if (trace)
 			log.trace("invoking bind method for service " + service + " with props=" + properties);
@@ -199,7 +214,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 		invokeCustomServiceReferenceMethod(target, bindReference, service);
 	}
 
-	public void unbind(Object service, Map<?, ?> properties) throws Exception {
+	public void unbind(Object service, Map properties) throws Exception {
 		boolean trace = log.isTraceEnabled();
 		if (!initialized)
 			retrieveTarget();

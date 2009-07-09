@@ -262,15 +262,22 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	private Dictionary mergeServiceProperties(Map serviceProperties, String beanName) {
 		MapBasedDictionary props = new MapBasedDictionary();
 
-		props.putAll(propertiesResolver.getServiceProperties(beanName));
-
 		// add service properties
 		if (serviceProperties != null)
 			props.putAll(serviceProperties);
 
+		// eliminate any property that might clash with the official ones
+		props.remove(OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY);
+		props.remove(OsgiServicePropertiesResolver.BLUEPRINT_COMP_NAME);
+		props.remove(Constants.SERVICE_RANKING);
+
+		// override any user property that might clash with the official ones
+		props.putAll(propertiesResolver.getServiceProperties(beanName));
+
 		if (ranking != 0) {
-			props.put(org.osgi.framework.Constants.SERVICE_RANKING, new Integer(ranking));
+			props.put(Constants.SERVICE_RANKING, Integer.valueOf(ranking));
 		}
+
 		return props;
 	}
 
@@ -288,7 +295,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		}
 
 		// if we have a nested bean / non-Spring managed object
-		String beanName = (!hasNamedBean ? ObjectUtils.getIdentityHexString(target) : targetBeanName);
+		String beanName = (!hasNamedBean ? null : targetBeanName);
 
 		Dictionary serviceProperties = mergeServiceProperties(this.serviceProperties, beanName);
 
