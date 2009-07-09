@@ -26,8 +26,8 @@ import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.util.Assert;
 
 /**
- * Decorator class for {@link ServiceReference} which add notification for
- * {@link ServiceRegistration#unregister()} method when dealing with listeners.
+ * Decorator class for {@link ServiceReference} which add notification for {@link ServiceRegistration#unregister()}
+ * method when dealing with listeners.
  * 
  * @author Costin Leau
  */
@@ -39,7 +39,6 @@ public class ServiceRegistrationDecorator implements ServiceRegistration {
 	private final OsgiServiceRegistrationListener[] listeners;
 
 	private final Object service;
-
 
 	public ServiceRegistrationDecorator(Object service, ServiceRegistration registration,
 			OsgiServiceRegistrationListener[] listeners) {
@@ -62,20 +61,19 @@ public class ServiceRegistrationDecorator implements ServiceRegistration {
 		// if the delegate is unregistered then an exception will be thrown
 		Map properties = (Map) OsgiServiceReferenceUtils.getServicePropertiesSnapshot(delegate.getReference());
 
-		delegate.unregister();
-
 		// if no exception has been thrown (i.e. the delegate is properly
 		// unregistered), the listeners will be informed
 		for (int i = 0; i < listeners.length; i++) {
 			if (listeners[i] != null) {
 				try {
 					listeners[i].unregistered(service, properties);
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					// no need to log exceptions, the wrapper already does this
 				}
 			}
 		}
+
+		delegate.unregister();
 	}
 
 	public String toString() {

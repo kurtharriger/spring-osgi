@@ -36,7 +36,7 @@ public interface OsgiServiceRegistrationListener {
 	 * @param serviceProperties OSGi service registration properties
 	 * @throws Exception custom exception that is logged but not propagated to other listeners
 	 */
-	void registered(Object service, Map<?, ?> serviceProperties) throws Exception;
+	void registered(Object service, Map serviceProperties) throws Exception;
 
 	/**
 	 * Called when the OSGi service has been unregistered (removed from OSGi space). The service properties are made
@@ -46,6 +46,6 @@ public interface OsgiServiceRegistrationListener {
 	 * @param serviceProperties OSGi service registration properties
 	 * @throws Exception custom exception that is logged but not propagated to other listeners
 	 */
-	void unregistered(Object service, Map<?, ?> serviceProperties) throws Exception;
+	void unregistered(Object service, Map serviceProperties) throws Exception;
 
 }

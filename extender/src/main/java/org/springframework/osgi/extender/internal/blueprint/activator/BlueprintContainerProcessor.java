@@ -114,7 +114,7 @@ public class BlueprintContainerProcessor implements
 				// lazy logger evaluation
 				Log logger = LogFactory.getLog(context.getClass());
 
-				if (beanFactory instanceof BeanDefinitionRegistry) {
+				if (!(beanFactory instanceof BeanDefinitionRegistry)) {
 					logger.warn("Environmental beans will be registered as singletons instead "
 							+ "of usual bean definitions since beanFactory " + beanFactory
 							+ " is not a BeanDefinitionRegistry");

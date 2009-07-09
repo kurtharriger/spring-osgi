@@ -39,7 +39,7 @@ interface BlueprintConstants {
 	static final String EXTENDER_BUNDLE_VERSION = org.osgi.service.blueprint.container.EventConstants.EXTENDER_BUNDLE_VERSION;
 
 	static final String EXCEPTION = EventConstants.EXCEPTION;
-	static final String CAUSE = org.osgi.service.blueprint.container.EventConstants.CAUSE;
+	static final String CAUSE = "cause";
 	static final String EXCEPTION_CLASS = EventConstants.EXECPTION_CLASS;
 	static final String EXCEPTION_MESSAGE = EventConstants.EXCEPTION_MESSAGE;
 

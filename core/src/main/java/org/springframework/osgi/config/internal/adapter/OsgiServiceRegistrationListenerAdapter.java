@@ -99,9 +99,18 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 			throw new IllegalArgumentException("target object needs to implement "
 					+ OsgiServiceRegistrationListener.class.getName()
 					+ " or custom registered/unregistered methods have to be specified");
+
+		if (log.isTraceEnabled()) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("Discovered bind methods=");
+			builder.append(registrationMethods.values());
+			builder.append("\nunbind methods=");
+			builder.append(unregistrationMethods.values());
+			log.trace(builder.toString());
+		}
 	}
 
-	public void registered(Object service, Map<?, ?> serviceProperties) {
+	public void registered(Object service, Map serviceProperties) {
 		boolean trace = log.isTraceEnabled();
 
 		if (trace)
@@ -125,7 +134,7 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 		CustomListenerAdapterUtils.invokeCustomMethods(target, registrationMethods, service, serviceProperties);
 	}
 
-	public void unregistered(Object service, Map<?, ?> serviceProperties) {
+	public void unregistered(Object service, Map serviceProperties) {
 
 		boolean trace = log.isTraceEnabled();
 

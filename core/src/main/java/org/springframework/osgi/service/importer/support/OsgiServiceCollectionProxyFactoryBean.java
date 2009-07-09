@@ -114,6 +114,7 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 
 	/** proxy infrastructure hook exposed to allow clean up */
 	private Runnable proxyDestructionCallback;
+	private Runnable initializationCallback;
 
 	/** proxy creator */
 	private ServiceProxyCreator proxyCreator;
@@ -145,31 +146,14 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * 
-	 * Returns the managed collection type.
-	 */
-	public Class<?> getObjectType() {
-		return (proxy != null ? proxy.getClass() : collectionType.getCollectionClass());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * Returns a managed collection that automatically handles the dynamics of matching OSGi services.
-	 */
-	public Object getObject() {
-		return super.getObject();
-	}
-
-	/**
 	 * Create the managed-collection given the existing settings. This method creates the osgi managed collection and
 	 * wraps it with an unmodifiable map to prevent exposing infrastructure methods and write access.
 	 * 
 	 * @return importer proxy
 	 */
 	@SuppressWarnings("unchecked")
-	Object createProxy() {
+	@Override
+	Object createProxy(boolean lazyProxy) {
 		if (log.isDebugEnabled())
 			log.debug("Creating a multi-value/collection proxy");
 
@@ -216,7 +200,18 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 		collection.setServiceImporter(this);
 		collection.setServiceImporterName(getBeanName());
 		collection.setUseBlueprintExceptions(isUseBlueprintExceptions());
-		collection.afterPropertiesSet();
+
+		// start the lookup only after the proxy has been assembled
+		if (!lazyProxy) {
+			collection.afterPropertiesSet();
+		} else {
+			final OsgiServiceCollection col = collection;
+			initializationCallback = new Runnable() {
+				public void run() {
+					col.afterPropertiesSet();
+				}
+			};
+		}
 
 		proxy = delegate;
 		exposedProxy = collection;
@@ -225,6 +220,12 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 		return delegate;
 	}
 
+	@Override
+	Runnable getProxyInitializer() {
+		return initializationCallback;
+	}
+
+	@Override
 	Runnable getProxyDestructionCallback() {
 		return proxyDestructionCallback;
 	}

@@ -40,13 +40,18 @@ Package org.springframework.osgi.service
 * deprecated AutoExport in favour of DefaultInterfaceDetector enum
 * deprecated Cardinality class in favour of Availability enum
 * improved laziness of the backing service retrieval
-* added 'sticky' option on single importers to prevent rebinds if higher ranking services
-  appear while the backing service is still alive
+* added 'sticky' option on single importers to prevent rebinds if higher ranking services appear while the backing
+  service is still alive
 * deprecated ExportContextClassLoader in favour of ExportContextClassLoaderEnum
 * deprecated ImportContextClassLoader in favour of ImportContextClassLoaderEnum
 * service collection can now contain service references instead of just service proxies
 * service exporter returns a 'safe' service registration that forbids unregistration
 * added new custom callback signature to service importer and exporter listeners
+* framework defined property take precedence over the user defined ones
+* eliminated generated name property for inner/anonymous beans
+* fixed reference collection listener behaviour by invoking the callbacks before items are removed from the collection
+* fixed service registration listener behaviour by invoking the callbacks before the service gets unregistered
+* improved proxy class generation to avoid introspection problems in concurrent environments
 
 Package org.springframework.osgi.mock
 * added specific OSGi r4.2 methods

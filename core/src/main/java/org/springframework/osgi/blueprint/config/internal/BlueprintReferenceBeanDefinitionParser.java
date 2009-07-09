@@ -65,6 +65,7 @@ public class BlueprintReferenceBeanDefinitionParser extends ReferenceBeanDefinit
 	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
 		super.doParse(element, context, builder);
 		builder.addPropertyValue("useBlueprintExceptions", true);
+		builder.addPropertyValue("blueprintCompliant", true);
 		builder.addPropertyValue("sticky", true);
 	}
 

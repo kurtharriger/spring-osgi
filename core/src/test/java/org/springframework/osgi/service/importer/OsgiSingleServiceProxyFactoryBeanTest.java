@@ -98,6 +98,8 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 
 	public void testGetObjectTypeCompositeInterface() {
 		this.serviceFactoryBean.setInterfaces(new Class<?>[] { ApplicationContext.class });
+		this.serviceFactoryBean.setBundleContext(this.bundleContext);
+		this.serviceFactoryBean.afterPropertiesSet();
 		assertTrue("composite interface not properly created", ApplicationContext.class
 				.isAssignableFrom(this.serviceFactoryBean.getObjectType()));
 		assertTrue("mixing interface not introduced", ImportedOsgiServiceProxy.class
@@ -106,8 +108,15 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 
 	public void testObjectTypeWOCompositeInterface() {
 		this.serviceFactoryBean.setInterfaces(new Class<?>[] { AbstractApplicationContext.class });
-		assertNull("should not be able to create composite interface when a class is specified",
-				this.serviceFactoryBean.getObjectType());
+		this.serviceFactoryBean.setBundleContext(this.bundleContext);
+		this.serviceFactoryBean.afterPropertiesSet();
+
+		try {
+			this.serviceFactoryBean.getObjectType();
+			fail("should not be able to create composite interface when a class is specified since CGLIB is not in the classpath");
+		} catch (Exception ex) {
+
+		}
 	}
 
 	// OsgiServiceUtils are tested independently in error cases, here we

@@ -42,17 +42,27 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 	private boolean initialized = false;
 	private Object proxy;
 	private boolean useBlueprintException = false;
+	private volatile boolean lazyProxy = false;
 
 	/** aop classloader */
 	private ChainedClassLoader aopClassLoader;
+	private boolean blueprintCompliant;
 
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
+
+		if (blueprintCompliant) {
+			setUseBlueprintExceptions(true);
+		}
 
 		Class<?>[] intfs = getInterfaces();
 
 		for (int i = 0; i < intfs.length; i++) {
 			Class<?> intf = intfs[i];
+			if (blueprintCompliant && !intf.isInterface()) {
+				throw new IllegalArgumentException(
+						"Blueprint importers support only interfaces - for using concrete classes, use the Spring DM namespace");
+			}
 			aopClassLoader.addClassLoader(intf);
 		}
 
@@ -81,10 +91,41 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 			throw new FactoryBeanNotInitializedException();
 
 		if (proxy == null) {
-			proxy = createProxy();
+			synchronized (this) {
+				if (proxy == null) {
+					proxy = createProxy(false);
+				}
+			}
+		}
+
+		if (lazyProxy) {
+			synchronized (this) {
+				if (lazyProxy) {
+					getProxyInitializer().run();
+					lazyProxy = false;
+				}
+			}
 		}
 
 		return proxy;
+	}
+
+	/**
+	 * Returns the managed proxy type. Note that calling this method will cause the creation of the proxy but not its
+	 * initialization.
+	 */
+	public Class<?> getObjectType() {
+		if (!initialized)
+			throw new FactoryBeanNotInitializedException();
+		if (proxy == null) {
+			synchronized (this) {
+				if (proxy == null) {
+					proxy = createProxy(true);
+					lazyProxy = true;
+				}
+			}
+		}
+		return proxy.getClass();
 	}
 
 	/**
@@ -122,10 +163,19 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 	 * Creates the proxy tracking the matching OSGi services. This method is guaranteed to be called only once, normally
 	 * during initialization.
 	 * 
+	 * @param lazy indicates whether the proxy is lazy (no code is executed in the proxy) or not
 	 * @return OSGi service tracking proxy.
 	 * @see #getProxyDestructionCallback()
 	 */
-	abstract Object createProxy();
+	abstract Object createProxy(boolean lazy);
+
+	/**
+	 * Returns a callback to the proxy which gets called when the proxy is called for the first time, if a lazy creation
+	 * was used. For eager initialization, a null object should be returned.
+	 * 
+	 * @return proxy initialization callback
+	 */
+	abstract Runnable getProxyInitializer();
 
 	/**
 	 * Returns the destruction callback associated with the proxy created by this object. The callback is called once,
@@ -173,5 +223,19 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 
 	boolean isUseBlueprintExceptions() {
 		return useBlueprintException;
+	}
+
+	/**
+	 * Indicates whether the importer should use (strict) blueprint spec compliance or not. Strict compliance means that
+	 * only interfaces are supported and that Blueprint exceptions are thrown by default.
+	 * 
+	 * @param compliant
+	 */
+	public void setBlueprintCompliant(boolean compliant) {
+		this.blueprintCompliant = compliant;
+	}
+
+	boolean isBlueprintCompliant() {
+		return blueprintCompliant;
 	}
 }
