@@ -98,7 +98,7 @@ class ValueFactory {
 						AbstractBeanDefinition abd = (AbstractBeanDefinition) def;
 						if (abd.isSynthetic() && abd.hasAttribute(GENERATED_REF)) {
 							BeanDefinition actual = abd.getOriginatingBeanDefinition();
-							return nestedMandatoryReference(actual);
+							return ComponentMetadataFactory.buildMetadata(null, actual);
 						}
 					} else {
 						return new SimpleRefMetadata((String) MetadataUtils.getValue(def.getPropertyValues(),
@@ -146,12 +146,9 @@ class ValueFactory {
 			throw new IllegalArgumentException("Unsupported metadata type " + metadata.getClass());
 		}
 
-		throw new UnsupportedOperationException("Cannot handle non metadata elements " + metadata + "| class "
-				+ metadata.getClass());
-	}
-
-	private static Metadata nestedMandatoryReference(BeanDefinition actual) {
-		return ComponentMetadataFactory.buildMetadata(null, actual);
+		// no metadata - probably some parser added the object directly
+		// try to convert it into a String
+		return new SimpleValueMetadata(null, metadata.toString());
 	}
 
 	static <E> List<Metadata> getMetadata(Collection<E> collection) {

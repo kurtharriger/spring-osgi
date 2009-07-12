@@ -32,7 +32,7 @@ import junit.framework.TestCase;
 /**
  * @author Costin Leau
  */
-public class TestBlueprintBuiltinConverters extends TestCase {
+public class TestBlueprintBuiltinConvertersTest extends TestCase {
 
 	private static final String CONFIG = "builtin-converters.xml";
 

@@ -61,7 +61,7 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 			Class<?> intf = intfs[i];
 			if (blueprintCompliant && !intf.isInterface()) {
 				throw new IllegalArgumentException(
-						"Blueprint importers support only interfaces - for using concrete classes, use the Spring DM namespace");
+						"Blueprint importers support only interfaces - for concrete classes, use the Spring DM namespace");
 			}
 			aopClassLoader.addClassLoader(intf);
 		}

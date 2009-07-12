@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
+import java.util.Timer;
 
 import org.apache.commons.logging.Log;
 import org.osgi.framework.Bundle;
@@ -370,7 +371,13 @@ public class ExtenderConfiguration implements DisposableBean {
 	}
 
 	private TaskExecutor createDefaultShutdownTaskExecutor() {
-		TimerTaskExecutor taskExecutor = new TimerTaskExecutor();
+		TimerTaskExecutor taskExecutor = new TimerTaskExecutor() {
+			@Override
+			protected Timer createTimer() {
+				return new Timer("Spring DM context shutdown thread", true);
+			}
+		};
+
 		taskExecutor.afterPropertiesSet();
 		isShutdownTaskExecutorManagedInternally = true;
 		return taskExecutor;

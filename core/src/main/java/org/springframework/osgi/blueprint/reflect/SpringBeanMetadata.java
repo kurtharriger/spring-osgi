@@ -37,6 +37,7 @@ class SpringBeanMetadata extends SpringComponentMetadata implements BeanMetadata
 
 	private final String factoryMethod;
 	private final Target factoryComponent;
+	private final String scope;
 
 	/**
 	 * Constructs a new <code>SpringLocalComponentMetadata</code> instance.
@@ -63,6 +64,7 @@ class SpringBeanMetadata extends SpringComponentMetadata implements BeanMetadata
 
 		arguments = MetadataUtils.getBeanArguments(definition);
 		properties = MetadataUtils.getBeanProperties(definition);
+		scope = (StringUtils.hasText(name) ? beanDefinition.getScope() : BeanDefinition.SCOPE_PROTOTYPE);
 	}
 
 	public List<BeanArgument> getArguments() {
@@ -98,6 +100,6 @@ class SpringBeanMetadata extends SpringComponentMetadata implements BeanMetadata
 	}
 
 	public String getScope() {
-		return beanDefinition.getScope();
+		return scope;
 	}
 }

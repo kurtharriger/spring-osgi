@@ -25,6 +25,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Default {@link ComponentMetadata} implementation based on Spring's {@link BeanDefinition}.
@@ -56,9 +57,14 @@ public class SpringComponentMetadata implements ComponentMetadata {
 			dependsOn = Collections.unmodifiableList(dependencies);
 		}
 
-		activation =
-				beanDefinition.isSingleton() ? (beanDefinition.isLazyInit() ? ACTIVATION_LAZY : ACTIVATION_EAGER)
-						: ACTIVATION_LAZY;
+		if (!StringUtils.hasText(name)) {
+			// nested components are always lazy
+			activation = ACTIVATION_LAZY;
+		} else {
+			activation =
+					beanDefinition.isSingleton() ? (beanDefinition.isLazyInit() ? ACTIVATION_LAZY : ACTIVATION_EAGER)
+							: ACTIVATION_LAZY;
+		}
 	}
 
 	public BeanDefinition getBeanDefinition() {

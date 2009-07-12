@@ -16,8 +16,20 @@
 
 package org.springframework.osgi.blueprint.reflect;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
+import org.springframework.beans.BeanMetadataElement;
+import org.springframework.beans.Mergeable;
+import org.springframework.beans.PropertyValue;
+import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 
 /**
@@ -90,5 +102,69 @@ class ComponentMetadataFactory implements MetadataConstants {
 			}
 		}
 		return (clazz.getName().equals(definition.getBeanClassName()));
+	}
+
+	static Collection<ComponentMetadata> buildNestedMetadata(String beanName, BeanDefinition beanDefinition) {
+		List<ComponentMetadata> col = new ArrayList<ComponentMetadata>(4);
+		processBeanDefinition(beanDefinition, col);
+		// remove the first definition
+		col.remove(0);
+		return col;
+	}
+
+	private static void processBeanMetadata(BeanMetadataElement metadata, Collection<ComponentMetadata> to) {
+		if (metadata instanceof BeanDefinition) {
+			processBeanDefinition((BeanDefinition) metadata, to);
+		}
+
+		else if (metadata instanceof BeanDefinitionHolder) {
+			BeanDefinitionHolder bh = (BeanDefinitionHolder) metadata;
+			processBeanDefinition(bh.getBeanDefinition(), to);
+		}
+
+		else if (metadata instanceof Mergeable && metadata instanceof Iterable) {
+			processIterable((Iterable) metadata, to);
+		}
+
+	}
+
+	private static void processBeanDefinition(BeanDefinition definition, Collection<ComponentMetadata> to) {
+		to.add(buildMetadata(null, definition));
+
+		// start with constructors
+		ConstructorArgumentValues cavs = definition.getConstructorArgumentValues();
+		// generic values
+		List<ValueHolder> genericValues = cavs.getGenericArgumentValues();
+		for (ValueHolder valueHolder : genericValues) {
+			Object value = MetadataUtils.getValue(valueHolder);
+			if (value instanceof BeanMetadataElement) {
+				processBeanMetadata((BeanMetadataElement) value, to);
+			}
+		}
+		// indexed ones
+		Map<Integer, ValueHolder> indexedValues = cavs.getIndexedArgumentValues();
+		for (ValueHolder valueHolder : indexedValues.values()) {
+			Object value = MetadataUtils.getValue(valueHolder);
+			if (value instanceof BeanMetadataElement) {
+				processBeanMetadata((BeanMetadataElement) value, to);
+			}
+		}
+
+		// now property values
+		PropertyValues pvs = definition.getPropertyValues();
+		for (PropertyValue pv : pvs.getPropertyValues()) {
+			Object value = MetadataUtils.getValue(pv);
+			if (value instanceof BeanMetadataElement) {
+				processBeanMetadata((BeanMetadataElement) value, to);
+			}
+		}
+	}
+
+	private static void processIterable(Iterable iterableMetadata, Collection<ComponentMetadata> to) {
+		for (Object value : iterableMetadata) {
+			if (value instanceof BeanMetadataElement) {
+				processBeanMetadata((BeanMetadataElement) value, to);
+			}
+		}
 	}
 }

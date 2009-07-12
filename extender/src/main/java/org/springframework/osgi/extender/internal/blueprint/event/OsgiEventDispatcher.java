@@ -17,6 +17,7 @@
 package org.springframework.osgi.extender.internal.blueprint.event;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -100,19 +101,21 @@ class OsgiEventDispatcher implements EventDispatcher, BlueprintConstants {
 		sendEvent(new Event(TOPIC_GRACE, props));
 	}
 
+	public void waiting(BlueprintEvent event) {
+		Dictionary<String, Object> props = init(event);
+		initDependencies(props, event);
+		sendEvent(new Event(TOPIC_WAITING, props));
+	}
+
 	private void initDependencies(Dictionary<String, Object> props, BlueprintEvent event) {
 		String[] deps = event.getDependencies();
 		if (!ObjectUtils.isEmpty(deps)) {
-			props.put(DEPENDENCIES, deps[0]);
+			props.put(DEPENDENCIES, deps);
 			props.put(SERVICE_FILTER, deps[0]);
 			props.put(SERVICE_FILTER_2, deps[0]);
 			props.put(SERVICE_OBJECTCLASS, extractObjectClassFromFilter(deps[0]));
 			props.put(ALL_DEPENDENCIES, deps);
 		}
-	}
-
-	public void waiting(BlueprintEvent event) {
-		throw new UnsupportedOperationException("waiting event dispatch not supported yet");
 	}
 
 	private String[] extractObjectClassFromFilter(String filterString) {
@@ -174,7 +177,22 @@ class OsgiEventDispatcher implements EventDispatcher, BlueprintConstants {
 		if (ref != null) {
 			EventAdmin eventAdmin = (EventAdmin) bundleContext.getService(ref);
 			if (eventAdmin != null) {
-				log.trace("Broadcasting OSGi event " + osgiEvent);
+				if (trace) {
+					StringBuilder sb = new StringBuilder();
+					String[] names = osgiEvent.getPropertyNames();
+					sb.append("{");
+					for (int i = 0; i < names.length; i++) {
+						String name = names[i];
+						sb.append(name);
+						sb.append("=");
+						sb.append(osgiEvent.getProperty(name));
+						if (i < names.length - 1)
+							sb.append(",");
+					}
+					sb.append("}");
+
+					log.trace("Broadcasting OSGi event " + osgiEvent + " w/ props " + sb.toString());
+				}
 				publisher.publish(eventAdmin, osgiEvent);
 			}
 		} else {

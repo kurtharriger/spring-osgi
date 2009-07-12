@@ -16,6 +16,8 @@
 
 package org.springframework.osgi.blueprint.reflect;
 
+import java.util.Collection;
+
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.springframework.beans.factory.config.BeanDefinition;
 
@@ -45,5 +47,10 @@ public class MetadataFactory {
 	 */
 	public static ComponentMetadata buildComponentMetadataFor(String name, BeanDefinition beanDefinition) {
 		return blueprintFactory.buildMetadata(name, beanDefinition);
+	}
+
+	public static Collection<ComponentMetadata> buildNestedComponentMetadataFor(String beanName,
+			BeanDefinition beanDefinition) {
+		return blueprintFactory.buildNestedMetadata(beanName, beanDefinition);
 	}
 }

@@ -128,7 +128,7 @@ public class RetryTemplateTest extends TestCase {
 	private Object monitor;
 
 
-	private static class CountingCallback implements RetryCallback {
+	private static class CountingCallback implements RetryCallback<Object> {
 
 		private int count = 0;
 		public final static int WAKES_THRESHOLD = 7;
@@ -151,7 +151,7 @@ public class RetryTemplateTest extends TestCase {
 		}
 	}
 
-	private static class FailingCallback implements RetryCallback {
+	private static class FailingCallback implements RetryCallback<Object> {
 
 		private static Object VALUE = new Object();
 
@@ -169,7 +169,7 @@ public class RetryTemplateTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		monitor = new Object();
-		callback = new DefaultRetryCallback() {
+		callback = new DefaultRetryCallback<Object>() {
 
 			public Object doWithRetry() {
 				return null;

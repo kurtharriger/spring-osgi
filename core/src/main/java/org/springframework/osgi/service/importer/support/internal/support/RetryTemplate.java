@@ -65,7 +65,7 @@ public class RetryTemplate {
 	 * @param callback
 	 * @return
 	 */
-	public Object execute(RetryCallback callback) {
+	public <T> T execute(RetryCallback<T> callback) {
 		long waitTime;
 
 		synchronized (monitor) {
@@ -80,7 +80,7 @@ public class RetryTemplate {
 		boolean startWaiting = false;
 
 		do {
-			Object result = callback.doWithRetry();
+			T result = callback.doWithRetry();
 
 			if (callback.isComplete(result)) {
 
@@ -132,7 +132,7 @@ public class RetryTemplate {
 			}
 		} while (retry || waitLeft > WAIT_THRESHOLD);
 
-		Object result = callback.doWithRetry();
+		T result = callback.doWithRetry();
 		stop = System.currentTimeMillis() - initialStart;
 
 		if (callback.isComplete(result)) {

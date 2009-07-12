@@ -19,7 +19,6 @@ package org.springframework.osgi.config.internal.adapter;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Iterator;
@@ -123,8 +122,7 @@ public abstract class CustomListenerAdapterUtils {
 							if (m.getParameterTypes().length == mt.getParameterTypes().length) {
 								if (trace)
 									log.trace("Method w/ signature " + methodSignature(m)
-											+ " has been already discovered; ignoring method" + m.toString()
-											+ "];ignoring " + m);
+											+ " has been already discovered; ignoring it");
 							} else {
 								org.springframework.util.ReflectionUtils.makeAccessible(mt);
 								mts.add(mt);
@@ -200,8 +198,8 @@ public abstract class CustomListenerAdapterUtils {
 						// rest of the methods
 						catch (Exception ex) {
 							Exception cause = ReflectionUtils.getInvocationException(ex);
-							log.warn("Custom method [" + method + "] threw exception when passing service type ["
-									+ (service != null ? service.getClass().getName() : null) + "]", cause);
+							log.warn("Custom method [" + method + "] threw exception when passing service ["
+									+ ObjectUtils.identityToString(service) + "]", cause);
 						}
 					}
 				}

@@ -41,14 +41,21 @@ abstract class MetadataUtils {
 	static Object getValue(PropertyValues pvs, String name) {
 		if (pvs.contains(name)) {
 			PropertyValue pv = pvs.getPropertyValue(name);
-			return (pv.isConverted() ? pv.getConvertedValue() : pv.getValue());
+			//return (pv.isConverted() ? pv.getConvertedValue() : pv.getValue());
+			return pv.getValue();
 		}
 
 		return null;
 	}
 
+	static Object getValue(PropertyValue pv) {
+		//return (pv.isConverted() ? pv.getConvertedValue() : pv.getValue());
+		return pv.getValue();
+	}
+
 	static Object getValue(ValueHolder valueHolder) {
-		return (valueHolder.isConverted() ? valueHolder.getConvertedValue() : valueHolder.getValue());
+		//return (valueHolder.isConverted() ? valueHolder.getConvertedValue() : valueHolder.getValue());
+		return valueHolder.getValue();
 	}
 
 	static List<BeanArgument> getBeanArguments(BeanDefinition definition) {
