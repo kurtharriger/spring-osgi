@@ -28,10 +28,9 @@ import org.springframework.util.Assert;
  */
 public class ServiceRegistrationWrapper implements ServiceRegistration {
 
-	private final ServiceRegistration delegate;
+	private volatile ServiceRegistration delegate;
 
 	public ServiceRegistrationWrapper(ServiceRegistration delegate) {
-		Assert.notNull(delegate);
 		this.delegate = delegate;
 	}
 
@@ -41,6 +40,10 @@ public class ServiceRegistrationWrapper implements ServiceRegistration {
 
 	public void setProperties(Dictionary properties) {
 		delegate.setProperties(properties);
+	}
+
+	public void swap(ServiceRegistration other) {
+		this.delegate = other;
 	}
 
 	public void unregister() {

@@ -124,7 +124,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	private volatile OsgiServicePropertiesResolver propertiesResolver;
 	private volatile BeanFactory beanFactory;
 	private volatile ServiceRegistration serviceRegistration;
-	private volatile ServiceRegistration safeServiceRegistration;
+	private final ServiceRegistrationWrapper safeServiceRegistration = new ServiceRegistrationWrapper(null);
 
 	private volatile Map serviceProperties;
 	private volatile ServicePropertiesChangeListener propertiesListener;
@@ -321,7 +321,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		ServiceRegistration reg = registerService(mergedClasses, serviceProperties);
 
 		serviceRegistration = notifyListeners(target, (Map) serviceProperties, reg);
-		safeServiceRegistration = new ServiceRegistrationWrapper(serviceRegistration);
+		safeServiceRegistration.swap(serviceRegistration);
 	}
 
 	/**
@@ -403,7 +403,6 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		unregisterService(serviceRegistration);
 		serviceRegistration = null;
-		safeServiceRegistration = null;
 	}
 
 	/**

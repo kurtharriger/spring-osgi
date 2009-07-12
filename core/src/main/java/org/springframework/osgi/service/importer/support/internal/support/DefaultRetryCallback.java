@@ -23,9 +23,9 @@ package org.springframework.osgi.service.importer.support.internal.support;
  * @author Costin Leau
  * 
  */
-public abstract class DefaultRetryCallback implements RetryCallback {
+public abstract class DefaultRetryCallback<T> implements RetryCallback<T> {
 
-	public boolean isComplete(Object result) {
+	public boolean isComplete(T result) {
 		return (result != null);
 	}
 }

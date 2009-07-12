@@ -242,13 +242,12 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 			DependencyServiceManager dl = createDependencyServiceListener(task);
 			dl.findServiceDependencies();
-			
+
 			// all dependencies are met, just go with stageTwo
 			if (dl.isSatisfied()) {
 				log.info("No outstanding OSGi service dependencies, completing initialization for " + getDisplayName());
 				stageTwo();
-			}
-			else {
+			} else {
 				// there are dependencies not met
 				// register a listener to look for them
 				synchronized (monitor) {
@@ -333,13 +332,11 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			if (state == ContextState.RESOLVING_DEPENDENCIES) {
 				if (debug)
 					log.debug("Cleaning up appCtx " + getDisplayName());
-				synchronized (delegateContext.getMonitor()) {
-					if (delegateContext.isActive()) {
-						try {
-							delegateContext.getBeanFactory().destroySingletons();
-						} catch (Exception ex) {
-							log.trace("Caught exception while interrupting context refresh ", ex);
-						}
+				if (delegateContext.isActive()) {
+					try {
+						delegateContext.getBeanFactory().destroySingletons();
+					} catch (Exception ex) {
+						log.trace("Caught exception while interrupting context refresh ", ex);
 					}
 					state = ContextState.INTERRUPTED;
 				}
@@ -349,10 +346,8 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			else if (state == ContextState.DEPENDENCIES_RESOLVED) {
 				if (debug)
 					log.debug("Shutting down appCtx " + getDisplayName() + " once stageTwo() is complete");
-				synchronized (delegateContext.getMonitor()) {
-					state = ContextState.STOPPED;
-					normalShutdown = true;
-				}
+				state = ContextState.STOPPED;
+				normalShutdown = true;
 			}
 			// Context is running, shut it down
 			else if (state == ContextState.STARTED) {

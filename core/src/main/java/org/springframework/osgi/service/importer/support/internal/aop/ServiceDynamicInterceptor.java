@@ -23,7 +23,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
@@ -95,7 +94,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		}
 	}
 
-	private class ServiceLookUpCallback extends DefaultRetryCallback {
+	private class ServiceLookUpCallback extends DefaultRetryCallback<Object> {
 
 		public Object doWithRetry() {
 			// before checking for a service, check whether the proxy is still valid
@@ -104,6 +103,18 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			}
 
 			return (holder != null ? holder.getService() : null);
+		}
+	}
+
+	private class ServiceReferenceLookUpCallback extends DefaultRetryCallback<ServiceReference> {
+
+		public ServiceReference doWithRetry() {
+			// before checking for a service, check whether the proxy is still valid
+			if (destroyed && !isDuringDestruction) {
+				throw new ServiceProxyDestroyedException();
+			}
+
+			return (holder != null ? holder.getReference() : null);
 		}
 	}
 
@@ -227,8 +238,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 		private void notifySatisfiedStateListeners() {
 			synchronized (stateListeners) {
-				for (Iterator iterator = stateListeners.iterator(); iterator.hasNext();) {
-					ImporterStateListener stateListener = (ImporterStateListener) iterator.next();
+				for (ImporterStateListener stateListener : stateListeners) {
 					stateListener.importerSatisfied(eventSource, dependency);
 				}
 			}
@@ -236,8 +246,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 		private void notifyUnsatisfiedStateListeners() {
 			synchronized (stateListeners) {
-				for (Iterator iterator = stateListeners.iterator(); iterator.hasNext();) {
-					ImporterStateListener stateListener = (ImporterStateListener) iterator.next();
+				for (ImporterStateListener stateListener : stateListeners) {
 					stateListener.importerUnsatisfied(eventSource, dependency);
 				}
 			}
@@ -326,7 +335,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	private final RetryTemplate retryTemplate = new EventSenderRetryTemplate();
 
 	/** retry callback */
-	private final RetryCallback retryCallback = new ServiceLookUpCallback();
+	private final RetryCallback<Object> retryCallback = new ServiceLookUpCallback();
 
 	/** dependable service importer */
 	private Object eventSource;
@@ -347,7 +356,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	private OsgiServiceDependency dependency;
 
 	/** internal state listeners */
-	private List stateListeners = Collections.EMPTY_LIST;
+	private List<ImporterStateListener> stateListeners = Collections.emptyList();
 	/** standard exception flag */
 	private boolean useBlueprintExceptions = false;
 
@@ -381,7 +390,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	 */
 	private Object lookupService() {
 		synchronized (lock) {
-			return (Object) retryTemplate.execute(retryCallback);
+			return retryTemplate.execute(retryCallback);
 		}
 	}
 
@@ -418,11 +427,23 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 			PUBLIC_LOGGER.info("Looking for mandatory OSGi service dependency for bean [" + sourceName
 					+ "] matching filter " + filter);
-			Object target = getTarget();
+
+			ServiceReference ref = lookupServiceReference();
 			if (debug)
-				log.debug("Service retrieved " + target);
+				log.debug("Retrieved service reference " + ref);
 
 			PUBLIC_LOGGER.info("Found mandatory OSGi service for bean [" + sourceName + "]");
+		}
+	}
+
+	/**
+	 * Dedicated lookup method that looks for service existence at startup but does not retrieve the service instance.
+	 * 
+	 * @return
+	 */
+	private ServiceReference lookupServiceReference() {
+		synchronized (lock) {
+			return retryTemplate.execute(new ServiceReferenceLookUpCallback());
 		}
 	}
 

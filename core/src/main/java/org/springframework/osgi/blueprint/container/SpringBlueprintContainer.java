@@ -36,7 +36,7 @@ import org.springframework.util.CollectionUtils;
 
 /**
  * Default {@link ModuleContext} implementation. Wraps a Spring's {@link ConfigurableListableBeanFactory} to the
- * Blueprint Service's ModuleContext interface. Additionally, this class adds RFC 124 specific behaviour.
+ * BlueprintContainer interface. Additionally, this class adds RFC 124 specific behaviour.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
@@ -99,9 +99,13 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 	private List<ComponentMetadata> getComponentMetadataForAllComponents() {
 		List<ComponentMetadata> metadata = new ArrayList<ComponentMetadata>();
 		String[] components = applicationContext.getBeanDefinitionNames();
+		ConfigurableListableBeanFactory factory = getBeanFactory();
 		for (String beanName : components) {
-			metadata.add(MetadataFactory.buildComponentMetadataFor(beanName, getBeanFactory().getBeanDefinition(
-					beanName)));
+			BeanDefinition definition = factory.getBeanDefinition(beanName);
+			// add metadata for top-level definitions
+			metadata.add(MetadataFactory.buildComponentMetadataFor(beanName, definition));
+			// look for nested ones
+			metadata.addAll(MetadataFactory.buildNestedComponentMetadataFor(beanName, definition));
 		}
 		return metadata;
 	}

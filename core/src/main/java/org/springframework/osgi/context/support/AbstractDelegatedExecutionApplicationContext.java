@@ -575,10 +575,6 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		this.executor = executor;
 	}
 
-	public Object getMonitor() {
-		return startupShutdownMonitor;
-	}
-
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException, BeansException {
 	}
 

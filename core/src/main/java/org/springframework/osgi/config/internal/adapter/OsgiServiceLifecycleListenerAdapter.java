@@ -31,6 +31,7 @@ import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.internal.ReflectionUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -184,8 +185,8 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 			// the listeners
 			catch (Exception ex) {
 				Exception cause = ReflectionUtils.getInvocationException(ex);
-				log.warn("custom method [" + method + "] threw exception when passing service reference ["
-						+ (service != null ? service.getClass().getName() : null) + "]", cause);
+				log.warn("custom method [" + method + "] threw exception when passing service ["
+						+ ObjectUtils.identityToString(service) + "]", cause);
 			}
 		}
 	}
@@ -193,7 +194,8 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 	public void bind(Object service, Map properties) throws Exception {
 		boolean trace = log.isTraceEnabled();
 		if (trace)
-			log.trace("invoking bind method for service " + service + " with props=" + properties);
+			log.trace("invoking bind method for service " + ObjectUtils.identityToString(service) + " with props="
+					+ properties);
 
 		if (!initialized)
 			retrieveTarget();
@@ -220,7 +222,8 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 			retrieveTarget();
 
 		if (trace)
-			log.trace("invoking unbind method for service " + service + " with props=" + properties);
+			log.trace("invoking unbind method for service " + ObjectUtils.identityToString(service) + " with props="
+					+ properties);
 
 		// first call interface method (if it exists)
 		if (isLifecycleListener) {
@@ -229,7 +232,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 			try {
 				((OsgiServiceLifecycleListener) target).unbind(service, properties);
 			} catch (Exception ex) {
-				log.warn("standard unbind method on [" + target.getClass().getName() + "] threw exception", ex);
+				log.warn("Standard unbind method on [" + target.getClass().getName() + "] threw exception", ex);
 			}
 		}
 

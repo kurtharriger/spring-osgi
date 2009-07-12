@@ -21,14 +21,14 @@ package org.springframework.osgi.service.importer.support.internal.support;
  * @author Costin Leau
  * 
  */
-public interface RetryCallback {
+public interface RetryCallback<T> {
 
 	/**
 	 * Does the actual work.
 	 * 
 	 * @return
 	 */
-	Object doWithRetry();
+	T doWithRetry();
 
 	/**
 	 * Returns true if the work has been completed or false is a retry is
@@ -36,6 +36,6 @@ public interface RetryCallback {
 	 * 
 	 * @return
 	 */
-	boolean isComplete(Object result);
+	boolean isComplete(T result);
 
 }

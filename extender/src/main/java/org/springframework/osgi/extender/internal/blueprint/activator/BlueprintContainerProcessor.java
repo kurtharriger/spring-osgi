@@ -30,6 +30,10 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.osgi.blueprint.container.BlueprintConverter;
 import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
 import org.springframework.osgi.blueprint.container.support.BlueprintContainerServicePublisher;
@@ -44,6 +48,7 @@ import org.springframework.osgi.extender.event.BootstrappingDependenciesEvent;
 import org.springframework.osgi.extender.event.BootstrappingDependenciesFailedEvent;
 import org.springframework.osgi.extender.internal.activator.OsgiContextProcessor;
 import org.springframework.osgi.extender.internal.blueprint.event.EventAdminDispatcher;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitStartingEvent;
 
 /**
  * Blueprint specific context processor.
@@ -53,9 +58,40 @@ import org.springframework.osgi.extender.internal.blueprint.event.EventAdminDisp
 public class BlueprintContainerProcessor implements
 		OsgiBundleApplicationContextListener<OsgiBundleApplicationContextEvent>, OsgiContextProcessor {
 
+	/** logger */
+	private static final Log log = LogFactory.getLog(BlueprintContainerProcessor.class);
+
 	private final EventAdminDispatcher dispatcher;
 	private final BlueprintListenerManager listenerManager;
 	private final Bundle extenderBundle;
+
+	class BlueprintWaitingEventDispatcher implements ApplicationListener<ApplicationEvent> {
+		private final BundleContext bundleContext;
+		private volatile boolean enabled = true;
+
+		BlueprintWaitingEventDispatcher(BundleContext context) {
+			this.bundleContext = context;
+		}
+
+		// WAITING event
+		public void onApplicationEvent(ApplicationEvent event) {
+			if (event instanceof ContextClosedEvent) {
+				enabled = false;
+				return;
+			}
+
+			if (event instanceof OsgiServiceDependencyWaitStartingEvent && enabled) {
+				OsgiServiceDependencyWaitStartingEvent evt = (OsgiServiceDependencyWaitStartingEvent) event;
+				String[] filter = new String[] { evt.getServiceDependency().getServiceFilter().toString() };
+				BlueprintEvent waitingEvent =
+						new BlueprintEvent(BlueprintEvent.WAITING, bundleContext.getBundle(), extenderBundle, filter);
+
+				listenerManager.blueprintEvent(waitingEvent);
+				dispatcher.waiting(waitingEvent);
+				return;
+			}
+		}
+	};
 
 	public BlueprintContainerProcessor(EventAdminDispatcher dispatcher, BlueprintListenerManager listenerManager,
 			Bundle extenderBundle) {
@@ -99,9 +135,14 @@ public class BlueprintContainerProcessor implements
 		final BundleContext bundleContext = context.getBundleContext();
 		// create the ModuleContext adapter
 		final BlueprintContainer blueprintContainer = new SpringBlueprintContainer(context, bundleContext);
+
+		// 1. add event listeners
 		// add service publisher
 		context.addApplicationListener(new BlueprintContainerServicePublisher(blueprintContainer, bundleContext));
-		// add moduleContext bean
+		// add waiting event broadcaster
+		context.addApplicationListener(new BlueprintWaitingEventDispatcher(context.getBundleContext()));
+
+		// 2. add environmental managers
 		context.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
 
 			private static final String BLUEPRINT_BUNDLE = "blueprintBundle";
@@ -159,23 +200,32 @@ public class BlueprintContainerProcessor implements
 
 		BlueprintEvent creatingEvent = new BlueprintEvent(BlueprintEvent.CREATING, context.getBundle(), extenderBundle);
 		listenerManager.blueprintEvent(creatingEvent);
-
 		dispatcher.beforeRefresh(creatingEvent);
 	}
 
 	public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent evt) {
 
+		// grace event
 		if (evt instanceof BootstrappingDependenciesEvent) {
 			BootstrappingDependenciesEvent event = (BootstrappingDependenciesEvent) evt;
 			Collection<String> flts = event.getDependencyFilters();
-			String[] filters = flts.toArray(new String[flts.size()]);
-			BlueprintEvent graceEvent =
-					new BlueprintEvent(BlueprintEvent.GRACE_PERIOD, evt.getBundle(), extenderBundle, filters);
-			listenerManager.blueprintEvent(graceEvent);
-			dispatcher.grace(graceEvent);
+			if (flts.isEmpty()) {
+				if (log.isDebugEnabled()) {
+					log.debug("All dependencies satisfied, not sending Blueprint GRACE event "
+							+ "with emtpy dependencies from " + event);
+				}
+			} else {
+				String[] filters = flts.toArray(new String[flts.size()]);
+				BlueprintEvent graceEvent =
+						new BlueprintEvent(BlueprintEvent.GRACE_PERIOD, evt.getBundle(), extenderBundle, filters);
+				listenerManager.blueprintEvent(graceEvent);
+				dispatcher.grace(graceEvent);
+			}
+
 			return;
 		}
 
+		// bootstrapping failure
 		if (evt instanceof BootstrappingDependenciesFailedEvent) {
 			BootstrappingDependenciesFailedEvent event = (BootstrappingDependenciesFailedEvent) evt;
 			Collection<String> flts = event.getDependencyFilters();
@@ -188,11 +238,13 @@ public class BlueprintContainerProcessor implements
 			return;
 		}
 
+		// created
 		if (evt instanceof OsgiBundleContextRefreshedEvent) {
 			postProcessRefresh((ConfigurableOsgiBundleApplicationContext) evt.getApplicationContext());
 			return;
 		}
 
+		// failure
 		if (evt instanceof OsgiBundleContextFailedEvent) {
 			OsgiBundleContextFailedEvent failureEvent = (OsgiBundleContextFailedEvent) evt;
 			postProcessRefreshFailure(

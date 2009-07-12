@@ -41,8 +41,8 @@ public class EventAdminDispatcher {
 	private static final boolean eventAdminAvailable;
 
 	static {
-		eventAdminAvailable = ClassUtils.isPresent("org.osgi.service.event.EventAdmin", EventAdminDispatcher.class
-				.getClassLoader());
+		eventAdminAvailable =
+				ClassUtils.isPresent("org.osgi.service.event.EventAdmin", EventAdminDispatcher.class.getClassLoader());
 
 		log = LogFactory.getLog(EventAdminDispatcher.class);
 
@@ -79,43 +79,71 @@ public class EventAdminDispatcher {
 
 	public void beforeClose(BlueprintEvent event) {
 		if (dispatcher != null) {
-			dispatcher.beforeClose(event);
+			try {
+				dispatcher.beforeClose(event);
+			} catch (Throwable th) {
+				log.warn("Cannot dispatch event " + event, th);
+			}
 		}
 	}
 
 	public void beforeRefresh(BlueprintEvent event) {
 		if (dispatcher != null) {
-			dispatcher.beforeRefresh(event);
+			try {
+				dispatcher.beforeRefresh(event);
+			} catch (Throwable th) {
+				log.warn("Cannot dispatch event " + event, th);
+			}
 		}
 	}
 
 	public void afterClose(BlueprintEvent event) {
 		if (dispatcher != null) {
-			dispatcher.afterClose(event);
+			try {
+				dispatcher.afterClose(event);
+			} catch (Throwable th) {
+				log.warn("Cannot dispatch event " + event, th);
+			}
 		}
 	}
 
 	public void afterRefresh(BlueprintEvent event) {
 		if (dispatcher != null) {
-			dispatcher.afterRefresh(event);
+			try {
+				dispatcher.afterRefresh(event);
+			} catch (Throwable th) {
+				log.warn("Cannot dispatch event " + event, th);
+			}
 		}
 	}
 
 	public void refreshFailure(BlueprintEvent event) {
 		if (dispatcher != null) {
-			dispatcher.refreshFailure(event);
+			try {
+				dispatcher.refreshFailure(event);
+			} catch (Throwable th) {
+				log.warn("Cannot dispatch event " + event, th);
+			}
 		}
 	}
 
 	public void grace(BlueprintEvent event) {
 		if (dispatcher != null) {
-			dispatcher.grace(event);
+			try {
+				dispatcher.grace(event);
+			} catch (Throwable th) {
+				log.warn("Cannot dispatch event " + event, th);
+			}
 		}
 	}
 
 	public void waiting(BlueprintEvent event) {
 		if (dispatcher != null) {
-			dispatcher.waiting(event);
+			try {
+				dispatcher.waiting(event);
+			} catch (Throwable th) {
+				log.warn("Cannot dispatch event " + event, th);
+			}
 		}
 	}
 }

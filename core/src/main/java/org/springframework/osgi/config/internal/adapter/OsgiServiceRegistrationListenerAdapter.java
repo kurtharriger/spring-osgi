@@ -96,7 +96,7 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 		unregistrationMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, unregistrationMethod);
 
 		if (!isListener && (registrationMethods.isEmpty() && unregistrationMethods.isEmpty()))
-			throw new IllegalArgumentException("target object needs to implement "
+			throw new IllegalArgumentException("Target object needs to implement "
 					+ OsgiServiceRegistrationListener.class.getName()
 					+ " or custom registered/unregistered methods have to be specified");
 
@@ -114,7 +114,7 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 		boolean trace = log.isTraceEnabled();
 
 		if (trace)
-			log.trace("invoking registered method with props=" + serviceProperties);
+			log.trace("Invoking registered method with props=" + serviceProperties);
 
 		if (!initialized)
 			retrieveTarget();
@@ -122,12 +122,12 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 		// first call interface method (if it exists)
 		if (isListener) {
 			if (trace)
-				log.trace("invoking listener interface methods");
+				log.trace("Invoking listener interface methods");
 
 			try {
 				((OsgiServiceRegistrationListener) target).registered(service, serviceProperties);
 			} catch (Exception ex) {
-				log.warn("standard registered method on [" + target.getClass().getName() + "] threw exception", ex);
+				log.warn("Standard registered method on [" + target.getClass().getName() + "] threw exception", ex);
 			}
 		}
 
@@ -139,7 +139,7 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 		boolean trace = log.isTraceEnabled();
 
 		if (trace)
-			log.trace("invoking unregistered method with props=" + serviceProperties);
+			log.trace("Invoking unregistered method with props=" + serviceProperties);
 
 		if (!initialized)
 			retrieveTarget();
@@ -147,12 +147,12 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 		// first call interface method (if it exists)
 		if (isListener) {
 			if (trace)
-				log.trace("invoking listener interface methods");
+				log.trace("Invoking listener interface methods");
 
 			try {
 				((OsgiServiceRegistrationListener) target).unregistered(service, serviceProperties);
 			} catch (Exception ex) {
-				log.warn("standard unregistered method on [" + target.getClass().getName() + "] threw exception", ex);
+				log.warn("Standard unregistered method on [" + target.getClass().getName() + "] threw exception", ex);
 			}
 		}
 		CustomListenerAdapterUtils.invokeCustomMethods(target, unregistrationMethods, service, serviceProperties);

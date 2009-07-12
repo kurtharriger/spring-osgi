@@ -13,28 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.blueprint.container;
+package org.springframework.osgi.blueprint.reflect;
+
+import java.util.Collection;
+
+import junit.framework.TestCase;
 
 import org.osgi.service.blueprint.container.BlueprintContainer;
+import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
 import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.context.support.PublicBlueprintDocumentLoader;
 import org.springframework.osgi.mock.MockBundleContext;
 
-import junit.framework.TestCase;
-
 /**
  * @author Costin Leau
  */
-public class TestLazyBeans extends TestCase {
+public class NestedDefinitionMetadataTest extends TestCase {
 
-	private static final String CONFIG = "lazy-beans.xml";
+	private static final String CONFIG = "nested-managers.xml";
 
 	private GenericApplicationContext context;
 	private XmlBeanDefinitionReader reader;
@@ -66,9 +71,32 @@ public class TestLazyBeans extends TestCase {
 		context.close();
 		context = null;
 	}
+
+	public void testFirstLevel() throws Exception {
+		String name = "first-level";
+		BeanDefinition def = context.getBeanDefinition(name);
+		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(name, def);
+		assertEquals(2, metadata.size());
+	}
 	
-	public void testConvertersAvailable() throws Exception {
-		System.out.println(blueprintContainer.getComponentIds());
-		blueprintContainer.getComponentInstance("lazyCollection");
+	public void testDeeplyNested() throws Exception {
+		String name = "deeply-nested";
+		BeanDefinition def = context.getBeanDefinition(name);
+		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(name, def);
+		assertEquals(3, metadata.size());
+	}
+
+	public void testCollectionNested() throws Exception {
+		String name = "nested-collection";
+		BeanDefinition def = context.getBeanDefinition(name);
+		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(name, def);
+		assertEquals(3, metadata.size());
+	}
+
+	public void testNestedBeans() throws Exception {
+		String name = "nested-beans";
+		BeanDefinition def = context.getBeanDefinition(name);
+		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(name, def);
+		assertEquals(4, metadata.size());
 	}
 }

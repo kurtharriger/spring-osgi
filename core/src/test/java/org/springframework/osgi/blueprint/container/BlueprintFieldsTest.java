@@ -27,7 +27,7 @@ import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactory
  * 
  * @author Costin Leau
  */
-public class BlueprintFields extends TestCase {
+public class BlueprintFieldsTest extends TestCase {
 
 	public void testUseBlueprintExceptions() throws Exception {
 		OsgiServiceProxyFactoryBean fb = new OsgiServiceProxyFactoryBean();

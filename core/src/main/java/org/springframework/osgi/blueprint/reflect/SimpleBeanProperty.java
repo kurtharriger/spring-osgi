@@ -49,7 +49,7 @@ public class SimpleBeanProperty implements BeanProperty {
 	 */
 	public SimpleBeanProperty(PropertyValue propertyValue) {
 		this.name = propertyValue.getName();
-		Object value = (propertyValue.isConverted() ? propertyValue.getConvertedValue() : propertyValue.getValue());
+		Object value = propertyValue.getValue();
 		this.value = ValueFactory.buildValue(value);
 	}
 
