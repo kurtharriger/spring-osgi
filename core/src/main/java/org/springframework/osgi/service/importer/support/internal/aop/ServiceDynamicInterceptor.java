@@ -384,13 +384,35 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		return target;
 	}
 
+	public ServiceReference getTargetReference() {
+		ServiceReference reference = lookupServiceReference();
+
+		// nothing found
+		if (reference == null) {
+			throw (useBlueprintExceptions ? BlueprintExceptionFactory.createServiceUnavailableException(filter)
+					: new ServiceUnavailableException(filter));
+		}
+		return reference;
+	}
+
 	/**
-	 * Look the service by waiting the service to appear. Note this method should use the same lock as the listener
+	 * Looks the service by waiting the service to appear. Note this method should use the same lock as the listener
 	 * handling the service reference.
 	 */
 	private Object lookupService() {
 		synchronized (lock) {
 			return retryTemplate.execute(retryCallback);
+		}
+	}
+
+	/**
+	 * Looks for the service reference to appear.
+	 * 
+	 * @return
+	 */
+	private ServiceReference lookupServiceReference() {
+		synchronized (lock) {
+			return retryTemplate.execute(new ServiceReferenceLookUpCallback());
 		}
 	}
 
@@ -428,22 +450,11 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			PUBLIC_LOGGER.info("Looking for mandatory OSGi service dependency for bean [" + sourceName
 					+ "] matching filter " + filter);
 
-			ServiceReference ref = lookupServiceReference();
+			ServiceReference ref = getTargetReference();
 			if (debug)
 				log.debug("Retrieved service reference " + ref);
 
 			PUBLIC_LOGGER.info("Found mandatory OSGi service for bean [" + sourceName + "]");
-		}
-	}
-
-	/**
-	 * Dedicated lookup method that looks for service existence at startup but does not retrieve the service instance.
-	 * 
-	 * @return
-	 */
-	private ServiceReference lookupServiceReference() {
-		synchronized (lock) {
-			return retryTemplate.execute(new ServiceReferenceLookUpCallback());
 		}
 	}
 

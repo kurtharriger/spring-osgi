@@ -82,7 +82,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 
 		// validate specified classes
 		Assert.isTrue(!ClassUtils.containsUnrelatedClasses(interfaces),
-				"more then one concrete class specified; cannot create proxy.");
+				"More then one concrete class specified; cannot create proxy.");
 
 		this.listeners = (listeners == null ? new OsgiServiceLifecycleListener[0] : listeners);
 
