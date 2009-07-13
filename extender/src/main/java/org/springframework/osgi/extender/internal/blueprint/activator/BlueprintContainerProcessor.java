@@ -24,6 +24,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.container.BlueprintEvent;
+import org.osgi.service.blueprint.container.NoSuchComponentException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -32,8 +33,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.osgi.blueprint.container.BlueprintConverter;
 import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
 import org.springframework.osgi.blueprint.container.support.BlueprintContainerServicePublisher;
@@ -93,6 +94,34 @@ public class BlueprintContainerProcessor implements
 		}
 	};
 
+	class ExceptionHandlingBlueprintContainer extends SpringBlueprintContainer {
+
+		private final Bundle bundle;
+
+		public ExceptionHandlingBlueprintContainer(ConfigurableApplicationContext applicationContext,
+				BundleContext bundleContext) {
+			super(applicationContext, bundleContext);
+			this.bundle = bundleContext.getBundle();
+		}
+
+		@Override
+		public Object getComponentInstance(String name) throws NoSuchComponentException {
+			try {
+				return super.getComponentInstance(name);
+			} catch (RuntimeException th) {
+				if (!(th instanceof NoSuchComponentException)) {
+					BlueprintEvent failureEvent =
+							new BlueprintEvent(BlueprintEvent.FAILURE, bundle, extenderBundle, th);
+
+					listenerManager.blueprintEvent(failureEvent);
+					dispatcher.refreshFailure(failureEvent);
+				}
+
+				throw th;
+			}
+		}
+	}
+
 	public BlueprintContainerProcessor(EventAdminDispatcher dispatcher, BlueprintListenerManager listenerManager,
 			Bundle extenderBundle) {
 		this.dispatcher = dispatcher;
@@ -134,7 +163,7 @@ public class BlueprintContainerProcessor implements
 	public void preProcessRefresh(final ConfigurableOsgiBundleApplicationContext context) {
 		final BundleContext bundleContext = context.getBundleContext();
 		// create the ModuleContext adapter
-		final BlueprintContainer blueprintContainer = new SpringBlueprintContainer(context, bundleContext);
+		final BlueprintContainer blueprintContainer = createBlueprintContainer(context, bundleContext);
 
 		// 1. add event listeners
 		// add service publisher
@@ -201,6 +230,12 @@ public class BlueprintContainerProcessor implements
 		BlueprintEvent creatingEvent = new BlueprintEvent(BlueprintEvent.CREATING, context.getBundle(), extenderBundle);
 		listenerManager.blueprintEvent(creatingEvent);
 		dispatcher.beforeRefresh(creatingEvent);
+	}
+
+	private BlueprintContainer createBlueprintContainer(ConfigurableOsgiBundleApplicationContext context,
+			BundleContext bundleContext) {
+		// return new ExceptionHandlingBlueprintContainer(context, bundleContext);
+		return new SpringBlueprintContainer(context, bundleContext);
 	}
 
 	public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent evt) {

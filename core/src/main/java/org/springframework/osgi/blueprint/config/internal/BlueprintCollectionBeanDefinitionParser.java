@@ -25,6 +25,7 @@ import org.springframework.osgi.config.internal.CollectionBeanDefinitionParser;
 import org.springframework.osgi.config.internal.OsgiDefaultsDefinition;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
+import org.springframework.osgi.service.importer.support.CollectionType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -76,5 +77,27 @@ public abstract class BlueprintCollectionBeanDefinitionParser extends Collection
 	@Override
 	protected String generateBeanName(String id, BeanDefinition def, ParserContext parserContext) {
 		return super.generateBeanName(ParsingUtils.BLUEPRINT_GENERATED_NAME_PREFIX + id, def, parserContext);
+	}
+
+	@Override
+	protected CollectionType collectionType() {
+		return null;
+	}
+
+	@Override
+	protected void postProcessListenerDefinition(BeanDefinition wrapperDef) {
+		wrapperDef.getPropertyValues().addPropertyValue("blueprintCompliant", true);
+	}
+
+	@Override
+	protected void applyDefaults(ParserContext parserContext, OsgiDefaultsDefinition defaults,
+			BeanDefinitionBuilder builder) {
+		super.applyDefaults(parserContext, defaults, builder);
+		if (defaults instanceof BlueprintDefaultsDefinition) {
+			BlueprintDefaultsDefinition defs = (BlueprintDefaultsDefinition) defaults;
+			if (defs.getDefaultInitialization()) {
+				builder.setLazyInit(defs.getDefaultInitialization());
+			}
+		}
 	}
 }

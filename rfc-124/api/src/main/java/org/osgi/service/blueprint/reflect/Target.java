@@ -16,14 +16,17 @@
 package org.osgi.service.blueprint.reflect;
 
 /**
- * Provides a common interface for managers that can be used as a direct target
- * for method calls. These are <code>bean</code>, <code>reference</code>,
- * and <code>ref</code>.
+ * A common interface for managed components that can be used as a direct target
+ * for method calls. These are <code>bean</code>, <code>reference</code>, and
+ * <code>ref</code>, where the <code>ref</code> must refer to a bean or
+ * reference component.
  * 
  * @see BeanMetadata
  * @see ReferenceMetadata
  * @see RefMetadata
+ * @ThreadSafe
+ * @version $Revision: 7563 $
  */
-public interface Target extends Metadata {
-
+public interface Target extends NonNullMetadata {
+	// marker interface
 }

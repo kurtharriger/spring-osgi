@@ -59,7 +59,7 @@ import org.osgi.framework.Bundle;
  * @see BlueprintListener
  * @see EventConstants
  * @Immutable
- * @version $Revision: 7564 $
+ * @version $Revision: 7590 $
  */
 public class BlueprintEvent {
 
@@ -178,8 +178,9 @@ public class BlueprintEvent {
 	 *        this event. This parameter must not be <code>null</code>.
 	 * @param dependencies An array of <code>String</code> filters for each
 	 *        dependency associated with this event. Must be a non-empty array
-	 *        for event types {@link #FAILURE}, {@link #GRACE_PERIOD} and
-	 *        {@link #WAITING}. Must be <code>null</code> for other event types.
+	 *        for event types {@link #GRACE_PERIOD} and {@link #WAITING}. It is
+	 *        optional for event type {@link #FAILURE}. Must be
+	 *        <code>null</code> for other event types.
 	 */
 	public BlueprintEvent(int type, Bundle bundle, Bundle extenderBundle,
 			String[] dependencies) {
@@ -214,8 +215,9 @@ public class BlueprintEvent {
 	 *        this event. This parameter must not be <code>null</code>.
 	 * @param dependencies An array of <code>String</code> filters for each
 	 *        dependency associated with this event. Must be a non-empty array
-	 *        for event types {@link #FAILURE}, {@link #GRACE_PERIOD} and
-	 *        {@link #WAITING}. Must be <code>null</code> for other event types.
+	 *        for event types {@link #GRACE_PERIOD} and {@link #WAITING}. It is
+	 *        optional for event type {@link #FAILURE}. Must be
+	 *        <code>null</code> for other event types.
 	 * @param cause A <code>Throwable</code> object describing the root cause of
 	 *        this event. May be <code>null</code>.
 	 */
@@ -234,16 +236,20 @@ public class BlueprintEvent {
 		if (extenderBundle == null) {
 			throw new NullPointerException("extenderBundle must not be null");
 		}
-		/*
 		switch (type) {
 			case WAITING :
 			case GRACE_PERIOD :
-			case FAILURE :
 				if (dependencies == null) {
 					throw new NullPointerException(
 							"dependencies must not be null");
 				}
 				if (dependencies.length == 0) {
+					throw new IllegalArgumentException(
+							"dependencies must not be length zero");
+				}
+				break;
+			case FAILURE :
+				if ((dependencies != null) && (dependencies.length == 0)) {
 					throw new IllegalArgumentException(
 							"dependencies must not be length zero");
 				}
@@ -255,7 +261,6 @@ public class BlueprintEvent {
 				}
 				break;
 		}
-		*/
 	}
 
 	/**

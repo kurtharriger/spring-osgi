@@ -41,6 +41,9 @@ public class ParsingUtils {
 	public static final String BLUEPRINT_GENERATED_NAME_PREFIX = ".";
 	/** Constant for the id attribute */
 	public static final String ID_ATTRIBUTE = "id";
+	/** Reserved blueprint constants */
+	private static final String[] RESERVED_NAMES =
+			new String[] { "blueprintContainer", "blueprintBundle", "blueprintBundleContext", "blueprintConverter" };
 
 	public static BeanDefinitionHolder decorateAndRegister(Element ele, BeanDefinitionHolder bdHolder,
 			ParserContext parserContext) {
@@ -53,6 +56,7 @@ public class ParsingUtils {
 
 	public static BeanDefinitionHolder register(Element ele, BeanDefinitionHolder bdHolder, ParserContext parserContext) {
 		if (bdHolder != null) {
+			checkReservedName(bdHolder.getBeanName(), ele, parserContext);
 			try {
 				// Register the final decorated instance.
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, parserContext.getReaderContext()
@@ -155,6 +159,22 @@ public class ParsingUtils {
 				id = generateBlueprintBeanName(definition, parserContext.getRegistry(), false);
 			}
 			return id;
+		}
+	}
+
+	public static boolean isReservedName(String name, Element element, ParserContext parserContext) {
+		for (String reservedName : RESERVED_NAMES) {
+			if (reservedName.equals(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void checkReservedName(String name, Element element, ParserContext parserContext) {
+		if (isReservedName(name, element, parserContext)) {
+			parserContext.getReaderContext().error("Blueprint reserved name '" + name + "' cannot be used", element,
+					null, null);
 		}
 	}
 }

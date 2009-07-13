@@ -16,13 +16,18 @@
 package org.osgi.service.blueprint.reflect;
 
 /**
- * A value specified to be <code>null</code> via the &lt;null/&gt; element.
+ * Metadata for a value specified to be <code>null</code> via the &lt;null&gt;
+ * element.
+ * 
+ * @ThreadSafe
+ * @version $Revision: 7563 $
  */
 public interface NullMetadata extends Metadata {
 
 	/**
-	 * Singleton instance of the <code>NULL</code> Metadata.
+	 * Singleton instance of <code>NullMetadata</code>.
 	 */
-	static final NullMetadata NULL = new NullMetadata() {
-	};
+	static final NullMetadata	NULL	= new NullMetadata() {
+											// empty body
+										};
 }

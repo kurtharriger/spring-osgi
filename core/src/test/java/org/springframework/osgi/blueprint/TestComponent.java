@@ -24,7 +24,7 @@ import org.osgi.framework.ServiceReference;
  * @author Costin Leau
  * 
  */
-public class TestComponent {
+public class TestComponent implements java.io.Serializable {
 
 	private Object propA;
 	private Object propB;

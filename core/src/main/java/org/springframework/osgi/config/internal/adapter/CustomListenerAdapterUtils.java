@@ -58,12 +58,14 @@ public abstract class CustomListenerAdapterUtils {
 	 * It will return a map which has the serviceType (first argument) as type and contains as list the variants of
 	 * methods using the second argument. This method is normally used by listeners when determining custom methods.
 	 * 
+	 * @param target
 	 * @param methodName
 	 * @param possibleArgumentTypes
+	 * @param modifier
 	 * @return
 	 */
 	static Map<Class<?>, List<Method>> determineCustomMethods(final Class<?> target, final String methodName,
-			final Class<?>[] possibleArgumentTypes) {
+			final Class<?>[] possibleArgumentTypes, final boolean onlyPublic) {
 
 		if (!StringUtils.hasText(methodName)) {
 			return Collections.emptyMap();
@@ -80,6 +82,11 @@ public abstract class CustomListenerAdapterUtils {
 
 					public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 						if (!method.isBridge() && methodName.equals(method.getName())) {
+							if (onlyPublic && !Modifier.isPublic(method.getModifiers())) {
+								if (trace)
+									log.trace("Only public methods are considered; ignoring " + method);
+								return;
+							}
 							// take a look at the variables
 							Class<?>[] args = method.getParameterTypes();
 
@@ -159,8 +166,9 @@ public abstract class CustomListenerAdapterUtils {
 	 * @param methodName
 	 * @return
 	 */
-	static Map<Class<?>, List<Method>> determineCustomMethods(Class<?> target, final String methodName) {
-		return determineCustomMethods(target, methodName, new Class[] { Dictionary.class, Map.class });
+	static Map<Class<?>, List<Method>> determineCustomMethods(Class<?> target, final String methodName,
+			boolean onlyPublic) {
+		return determineCustomMethods(target, methodName, new Class[] { Dictionary.class, Map.class }, onlyPublic);
 	}
 
 	/**

@@ -157,6 +157,10 @@ public class BlueprintParser {
 			if (checkNameUniqueness(beanName, aliases, usedNames)) {
 				error("Bean name '" + beanName + "' is already used in this file", ele);
 			}
+
+			if (ParsingUtils.isReservedName(beanName, ele, parserContext)) {
+				error("Blueprint reserved name '" + beanName + "' cannot be used", ele);
+			}
 		}
 
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
@@ -196,7 +200,8 @@ public class BlueprintParser {
 	 * Parse the bean definition itself, without regard to name or aliases. May return <code>null</code> if problems
 	 * occured during the parse of the bean definition.
 	 */
-	private AbstractBeanDefinition parseBeanDefinitionElement(Element ele, String beanName, BeanDefinition containingBean) {
+	private AbstractBeanDefinition parseBeanDefinitionElement(Element ele, String beanName,
+			BeanDefinition containingBean) {
 
 		this.parseState.push(new BeanEntry(beanName));
 
@@ -325,18 +330,30 @@ public class BlueprintParser {
 
 		try {
 			this.parseState.push(hasIndex ? new ConstructorArgumentEntry(index) : new ConstructorArgumentEntry());
+
+			ConstructorArgumentValues values = beanDefinition.getConstructorArgumentValues();
+			// Blueprint failure (index duplication)
+			Integer indexInt = Integer.valueOf(index);
+			if (values.getIndexedArgumentValues().containsKey(indexInt)) {
+				error("duplicate 'index' with value=[" + index + "] specified", ele);
+			}
+
 			Object value = parsePropertyValue(ele, beanDefinition, null);
 			ConstructorArgumentValues.ValueHolder valueHolder = new ConstructorArgumentValues.ValueHolder(value);
 			if (StringUtils.hasLength(typeAttr)) {
 				valueHolder.setType(typeAttr);
 			}
 			valueHolder.setSource(extractSource(ele));
-			ConstructorArgumentValues values = beanDefinition.getConstructorArgumentValues();
 
 			if (hasIndex) {
 				values.addIndexedArgumentValue(index, valueHolder);
 			} else {
 				values.addGenericArgumentValue(valueHolder);
+			}
+			// Blueprint failure (mixed index/non-indexed arguments)
+			if (!values.getGenericArgumentValues().isEmpty() && !values.getIndexedArgumentValues().isEmpty()) {
+				error("indexed and non-indexed constructor arguments are not supported by Blueprint; "
+						+ "consider using the Spring namespace instead", ele);
 			}
 		} finally {
 			this.parseState.pop();
@@ -826,13 +843,6 @@ public class BlueprintParser {
 	 */
 	private void error(String message, Node source, Throwable cause) {
 		parserContext.getReaderContext().error(message, source, parseState.snapshot(), cause);
-	}
-
-	/**
-	 * Reports an error with the given exception for the given source element.
-	 */
-	private void error(Node source, Throwable cause) {
-		parserContext.getReaderContext().error(cause.getLocalizedMessage(), source, parseState.snapshot(), cause);
 	}
 
 	private BlueprintDefaultsDefinition getDefaults(Element ele) {

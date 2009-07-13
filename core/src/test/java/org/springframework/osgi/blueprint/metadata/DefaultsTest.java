@@ -22,6 +22,7 @@ import java.util.List;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.BeanProperty;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
+import org.osgi.service.blueprint.reflect.Metadata;
 import org.osgi.service.blueprint.reflect.ReferenceListMetadata;
 import org.osgi.service.blueprint.reflect.ReferenceMetadata;
 import org.springframework.osgi.blueprint.TestComponent;
@@ -59,5 +60,14 @@ public class DefaultsTest extends BaseMetadataTest {
 		TestComponent componentInstance = (TestComponent) blueprintContainer.getComponentInstance("nested");
 		Collection propB = (Collection) componentInstance.getPropB();
 		System.out.println(propB.size());
+	}
+
+	public void testDefaultActivation() throws Exception {
+		ComponentMetadata metadata = blueprintContainer.getComponentMetadata("lazy-ref");
+		assertEquals(ReferenceMetadata.ACTIVATION_LAZY, metadata.getActivation());
+		metadata = blueprintContainer.getComponentMetadata("lazy-col");
+		assertEquals(ReferenceMetadata.ACTIVATION_LAZY, metadata.getActivation());
+		metadata = blueprintContainer.getComponentMetadata("lazy-service");
+		assertEquals(ReferenceMetadata.ACTIVATION_LAZY, metadata.getActivation());
 	}
 }

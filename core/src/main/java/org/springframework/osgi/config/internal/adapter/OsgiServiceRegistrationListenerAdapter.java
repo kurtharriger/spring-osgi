@@ -63,6 +63,8 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 	 */
 	private Map<Class<?>, List<Method>> registrationMethods, unregistrationMethods;
 
+	private boolean isBlueprintCompliant = false;
+
 	public void afterPropertiesSet() {
 		Assert.notNull(beanFactory);
 		Assert.isTrue(target != null || StringUtils.hasText(targetBeanName),
@@ -92,8 +94,10 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 			if (log.isDebugEnabled())
 				log.debug(clazz.getName() + " is a registration listener");
 
-		registrationMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, registrationMethod);
-		unregistrationMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, unregistrationMethod);
+		registrationMethods =
+				CustomListenerAdapterUtils.determineCustomMethods(clazz, registrationMethod, isBlueprintCompliant);
+		unregistrationMethods =
+				CustomListenerAdapterUtils.determineCustomMethods(clazz, unregistrationMethod, isBlueprintCompliant);
 
 		if (!isListener && (registrationMethods.isEmpty() && unregistrationMethods.isEmpty()))
 			throw new IllegalArgumentException("Target object needs to implement "
@@ -188,5 +192,9 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 	 */
 	public void setTargetBeanName(String targetBeanName) {
 		this.targetBeanName = targetBeanName;
+	}
+
+	public void setBlueprintCompliant(boolean compliant) {
+		this.isBlueprintCompliant = compliant;
 	}
 }
