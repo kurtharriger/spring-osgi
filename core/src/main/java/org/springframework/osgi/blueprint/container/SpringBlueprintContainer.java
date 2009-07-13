@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.blueprint.container.BlueprintContainer;
+import org.osgi.service.blueprint.container.ComponentDefinitionException;
 import org.osgi.service.blueprint.container.NoSuchComponentException;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -36,7 +37,10 @@ import org.springframework.util.CollectionUtils;
 
 /**
  * Default {@link ModuleContext} implementation. Wraps a Spring's {@link ConfigurableListableBeanFactory} to the
- * BlueprintContainer interface. Additionally, this class adds RFC 124 specific behaviour.
+ * BlueprintContainer interface.
+ * 
+ * <b>Note</b>: This class does not fully implements the Blueprint contract: for example it does not trigger any of the
+ * Blueprint events or does not perform exception handling - these concerned are left to the Blueprint extender.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
@@ -55,7 +59,11 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 
 	public Object getComponentInstance(String name) throws NoSuchComponentException {
 		if (applicationContext.containsBean(name)) {
-			return applicationContext.getBean(name);
+			try {
+				return applicationContext.getBean(name);
+			} catch (RuntimeException ex) {
+				throw new ComponentDefinitionException("Cannot get component instance " + name, ex);
+			}
 		} else {
 			throw new NoSuchComponentException(name);
 		}

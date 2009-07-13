@@ -51,6 +51,8 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 	 */
 	private Map<Class<?>, List<Method>> bindMethods, unbindMethods;
 
+	private boolean isBlueprintCompliant = false;
+
 	/**
 	 * anyName(ServiceReference reference) method signature.
 	 */
@@ -105,7 +107,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 			if (log.isDebugEnabled())
 				log.debug(clazz.getName() + " is a lifecycle listener");
 
-		bindMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, bindMethod);
+		bindMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, bindMethod, isBlueprintCompliant);
 
 		if (StringUtils.hasText(bindMethod)) {
 			// determine methods using ServiceReference signature
@@ -122,7 +124,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 			}
 		}
 
-		unbindMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, unbindMethod);
+		unbindMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, unbindMethod, isBlueprintCompliant);
 
 		if (StringUtils.hasText(unbindMethod)) {
 			unbindReference =
@@ -260,6 +262,10 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 
 	public void setTargetBeanName(String targetName) {
 		this.targetBeanName = targetName;
+	}
+
+	public void setBlueprintCompliant(boolean compliant) {
+		this.isBlueprintCompliant = compliant;
 	}
 
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {

@@ -12,5 +12,37 @@
            </reference-list>
        </property>
    </bean>
+   
+   <bean id="dependsleaf1" class="org.springframework.osgi.blueprint.InitializedBean" init-method="init">
+   		<argument>
+   			<value>dependsleaf1</value>
+   		</argument>
+   </bean>
+   
+   <bean id="dependsleaf2" class="org.springframework.osgi.blueprint.InitializedBean" init-method="init" 
+   			depends-on="dependsleaf1">
+   		<argument>
+   			<value>dependsleaf2</value>
+   		</argument>
+   </bean>
 
+   <bean id="exporterListener" class="org.springframework.osgi.blueprint.ExporterListener"/>
+    
+   <!-- simple export using a reference and just one interface. -->
+   <service id="lazy-service" ref="nested" interface="java.io.Serializable"
+       depends-on="dependsleaf1 dependsleaf2">
+       <service-properties>
+           <entry key="service.property.integer">
+               <ref component-id="dependsleaf1"/>
+           </entry>
+       </service-properties>
+       <registration-listener ref="exporterListener"
+           registration-method="up"
+           unregistration-method="down"/>
+   </service>
+   
+   <reference id="lazy-ref" interface="java.io.Serializable" availability="optional"/>
+   
+   <reference-list id="lazy-col" interface="java.io.Serializable" availability="optional"/>
+    
 </blueprint>

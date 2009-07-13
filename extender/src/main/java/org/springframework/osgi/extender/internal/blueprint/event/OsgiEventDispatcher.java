@@ -17,7 +17,6 @@
 package org.springframework.osgi.extender.internal.blueprint.event;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;

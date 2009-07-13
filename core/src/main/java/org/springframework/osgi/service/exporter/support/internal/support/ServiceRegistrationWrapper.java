@@ -19,7 +19,6 @@ import java.util.Dictionary;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.util.Assert;
 
 /**
  * Simple wrapper that prevents a service registration from being unregistered.

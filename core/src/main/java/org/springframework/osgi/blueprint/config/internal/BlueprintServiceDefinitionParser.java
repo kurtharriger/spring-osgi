@@ -22,8 +22,11 @@ import java.util.Set;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.osgi.config.internal.OsgiDefaultsDefinition;
 import org.springframework.osgi.config.internal.ServiceBeanDefinitionParser;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
@@ -51,5 +54,27 @@ public class BlueprintServiceDefinitionParser extends ServiceBeanDefinitionParse
 			throws BeanDefinitionStoreException {
 		return ParsingUtils.resolveId(element, definition, parserContext, shouldGenerateId(),
 				shouldGenerateIdAsFallback());
+	}
+
+	@Override
+	protected OsgiDefaultsDefinition resolveDefaults(Document document, ParserContext parserContext) {
+		return new BlueprintDefaultsDefinition(document, parserContext);
+	}
+
+	@Override
+	protected void postProcessListenerDefinition(BeanDefinition wrapperDef) {
+		wrapperDef.getPropertyValues().addPropertyValue("blueprintCompliant", true);
+	}
+
+	@Override
+	protected void applyDefaults(ParserContext parserContext, OsgiDefaultsDefinition defaults,
+			BeanDefinitionBuilder builder) {
+		super.applyDefaults(parserContext, defaults, builder);
+		if (defaults instanceof BlueprintDefaultsDefinition) {
+			BlueprintDefaultsDefinition defs = (BlueprintDefaultsDefinition) defaults;
+			if (defs.getDefaultInitialization()) {
+				builder.setLazyInit(defs.getDefaultInitialization());
+			}
+		}
 	}
 }

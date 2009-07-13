@@ -171,16 +171,11 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 		}
 
 		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-
 		builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
-		if (parserContext.isNested()) {
-			// Inner bean definition must receive same scope as containing bean.
-			builder.setScope(parserContext.getContainingBeanDefinition().getScope());
-		}
-		if (parserContext.isDefaultLazyInit()) {
-			// Default-lazy-init applies to custom bean definitions as well.
-			builder.setLazyInit(true);
-		}
+
+		OsgiDefaultsDefinition defaults = resolveDefaults(element.getOwnerDocument(), parserContext);
+		applyDefaults(parserContext, defaults, builder);
+
 		doParse(element, parserContext, builder);
 
 		AbstractBeanDefinition def = builder.getBeanDefinition();
@@ -202,6 +197,18 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 		}
 
 		return def;
+	}
+
+	protected void applyDefaults(ParserContext parserContext, OsgiDefaultsDefinition defaults,
+			BeanDefinitionBuilder builder) {
+		if (parserContext.isNested()) {
+			// Inner bean definition must receive same scope as containing bean.
+			builder.setScope(parserContext.getContainingBeanDefinition().getScope());
+		}
+		if (parserContext.isDefaultLazyInit()) {
+			// Default-lazy-init applies to custom bean definitions as well.
+			builder.setLazyInit(true);
+		}
 	}
 
 	private AbstractBeanDefinition createBeanReferenceDefinition(String beanName, BeanDefinition actualDef) {
@@ -390,11 +397,17 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 				vals.addPropertyValue(TARGET_PROP, target);
 
 			wrapperDef.setPropertyValues(vals);
+
+			postProcessListenerDefinition(wrapperDef);
+
 			// add listener to list
 			listenersRef.add(wrapperDef);
 		}
 
 		builder.addPropertyValue(LISTENERS_PROP, listenersRef);
+	}
+
+	protected void postProcessListenerDefinition(BeanDefinition wrapperDef) {
 	}
 
 	protected Object parsePropertySubElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {

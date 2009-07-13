@@ -30,6 +30,8 @@ import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
+import org.springframework.osgi.blueprint.config.internal.BlueprintDefaultsDefinition;
+import org.springframework.osgi.config.internal.ReferenceBeanDefinitionParser.TimeoutAttributeCallback;
 import org.springframework.osgi.config.internal.adapter.OsgiServiceRegistrationListenerAdapter;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
@@ -38,6 +40,7 @@ import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -52,6 +55,39 @@ import org.w3c.dom.NodeList;
  */
 public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
+	class ServiceAttributeCallback implements AttributeCallback {
+
+		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder bldr) {
+			String name = attribute.getLocalName();
+
+			if (INTERFACE.equals(name)) {
+				bldr.addPropertyValue(INTERFACES_PROP, attribute.getValue());
+				return false;
+			} else if (REF.equals(name)) {
+				return false;
+			}
+
+			else if (AUTOEXPORT.equals(name)) {
+				// convert constant to upper case to let Spring do the
+				// conversion
+				String label = attribute.getValue().toUpperCase(Locale.ENGLISH).replace('-', '_');
+				bldr.addPropertyValue(AUTOEXPORT_PROP, Enum.valueOf(DefaultInterfaceDetector.class, label));
+				return false;
+			}
+
+			else if (CONTEXT_CLASSLOADER.equals(name)) {
+				// convert constant to upper case to let Spring do the
+				// conversion
+
+				String value = attribute.getValue().toUpperCase(Locale.ENGLISH).replace('-', '_');
+				bldr.addPropertyValue(CCL_PROP, value);
+				return false;
+			}
+
+			return true;
+		}
+	}
+
 	// bean properties
 	private static final String TARGET_BEAN_NAME_PROP = "targetBeanName";
 
@@ -64,7 +100,6 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 	private static final String AUTOEXPORT_PROP = "interfaceDetector";
 
 	private static final String CCL_PROP = "contextClassLoader";
-
 	// XML elements
 	private static final String INTERFACES_ID = "interfaces";
 
@@ -86,39 +121,14 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-		// parse attributes
-		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback() {
+		builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
 
-			public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder bldr) {
-				String name = attribute.getLocalName();
+		OsgiDefaultsDefinition defaults = resolveDefaults(element.getOwnerDocument(), parserContext);
 
-				if (INTERFACE.equals(name)) {
-					bldr.addPropertyValue(INTERFACES_PROP, attribute.getValue());
-					return false;
-				} else if (REF.equals(name)) {
-					return false;
-				}
+		applyDefaults(parserContext, defaults, builder);
 
-				else if (AUTOEXPORT.equals(name)) {
-					// convert constant to upper case to let Spring do the
-					// conversion
-					String label = attribute.getValue().toUpperCase(Locale.ENGLISH).replace('-', '_');
-					bldr.addPropertyValue(AUTOEXPORT_PROP, Enum.valueOf(DefaultInterfaceDetector.class, label));
-					return false;
-				}
-
-				else if (CONTEXT_CLASSLOADER.equals(name)) {
-					// convert constant to upper case to let Spring do the
-					// conversion
-
-					String value = attribute.getValue().toUpperCase(Locale.ENGLISH).replace('-', '_');
-					bldr.addPropertyValue(CCL_PROP, value);
-					return false;
-				}
-
-				return true;
-			}
-		});
+		AttributeCallback callback = new ServiceAttributeCallback();
+		parseAttributes(element, builder, new AttributeCallback[] { callback }, defaults);
 
 		// determine nested/referred beans
 		Object target = null;
@@ -148,9 +158,10 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 					;
 				// osgi:registration-listener
 				else if (LISTENER.equals(name)) {
-					listeners.add(parseListener(parserContext, subElement, builder));
-				}
-				else if (BeanDefinitionParserDelegate.DESCRIPTION_ELEMENT.equals(name)) {
+					BeanDefinition listenerDef = parseListener(parserContext, subElement, builder);
+					postProcessListenerDefinition(listenerDef);
+					listeners.add(listenerDef);
+				} else if (BeanDefinitionParserDelegate.DESCRIPTION_ELEMENT.equals(name)) {
 					builder.getRawBeanDefinition().setDescription(subElement.getTextContent());
 				}
 
@@ -171,6 +182,34 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 
 		// add listeners
 		builder.addPropertyValue(LISTENERS_PROP, listeners);
+	}
+
+	protected void applyDefaults(ParserContext parserContext, OsgiDefaultsDefinition defaults,
+			BeanDefinitionBuilder builder) {
+		if (parserContext.isDefaultLazyInit()) {
+			// Default-lazy-init applies to custom bean definitions as well.
+			builder.setLazyInit(true);
+		}
+	}
+
+	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks,
+			OsgiDefaultsDefinition defaults) {
+
+		// parse attributes
+		ParserUtils.parseCustomAttributes(element, builder, callbacks);
+	}
+
+	/**
+	 * Get OSGi defaults (in case they haven't been resolved).
+	 * 
+	 * @param document
+	 * @return
+	 */
+	protected OsgiDefaultsDefinition resolveDefaults(Document document, ParserContext parserContext) {
+		return new OsgiDefaultsDefinition(document, parserContext);
+	}
+
+	protected void postProcessListenerDefinition(BeanDefinition wrapperDef) {
 	}
 
 	// osgi:interfaces
@@ -240,7 +279,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 	}
 
 	// osgi:listener
-	private BeanDefinition parseListener(ParserContext context, Element element, BeanDefinitionBuilder builder) {
+	protected BeanDefinition parseListener(ParserContext context, Element element, BeanDefinitionBuilder builder) {
 
 		// filter elements
 		NodeList nl = element.getChildNodes();
@@ -280,19 +319,23 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 
 			if (REF.equals(name))
 				targetName = attribute.getValue();
-			else
+			else {
 				vals.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
+			}
+
 		}
 
 		// create serviceListener wrapper
 		RootBeanDefinition wrapperDef = new RootBeanDefinition(OsgiServiceRegistrationListenerAdapter.class);
 
 		// set the target name (if we have one)
-		if (targetName != null)
+		if (targetName != null) {
 			vals.addPropertyValue(TARGET_BEAN_NAME_PROP, targetName);
+		}
 		// else set the actual target
-		else
+		else {
 			vals.addPropertyValue(TARGET_PROP, target);
+		}
 
 		wrapperDef.setPropertyValues(vals);
 

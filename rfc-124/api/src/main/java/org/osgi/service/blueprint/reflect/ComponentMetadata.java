@@ -18,52 +18,58 @@ package org.osgi.service.blueprint.reflect;
 import java.util.List;
 
 /**
- * Base class for all managers.
- *
- * @see BeanMetadata
- * @see ServiceReferenceMetadata
- * @see ServiceMetadata
- * @see Target
+ * Metadata for managed components. This is the base type for
+ * {@link BeanMetadata}, {@link ServiceMetadata} and
+ * {@link ServiceReferenceMetadata}.
+ * 
+ * @ThreadSafe
+ * @version $Revision: 7563 $
  */
 public interface ComponentMetadata extends NonNullMetadata {
 
 	/**
-	 * The manager will be eagerly activate
+	 * The component's manager must eagerly activate the component.
+	 * 
+	 * @see #getActivation()
 	 */
-	static final int ACTIVATION_EAGER = 1;
+	static final int	ACTIVATION_EAGER	= 1;
 
 	/**
- 	 * The manager will be lazily activated
- 	 */
-	static final int ACTIVATION_LAZY = 2;
+	 * The component's manager must lazily activate the component.
+	 * 
+	 * @see #getActivation()
+	 */
+	static final int	ACTIVATION_LAZY		= 2;
 
 	/**
-	 * The id of the manager.
-	 *
-	 * @return manager id. The manager id can be <code>null</code> if this
-	 *         is an anonymously defined and/or inlined manager.
+	 * Return the id of the component.
+	 * 
+	 * @return The id of the component. The component id can be
+	 *         <code>null</code> if this is an anonymously defined and/or
+	 *         inlined component.
 	 */
 	String getId();
 
 	/**
- 	 * Activation strategy for this manager.
- 	 *
- 	 * This is the <code>activation</code> attribute or the
- 	 * <code>default-activation</code> in the <code>blueprint</code> element
- 	 * if not set. If this is also not set, it is {@link #ACTIVATION_EAGER}.
- 	 *
- 	 * @return the activation method
- 	 * @see #ACTIVATION_EAGER
- 	 * @see #ACTIVATION_LAZY
- 	 */
+	 * Return the activation strategy for the component.
+	 * 
+	 * This is specified by the <code>activation</code> attribute of a component
+	 * definition. If this is not set, then the <code>default-activation</code>
+	 * in the <code>blueprint</code> element is used. If that is also not set,
+	 * then the activation strategy is {@link #ACTIVATION_EAGER}.
+	 * 
+	 * @return The activation strategy for the component.
+	 * @see #ACTIVATION_EAGER
+	 * @see #ACTIVATION_LAZY
+	 */
 	int getActivation();
 
 	/**
-	 * The id of any managers listed in a <code>depends-on</code> attribute for this
-	 * manager.
-	 *
-	 * @return an immutable List of manager ids that are
-	 *         explicitly declared as a dependency, or an empty List if none.
+	 * Return the ids of any components listed in a <code>depends-on</code>
+	 * attribute for the component.
+	 * 
+	 * @return An immutable List of component ids that are explicitly declared
+	 *         as a dependency, or an empty List if none.
 	 */
 	List/* <String> */getDependsOn();
 }

@@ -78,4 +78,16 @@ public class BlueprintReferenceBeanDefinitionParser extends ReferenceBeanDefinit
 	protected String generateBeanName(String id, BeanDefinition def, ParserContext parserContext) {
 		return super.generateBeanName(ParsingUtils.BLUEPRINT_GENERATED_NAME_PREFIX + id, def, parserContext);
 	}
+
+	@Override
+	protected void applyDefaults(ParserContext parserContext, OsgiDefaultsDefinition defaults,
+			BeanDefinitionBuilder builder) {
+		super.applyDefaults(parserContext, defaults, builder);
+		if (defaults instanceof BlueprintDefaultsDefinition) {
+			BlueprintDefaultsDefinition defs = (BlueprintDefaultsDefinition) defaults;
+			if (defs.getDefaultInitialization()) {
+				builder.setLazyInit(defs.getDefaultInitialization());
+			}
+		}
+	}
 }
