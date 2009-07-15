@@ -621,6 +621,6 @@ public abstract class ClassUtils {
 			}
 		}
 
-		return classes[0];
+		return (ObjectUtils.isEmpty(classes) ? null : classes[0]);
 	}
 }

@@ -77,14 +77,21 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	public void afterPropertiesSet() {
 		Assert.notNull(this.bundleContext, "Required 'bundleContext' property was not set.");
 		Assert.notNull(classLoader, "Required 'classLoader' property was not set.");
-		Assert.notEmpty(interfaces, "Required 'interfaces' property was not set.");
-		Assert.noNullElements(interfaces, "Null 'interfaces' entries not allowed.");
+		Assert.isTrue(!ObjectUtils.isEmpty(interfaces) || StringUtils.hasText(filter)
+				|| StringUtils.hasText(serviceBeanName),
+				"At least the interface or filter or service name needs to be defined to import an OSGi service");
+		if (ObjectUtils.isEmpty(interfaces)) {
+			log.warn("OSGi importer [" + beanName + "] definition contains no interfaces: "
+					+ "all invocations will be executed on the proxy and not on the backing service");
+		}
 
 		// validate specified classes
 		Assert.isTrue(!ClassUtils.containsUnrelatedClasses(interfaces),
 				"More then one concrete class specified; cannot create proxy.");
 
 		this.listeners = (listeners == null ? new OsgiServiceLifecycleListener[0] : listeners);
+		this.interfaces = (interfaces == null ? new Class<?>[0] : interfaces);
+		this.filter = (StringUtils.hasText(filter) ? filter : "");
 
 		getUnifiedFilter(); // eager initialization of the cache to catch filter errors
 	}
@@ -100,7 +107,8 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 			return unifiedFilter;
 		}
 
-		String filterWithClasses = OsgiFilterUtils.unifyFilter(interfaces, filter);
+		String filterWithClasses =
+				(!ObjectUtils.isEmpty(interfaces) ? OsgiFilterUtils.unifyFilter(interfaces, filter) : filter);
 
 		boolean trace = log.isTraceEnabled();
 		if (trace)

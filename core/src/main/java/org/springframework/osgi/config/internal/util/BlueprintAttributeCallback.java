@@ -33,8 +33,13 @@ public class BlueprintAttributeCallback implements AttributeCallback {
 		String name = attribute.getLocalName();
 		String value = attribute.getValue();
 
-		if (ACTIVATION_ATTR.equals(name) && StringUtils.hasText(value) && LAZY_ACTIVATION.equalsIgnoreCase(value)) {
+		if (ACTIVATION_ATTR.equals(name) && StringUtils.hasText(value)) {
+			if (LAZY_ACTIVATION.equalsIgnoreCase(value)) {
 			builder.setLazyInit(true);
+			}
+			else {
+				builder.setLazyInit(false);
+			}
 			return false;
 		}
 

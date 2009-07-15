@@ -148,4 +148,13 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 		serviceFactoryBean.setImportContextClassLoader(ImportContextClassLoaderEnum.SERVICE_PROVIDER);
 		serviceFactoryBean.setImportContextClassLoader(ImportContextClassLoaderEnum.UNMANAGED);
 	}
+	
+	public void testNoInterfaceSpecified() throws Exception {
+		serviceFactoryBean.setBundleContext(new MockBundleContext());
+		serviceFactoryBean.setInterfaces(null);
+		serviceFactoryBean.setFilter(null);
+		serviceFactoryBean.setServiceBeanName("foo");
+		serviceFactoryBean.afterPropertiesSet();
+		serviceFactoryBean.getObject();
+	}
 }
