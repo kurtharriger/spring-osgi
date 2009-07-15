@@ -80,6 +80,11 @@ public class BlueprintReferenceBeanDefinitionParser extends ReferenceBeanDefinit
 	}
 
 	@Override
+	protected void postProcessListenerDefinition(BeanDefinition wrapperDef) {
+		wrapperDef.getPropertyValues().addPropertyValue("blueprintCompliant", true);
+	}
+
+	@Override
 	protected void applyDefaults(ParserContext parserContext, OsgiDefaultsDefinition defaults,
 			BeanDefinitionBuilder builder) {
 		super.applyDefaults(parserContext, defaults, builder);

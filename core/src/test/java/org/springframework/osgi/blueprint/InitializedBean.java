@@ -15,10 +15,12 @@
  */
 package org.springframework.osgi.blueprint;
 
+import java.io.Serializable;
+
 /**
  * @author Costin Leau
  */
-public class InitializedBean {
+public class InitializedBean implements Serializable {
 
 	private final String name;
 	private volatile boolean init = false;

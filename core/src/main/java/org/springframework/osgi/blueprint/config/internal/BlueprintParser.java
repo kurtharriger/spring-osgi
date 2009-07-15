@@ -255,8 +255,12 @@ public class BlueprintParser {
 		// handle lazy flag (initialize)
 		String lazyInit = ele.getAttribute(LAZY_INIT_ATTR);
 		// check whether the value is "lazy"
-		if (StringUtils.hasText(lazyInit) && lazyInit.equalsIgnoreCase(LAZY_INIT_VALUE)) {
-			bd.setLazyInit(true);
+		if (StringUtils.hasText(lazyInit)) {
+			if (lazyInit.equalsIgnoreCase(LAZY_INIT_VALUE)) {
+				bd.setLazyInit(true);
+			} else {
+				bd.setLazyInit(false);
+			}
 		} else {
 			bd.setLazyInit(getDefaults(ele).getDefaultInitialization());
 		}
@@ -267,6 +271,11 @@ public class BlueprintParser {
 			bd.setFactoryBeanName(componentFactory);
 		}
 
+		// check whether the bean is a prototype with destroy method
+		if (StringUtils.hasText(bd.getDestroyMethodName()) && BeanDefinition.SCOPE_PROTOTYPE.equalsIgnoreCase(bd.getScope())){
+			error("Blueprint prototype beans cannot define destroy methods", ele);
+		}
+		
 		return bd;
 	}
 

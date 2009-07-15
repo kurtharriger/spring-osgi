@@ -62,9 +62,6 @@ public class ServiceRegistrationDecorator implements ServiceRegistration {
 		ServiceReference reference = delegate.getReference();
 		Map properties = (Map) OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference);
 
-		System.out.println("*** Unregistration props: " + properties + " for reference " + reference
-				+ " from registration " + delegate);
-
 		// if no exception has been thrown (i.e. the delegate is properly
 		// unregistered), the listeners will be informed
 		for (int i = 0; i < listeners.length; i++) {

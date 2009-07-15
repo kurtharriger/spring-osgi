@@ -134,9 +134,11 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 		final ServiceProviderTCCLInterceptor tcclAdvice = new ServiceProviderTCCLInterceptor();
 		final OsgiServiceLifecycleListener tcclListener = tcclAdvice.new ServiceProviderTCCLListener();
 
+		Class<?> filterClass = ClassUtils.getParticularClass(getInterfaces());
+		String filterClassName = (filterClass != null ? filterClass.getName() : null);
 		final ServiceDynamicInterceptor lookupAdvice =
-				new ServiceDynamicInterceptor(getBundleContext(), ClassUtils.getParticularClass(getInterfaces())
-						.getName(), getUnifiedFilter(), getAopClassLoader());
+				new ServiceDynamicInterceptor(getBundleContext(), filterClassName, getUnifiedFilter(),
+						getAopClassLoader());
 
 		lookupAdvice.setRequiredAtStartup(Availability.MANDATORY.equals(getAvailability()));
 		lookupAdvice.setUseBlueprintExceptions(isUseBlueprintExceptions());

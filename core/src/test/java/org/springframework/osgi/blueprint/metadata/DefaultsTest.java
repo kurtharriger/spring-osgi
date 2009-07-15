@@ -70,4 +70,11 @@ public class DefaultsTest extends BaseMetadataTest {
 		metadata = blueprintContainer.getComponentMetadata("lazy-service");
 		assertEquals(ReferenceMetadata.ACTIVATION_LAZY, metadata.getActivation());
 	}
+	
+	public void testOverriddenActivation() throws Exception {
+		ComponentMetadata metadata = blueprintContainer.getComponentMetadata("overriden-activation");
+		assertEquals(ReferenceMetadata.ACTIVATION_EAGER, metadata.getActivation());
+		metadata = blueprintContainer.getComponentMetadata("overriden-service");
+		assertEquals(ReferenceMetadata.ACTIVATION_EAGER, metadata.getActivation());
+	}
 }

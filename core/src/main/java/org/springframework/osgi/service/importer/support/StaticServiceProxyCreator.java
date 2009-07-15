@@ -128,7 +128,7 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 
 		// remove classes if needed
 		if (interfacesOnlyProxying) {
-			Set clazzes = new LinkedHashSet(classes.length);
+			Set<Class<?>> clazzes = new LinkedHashSet<Class<?>>(classes.length);
 			for (int classIndex = 0; classIndex < classes.length; classIndex++) {
 				Class<?> clazz = classes[classIndex];
 				if (clazz.isInterface())
