@@ -58,6 +58,13 @@ public class ParsingUtils {
 		if (bdHolder != null) {
 			checkReservedName(bdHolder.getBeanName(), ele, parserContext);
 			try {
+				// add non-lenient constructor resolution
+				BeanDefinition beanDefinition = bdHolder.getBeanDefinition();
+				if (beanDefinition instanceof AbstractBeanDefinition) {
+					AbstractBeanDefinition abd = (AbstractBeanDefinition) beanDefinition;
+					//abd.setLenientConstructorResolution(false);
+				}
+				
 				// Register the final decorated instance.
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, parserContext.getReaderContext()
 						.getRegistry());

@@ -15,6 +15,11 @@
  */
 package org.springframework.osgi.blueprint.container;
 
+import java.util.Collection;
+import java.util.Set;
+
+import junit.framework.TestCase;
+
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -22,12 +27,11 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.osgi.blueprint.CollectionTestComponent;
 import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.context.support.PublicBlueprintDocumentLoader;
 import org.springframework.osgi.mock.MockBundleContext;
-
-import junit.framework.TestCase;
 
 /**
  * @author Costin Leau
@@ -66,8 +70,26 @@ public class TestBlueprintBuiltinConvertersTest extends TestCase {
 		context.close();
 		context = null;
 	}
-	
+
 	public void testConvertersAvailable() throws Exception {
 		System.out.println(blueprintContainer.getComponentIds());
+	}
+
+	public void testCollection() throws Exception {
+		CollectionTestComponent cpn = context.getBean("arrayToCollection", CollectionTestComponent.class);
+		Object value = cpn.getPropertyValue();
+		assertTrue(value instanceof Collection);
+		System.out.println(value.getClass());
+		Collection col = (Collection) value;
+		assertEquals(3, col.size());
+	}
+
+	public void testSetToCollection() throws Exception {
+		CollectionTestComponent cpn = context.getBean("setToCollection", CollectionTestComponent.class);
+		Object value = cpn.getPropertyValue();
+		assertTrue(value instanceof Set);
+		System.out.println(value.getClass());
+		Collection col = (Collection) value;
+		assertEquals(2, col.size());
 	}
 }
