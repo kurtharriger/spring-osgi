@@ -49,6 +49,7 @@ public class MandatoryDependencyBeanPostProcessor implements BeanFactoryAware, B
 
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		// disable publication until all the dependencies have been fulfilled
+		
 		// ignore inner beans
 		if (bean instanceof OsgiServiceFactoryBean && beanFactory.containsLocalBean(beanName)) {
 			String exporterName = beanName;

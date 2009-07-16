@@ -16,6 +16,7 @@
 package org.springframework.osgi.blueprint.container.support;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -24,8 +25,12 @@ import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Queue;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -47,12 +52,51 @@ import org.springframework.beans.propertyeditors.PropertiesEditor;
  */
 public class BlueprintEditorRegistrar implements PropertyEditorRegistrar {
 
+	/**
+	 * Class that changes the default Spring implementation for 'collection'. Spring uses a LinkedHashSet but Blueprint
+	 * mandates an ArrayList.
+	 * 
+	 * @author Costin Leau
+	 */
+	private static class BlueprintCustomCollectionEditor extends CustomCollectionEditor {
+
+		public BlueprintCustomCollectionEditor(Class collectionType) {
+			super(collectionType);
+		}
+
+		@Override
+		protected Collection createCollection(Class collectionType, int initialCapacity) {
+			if (!collectionType.isInterface()) {
+				try {
+					return (Collection) collectionType.newInstance();
+				} catch (Exception ex) {
+					throw new IllegalArgumentException("Could not instantiate collection class ["
+							+ collectionType.getName() + "]: " + ex.getMessage());
+				}
+			} else if (List.class.equals(collectionType)) {
+				return new ArrayList(initialCapacity);
+			} else if (SortedSet.class.equals(collectionType)) {
+				return new TreeSet();
+			} else {
+				return new ArrayList(initialCapacity);
+			}
+		}
+	};
+
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
 		// Date
 		registry.registerCustomEditor(Date.class, new DateEditor());
 		// Collection concrete types
 		registry.registerCustomEditor(Stack.class, new CustomCollectionEditor(Stack.class));
 		registry.registerCustomEditor(Vector.class, new CustomCollectionEditor(Vector.class));
+
+		// Spring creates a LinkedHashSet for Collection, RFC mandates an ArrayList
+		// reinitialize default editors
+		registry.registerCustomEditor(Collection.class, new BlueprintCustomCollectionEditor(Collection.class));
+		registry.registerCustomEditor(Set.class, new CustomCollectionEditor(Set.class));
+		registry.registerCustomEditor(SortedSet.class, new CustomCollectionEditor(SortedSet.class));
+		registry.registerCustomEditor(List.class, new CustomCollectionEditor(List.class));
+		registry.registerCustomEditor(SortedMap.class, new CustomMapEditor(SortedMap.class));
 
 		registry.registerCustomEditor(HashSet.class, new CustomCollectionEditor(HashSet.class));
 		registry.registerCustomEditor(LinkedHashSet.class, new CustomCollectionEditor(LinkedHashSet.class));

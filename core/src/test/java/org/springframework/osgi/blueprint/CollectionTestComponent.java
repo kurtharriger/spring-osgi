@@ -164,4 +164,9 @@ public class CollectionTestComponent {
 	private void setPropertyValue(String name, Object value, Object type) {
 		this.value = value;
 	}
+
+	public Object getPropertyValue() {
+		return this.value;
+	}
+
 }
