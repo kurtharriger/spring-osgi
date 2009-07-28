@@ -4,7 +4,7 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/2.5.6.SEC01/org.springframework.context-2.5.6.SEC01.jar" sourcepath="/M2_REPO/org/springframework/org.springframework.context/2.5.6.SEC01/org.springframework.context-2.5.6.A-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/2.5.6.SEC01/org.springframework.context-2.5.6.SEC01.jar" sourcepath="/M2_REPO/org/springframework/org.springframework.context/2.5.6.SEC01/org.springframework.context-2.5.6.SEC01-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.aop/2.5.6.SEC01/org.springframework.aop-2.5.6.SEC01.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/aopalliance/com.springsource.org.aopalliance/1.0.0/com.springsource.org.aopalliance-1.0.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.core/2.5.6.SEC01/org.springframework.core-2.5.6.SEC01.jar" sourcepath="/SPRING_SRC"/>
@@ -37,6 +37,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/jasper.osgi/5.5.23-SNAPSHOT/jasper.osgi-5.5.23-SNAPSHOT.jar" sourcepath="/JASPER_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/catalina.osgi/5.5.23-SNAPSHOT/catalina.osgi-5.5.23-SNAPSHOT.jar" sourcepath="/CATALINA_5.5.X"/>
 	<classpathentry kind="var" path="M2_REPO/com/cenqua/clover/clover/2.3.1/clover-2.3.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/1.2.1-SNAPSHOT/spring-osgi-extender-1.2.1-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/extender/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/1.2.1-SNAPSHOT/spring-osgi-extender-1.2.1-SNAPSHOT.jar" sourcepath="/OSGI_12_SRC_ROOT/extender/src/main/java"/>
 	<classpathentry kind="output" path="target/test-classes"/>
 </classpath>
