@@ -96,6 +96,11 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 		if (OsgiBundleUtils.isSystemBundle(bundle)) {
 			return;
 		}
+		// Ignore non-wired Spring DM bundles
+		if ("org.springframework.osgi.core".equals(bundle.getSymbolicName())
+				&& !bundle.equals(BundleUtils.getDMCoreBundle(context))) {
+			return;
+		}
 
 		boolean hasHandlers = bundle.findEntries(META_INF, SPRING_HANDLERS, false) != null;
 		boolean hasSchemas = bundle.findEntries(META_INF, SPRING_SCHEMAS, false) != null;
