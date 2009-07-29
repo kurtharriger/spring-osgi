@@ -25,7 +25,7 @@ public class InitializedBean implements Serializable {
 	private final String name;
 	private volatile boolean init = false;
 
-	InitializedBean(String name) {
+	public InitializedBean(String name) {
 		this.name = name;
 	}
 
