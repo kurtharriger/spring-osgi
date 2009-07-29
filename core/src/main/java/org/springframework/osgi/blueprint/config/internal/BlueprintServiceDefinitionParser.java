@@ -26,6 +26,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.config.internal.OsgiDefaultsDefinition;
 import org.springframework.osgi.config.internal.ServiceBeanDefinitionParser;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -33,6 +34,31 @@ import org.w3c.dom.Element;
  * @author Costin Leau
  */
 public class BlueprintServiceDefinitionParser extends ServiceBeanDefinitionParser {
+
+	private static final String INTERFACE = "interface";
+	private static final String INTERFACES = "interfaces";
+	private static final String AUTOEXPORT = "auto-export";
+	private static final String DISABLED = "disabled";
+
+	@Override
+	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		// first check the attributes
+		if (element.hasAttribute(AUTOEXPORT) && !DISABLED.equals(element.getAttribute(AUTOEXPORT).trim())) {
+			if (element.hasAttribute(INTERFACE)) {
+				parserContext.getReaderContext().error(
+						"either 'auto-export' or 'interface' attribute has be specified but not both", element);
+			}
+			if (DomUtils.getChildElementByTagName(element, INTERFACES) != null) {
+				parserContext.getReaderContext().error(
+						"either 'auto-export' attribute or <intefaces> sub-element has be specified but not both",
+						element);
+
+			}
+
+		}
+
+		super.doParse(element, parserContext, builder);
+	}
 
 	@Override
 	protected Map<?, ?> parsePropertyMapElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {

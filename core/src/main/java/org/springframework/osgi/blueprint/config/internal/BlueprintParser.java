@@ -81,8 +81,10 @@ public class BlueprintParser {
 	private static final String FACTORY_REF_ATTR = "factory-ref";
 	private static final String LAZY_INIT_ATTR = "activation";
 	private static final String LAZY_INIT_VALUE = "lazy";
+	private static final String EAGER_INIT_VALUE = "eager";
 
 	public static final String NAMESPACE_URI = "http://www.osgi.org/xmlns/blueprint/v1.0.0";
+	public static final String DECLARED_SCOPE = "org.springframework.osgi.blueprint.xml.bean.declared.scope";
 
 	private final ParseState parseState;
 
@@ -198,7 +200,7 @@ public class BlueprintParser {
 
 	/**
 	 * Parse the bean definition itself, without regard to name or aliases. May return <code>null</code> if problems
-	 * occured during the parse of the bean definition.
+	 * occurred during the parse of the bean definition.
 	 */
 	private AbstractBeanDefinition parseBeanDefinitionElement(Element ele, String beanName,
 			BeanDefinition containingBean) {
@@ -214,6 +216,19 @@ public class BlueprintParser {
 			AbstractBeanDefinition beanDefinition =
 					BeanDefinitionReaderUtils.createBeanDefinition(null, className, parserContext.getReaderContext()
 							.getBeanClassLoader());
+
+			// some early validation
+			String activation = ele.getAttribute(LAZY_INIT_ATTR);
+			String scope = ele.getAttribute(BeanDefinitionParserDelegate.SCOPE_ATTRIBUTE);
+
+			if (EAGER_INIT_VALUE.equals(activation) && BeanDefinition.SCOPE_PROTOTYPE.equals(scope)) {
+				error("Prototype beans cannot be eagerly activated", ele);
+			}
+
+			// add marker to indicate that the scope was present
+			if (StringUtils.hasText(scope)) {
+				beanDefinition.setAttribute(DECLARED_SCOPE, Boolean.TRUE);
+			}
 
 			// parse attributes
 			parseAttributes(ele, beanName, beanDefinition);
@@ -272,10 +287,11 @@ public class BlueprintParser {
 		}
 
 		// check whether the bean is a prototype with destroy method
-		if (StringUtils.hasText(bd.getDestroyMethodName()) && BeanDefinition.SCOPE_PROTOTYPE.equalsIgnoreCase(bd.getScope())){
+		if (StringUtils.hasText(bd.getDestroyMethodName())
+				&& BeanDefinition.SCOPE_PROTOTYPE.equalsIgnoreCase(bd.getScope())) {
 			error("Blueprint prototype beans cannot define destroy methods", ele);
 		}
-		
+
 		return bd;
 	}
 

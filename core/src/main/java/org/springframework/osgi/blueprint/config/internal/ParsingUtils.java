@@ -62,7 +62,8 @@ public class ParsingUtils {
 				BeanDefinition beanDefinition = bdHolder.getBeanDefinition();
 				if (beanDefinition instanceof AbstractBeanDefinition) {
 					AbstractBeanDefinition abd = (AbstractBeanDefinition) beanDefinition;
-					//abd.setLenientConstructorResolution(false);
+					abd.setLenientConstructorResolution(false);
+					abd.setNonPublicAccessAllowed(false);
 				}
 				
 				// Register the final decorated instance.

@@ -112,4 +112,43 @@ public class ConstructorInjectionTest extends TestCase {
 		Locale[] propA = getPropA("compLocaleArray");
 		assertEquals(Locale.US, propA[0]);
 	}
+
+	public void testPrimitiveConstructor() throws Exception {
+		try {
+			Object component = context.getBean("primToWrapperArg");
+			fail("Expected an ambuigity exception");
+		} catch (Exception ex) {
+			// expected
+		}
+	}
+
+	public void testPrimitiveFactoryMethod() throws Exception {
+		try {
+			Object component = context.getBean("primToWrapperFactory");
+			fail("Expected an ambuigity exception");
+		} catch (Exception ex) {
+			// expected
+		}
+	}
+
+	public void testNestedValue() throws Exception {
+		Object component = context.getBean("nestedURLValue");
+	}
+
+	public void testNestedValueFactory() throws Exception {
+		Object component = context.getBean("nestedURLValueFactory");
+	}
+
+	public void testEmptyArray() throws Exception {
+		Object component = context.getBean("emptyArrayConstruct");
+	}
+	
+	public void testCollectionConversion() throws Exception {
+		try {
+			Object component = context.getBean("collectionConflict");
+			fail("Expected an ambuigity exception");
+		} catch (Exception ex) {
+			// expected
+		}
+	}
 }

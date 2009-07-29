@@ -8,7 +8,7 @@
 	<description>Components mixed subelements</description>
 
 	<bean id="classname" class="java.lang.String">
-		<argument value="java.io.Serializable" />
+		<argument type="java.lang.String" value="java.io.Serializable" />
 	</bean>
 
 	<bean id="class" factory-method="forName" class="java.lang.Class">

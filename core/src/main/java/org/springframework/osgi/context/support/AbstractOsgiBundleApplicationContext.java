@@ -18,6 +18,7 @@ package org.springframework.osgi.context.support;
 
 import java.beans.PropertyEditor;
 import java.io.IOException;
+import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Dictionary;
@@ -33,8 +34,6 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
-import org.springframework.beans.propertyeditors.ClassArrayEditor;
-import org.springframework.beans.propertyeditors.ClassEditor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
@@ -114,6 +113,8 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 */
 	private ResourcePatternResolver osgiPatternResolver;
 
+	private volatile AccessControlContext acc;
+
 	/**
 	 * Creates a new <code>AbstractOsgiBundleApplicationContext</code> with no parent.
 	 */
@@ -148,6 +149,8 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 
 		this.setDisplayName(ClassUtils.getShortName(getClass()) + "(bundle=" + getBundleSymbolicName() + ", config="
 				+ StringUtils.arrayToCommaDelimitedString(getConfigLocations()) + ")");
+
+		this.acc = AccessControlFactory.createContext(bundle);
 	}
 
 	public BundleContext getBundleContext() {
@@ -304,7 +307,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	@SuppressWarnings("unchecked")
 	private void publishContextAsOsgiServiceIfNecessary() {
 		if (publishContextAsService && serviceRegistration == null) {
-			Dictionary<Object, Object> serviceProperties = new MapBasedDictionary<Object, Object>();
+			final Dictionary<Object, Object> serviceProperties = new MapBasedDictionary<Object, Object>();
 
 			customizeApplicationContextServiceProperties((Map<Object, Object>) serviceProperties);
 
@@ -322,13 +325,26 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 					org.springframework.osgi.util.internal.ClassUtils.getVisibleClasses(classes, this.getClass()
 							.getClassLoader());
 
-			String[] serviceNames = org.springframework.osgi.util.internal.ClassUtils.toStringArray(filterClasses);
+			final String[] serviceNames =
+					org.springframework.osgi.util.internal.ClassUtils.toStringArray(filterClasses);
 
 			if (logger.isDebugEnabled())
 				logger.debug("Publishing service under classes " + ObjectUtils.nullSafeToString(serviceNames));
 
 			// Publish under all the significant interfaces we see
-			this.serviceRegistration = getBundleContext().registerService(serviceNames, this, serviceProperties);
+			boolean hasSecurity = (System.getSecurityManager() != null);
+
+			if (hasSecurity) {
+				serviceRegistration = AccessController.doPrivileged(new PrivilegedAction<ServiceRegistration>() {
+					public ServiceRegistration run() {
+						return getBundleContext().registerService(serviceNames, this, serviceProperties);
+					}
+				}, acc);
+
+			} else {
+				serviceRegistration = getBundleContext().registerService(serviceNames, this, serviceProperties);
+			}
+
 		} else {
 			if (logger.isInfoEnabled()) {
 				logger.info("Not publishing application context OSGi service for bundle "
