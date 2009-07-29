@@ -52,8 +52,9 @@
    		</argument>
    </bean>
  	
+ 	 
    <service id="overriden-service" ref="overriden-activation" auto-export="all-classes" activation="eager"/>
-   
+    
  	
    <!-- 
    <bean id="exception" class="org.springframework.osgi.blueprint.InitializedBean" scope="prototype" destroy-method="foo"/>
