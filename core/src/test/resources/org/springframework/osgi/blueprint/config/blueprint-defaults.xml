@@ -45,14 +45,16 @@
    
    <reference-list id="lazy-col" interface="java.io.Serializable" availability="optional"/>
    
+   
    <bean id="overriden-activation" class="org.springframework.osgi.blueprint.InitializedBean" init-method="init" activation="eager">
    		<argument>
    			<value>overridden-activation</value>
    		</argument>
    </bean>
-
+ 	
    <service id="overriden-service" ref="overriden-activation" auto-export="all-classes" activation="eager"/>
    
+ 	
    <!-- 
    <bean id="exception" class="org.springframework.osgi.blueprint.InitializedBean" scope="prototype" destroy-method="foo"/>
      -->

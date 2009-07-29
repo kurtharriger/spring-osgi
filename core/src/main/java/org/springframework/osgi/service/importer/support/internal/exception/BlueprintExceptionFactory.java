@@ -18,6 +18,7 @@ package org.springframework.osgi.service.importer.support.internal.exception;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.blueprint.container.ServiceUnavailableException;
+import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
@@ -44,8 +45,8 @@ public abstract class BlueprintExceptionFactory {
 
 		private static RuntimeException createServiceUnavailableException(ServiceReference reference) {
 			String id = (reference == null ? "null" : "" + OsgiServiceReferenceUtils.getServiceId(reference));
-			return new ServiceUnavailableException("service with id=[" + id + "] unavailable", "(service.id=" + id
-					+ ")");
+			return new ServiceUnavailableException("service with id=[" + id + "] unavailable", OsgiFilterUtils
+					.getFilter(reference));
 		}
 	}
 }

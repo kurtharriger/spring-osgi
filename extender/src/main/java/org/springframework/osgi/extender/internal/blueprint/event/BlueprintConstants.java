@@ -32,11 +32,14 @@ interface BlueprintConstants {
 	static final String TIMESTAMP = EventConstants.TIMESTAMP;
 
 	static final String EVENT = EventConstants.EVENT;
+	static final String TYPE = org.osgi.service.blueprint.container.EventConstants.TYPE;
 
 	static final String EXTENDER_BUNDLE = org.osgi.service.blueprint.container.EventConstants.EXTENDER_BUNDLE;
 	static final String EXTENDER_BUNDLE_ID = org.osgi.service.blueprint.container.EventConstants.EXTENDER_BUNDLE_ID;
-	static final String EXTENDER_BUNDLE_SYM_NAME = org.osgi.service.blueprint.container.EventConstants.EXTENDER_BUNDLE_SYMBOLICNAME;
-	static final String EXTENDER_BUNDLE_VERSION = org.osgi.service.blueprint.container.EventConstants.EXTENDER_BUNDLE_VERSION;
+	static final String EXTENDER_BUNDLE_SYM_NAME =
+			org.osgi.service.blueprint.container.EventConstants.EXTENDER_BUNDLE_SYMBOLICNAME;
+	static final String EXTENDER_BUNDLE_VERSION =
+			org.osgi.service.blueprint.container.EventConstants.EXTENDER_BUNDLE_VERSION;
 
 	static final String EXCEPTION = EventConstants.EXCEPTION;
 	static final String CAUSE = "cause";

@@ -96,6 +96,10 @@ public class OsgiDefaultsTests extends TestCase {
 		assertEquals(Availability.OPTIONAL, getCardinality(fb));
 	}
 
+	public void testNormalBeanInjection() throws Exception {
+		appContext.getBean("nestedURLValue");
+	}
+	
 	private Availability getCardinality(Object obj) {
 		return (Availability) TestUtils.getFieldValue(obj, "availability");
 	}

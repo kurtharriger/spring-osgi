@@ -170,11 +170,11 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	/**
 	 * Delegate execution of refresh method to a third party. This allows
 	 * breaking the refresh process into several small pieces providing
-	 * continuation-like behavior or completion of the refresh method on several
+	 * continuation-like behaviour or completion of the refresh method on several
 	 * threads, in a asynch manner.
 	 * <p/>
 	 * By default, the refresh method in executed in <em>one go</em> (normal
-	 * behavior).
+	 * behaviour).
 	 * <p/>
 	 * {@inheritDoc}
 	 */

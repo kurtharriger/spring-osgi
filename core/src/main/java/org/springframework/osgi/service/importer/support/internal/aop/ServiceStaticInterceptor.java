@@ -17,10 +17,12 @@
 package org.springframework.osgi.service.importer.support.internal.aop;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.ServiceProxyDestroyedException;
 import org.springframework.osgi.service.importer.support.internal.exception.BlueprintExceptionFactory;
+import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.util.Assert;
 
 /**
@@ -41,12 +43,14 @@ public class ServiceStaticInterceptor extends ServiceInvoker {
 	private final BundleContext bundleContext;
 	/** standard exception flag */
 	private boolean useBlueprintExceptions = false;
+	private final Filter filter;
 
 	public ServiceStaticInterceptor(BundleContext context, ServiceReference reference) {
 		Assert.notNull(context);
 		Assert.notNull(reference, "a not null service reference is required");
 		this.bundleContext = context;
 		this.reference = reference;
+		this.filter = OsgiFilterUtils.createFilter(OsgiFilterUtils.getFilter(reference));
 	}
 
 	protected Object getTarget() {
@@ -64,8 +68,8 @@ public class ServiceStaticInterceptor extends ServiceInvoker {
 				return target;
 		}
 		// throw exception
-		throw (useBlueprintExceptions ? BlueprintExceptionFactory.createServiceUnavailableException(reference)
-				: new ServiceUnavailableException(reference));
+		throw (useBlueprintExceptions ? BlueprintExceptionFactory.createServiceUnavailableException(filter)
+				: new ServiceUnavailableException(filter));
 	}
 
 	public void setUseBlueprintExceptions(boolean useBlueprintExceptions) {

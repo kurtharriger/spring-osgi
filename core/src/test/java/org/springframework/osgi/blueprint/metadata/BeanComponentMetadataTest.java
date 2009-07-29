@@ -27,6 +27,7 @@ import org.osgi.service.blueprint.reflect.CollectionMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.MapEntry;
 import org.osgi.service.blueprint.reflect.MapMetadata;
+import org.osgi.service.blueprint.reflect.Metadata;
 import org.osgi.service.blueprint.reflect.NullMetadata;
 import org.osgi.service.blueprint.reflect.PropsMetadata;
 import org.osgi.service.blueprint.reflect.RefMetadata;
@@ -237,7 +238,7 @@ public class BeanComponentMetadataTest extends BaseMetadataTest {
 		List<BeanProperty> props = localMetadata.getProperties();
 		BeanProperty a = props.get(0);
 		BeanMetadata meta = (BeanMetadata) a.getValue();
-		assertEquals(BeanMetadata.SCOPE_PROTOTYPE, meta.getScope());
+		assertNull(meta.getScope());
 		assertEquals(BeanMetadata.ACTIVATION_LAZY, meta.getActivation());
 	}
 
@@ -250,6 +251,7 @@ public class BeanComponentMetadataTest extends BaseMetadataTest {
 		List<MapEntry> entries = meta.getEntries();
 		MapEntry entry = entries.get(0);
 		BeanMetadata bm = (BeanMetadata) entry.getValue();
+		assertNull(bm.getScope());
 		args = bm.getArguments();
 		for (BeanArgument arg1 : args) {
 			assertEquals(String.class.getName(), arg1.getValueType());
@@ -262,5 +264,15 @@ public class BeanComponentMetadataTest extends BaseMetadataTest {
 			ValueMetadata vm = (ValueMetadata) beanProperty.getValue();
 			assertNull(vm.getType());
 		}
+	}
+	
+	public void testTypedItemMetadata() throws Exception {
+		BeanMetadata localMetadata = getLocalMetadata("typedItem");
+		List<BeanProperty> properties = localMetadata.getProperties();
+		BeanProperty bp = properties.get(0);
+		CollectionMetadata value = (CollectionMetadata) bp.getValue();
+		assertEquals(Double.class.getName(), value.getValueType());
+		List<ValueMetadata> values = value.getValues();
+		System.out.println(values.get(0).getStringValue());
 	}
 }

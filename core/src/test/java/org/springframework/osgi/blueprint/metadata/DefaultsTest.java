@@ -42,6 +42,7 @@ public class DefaultsTest extends BaseMetadataTest {
 	public void testDefaultsOnNestedBeans() throws Exception {
 		ComponentMetadata metadata = blueprintContainer.getComponentMetadata("nested");
 		assertEquals(ComponentMetadata.ACTIVATION_LAZY, metadata.getActivation());
+		assertNull("null scope expected", ((BeanMetadata)metadata).getScope());
 		BeanMetadata meta = (BeanMetadata) metadata;
 		List<BeanProperty> props = meta.getProperties();
 		assertEquals(2, props.size());

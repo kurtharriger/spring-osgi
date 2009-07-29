@@ -15,19 +15,30 @@
  */
 package org.springframework.osgi.blueprint;
 
-import java.net.URL;
-import java.util.Date;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 /**
  * @author Costin Leau
  */
-public class ConstructorInjectionStaticFactory {
+public class AssignBean {
 
-	public static Object makeInstance(Date[] date) {
-		return date;
+	public AssignBean(Set set) {
 	}
 
-	public static Object makeInstance(URL[] obj) {
-		return obj;
+	public AssignBean(SortedSet set) {
 	}
+
+	public AssignBean(Map map) {
+	}
+
+	public AssignBean(SortedMap map) {
+	}
+
+	public AssignBean(Properties map) {
+	}
+
 }

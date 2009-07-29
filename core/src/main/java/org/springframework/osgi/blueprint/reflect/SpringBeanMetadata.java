@@ -23,6 +23,7 @@ import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.BeanProperty;
 import org.osgi.service.blueprint.reflect.Target;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.osgi.blueprint.config.internal.BlueprintParser;
 import org.springframework.util.StringUtils;
 
 /**
@@ -64,7 +65,10 @@ class SpringBeanMetadata extends SpringComponentMetadata implements BeanMetadata
 
 		arguments = MetadataUtils.getBeanArguments(definition);
 		properties = MetadataUtils.getBeanProperties(definition);
-		scope = (StringUtils.hasText(name) ? beanDefinition.getScope() : BeanDefinition.SCOPE_PROTOTYPE);
+
+		// double check if the definition had "scope" declared
+		boolean hasAttribute = definition.hasAttribute(BlueprintParser.DECLARED_SCOPE);
+		scope = (hasAttribute ? (StringUtils.hasText(name) ? beanDefinition.getScope() : null) : null);
 	}
 
 	public List<BeanArgument> getArguments() {

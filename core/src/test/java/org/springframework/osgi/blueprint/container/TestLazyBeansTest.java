@@ -15,7 +15,10 @@
  */
 package org.springframework.osgi.blueprint.container;
 
+import java.util.Collection;
+
 import org.osgi.service.blueprint.container.BlueprintContainer;
+import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -70,5 +73,13 @@ public class TestLazyBeansTest extends TestCase {
 	public void testConvertersAvailable() throws Exception {
 		System.out.println(blueprintContainer.getComponentIds());
 		blueprintContainer.getComponentInstance("lazyCollection");
+	}
+	
+	public void testBeanCount() throws Exception {
+		Collection<ComponentMetadata> metadata = blueprintContainer.getMetadata(ComponentMetadata.class);
+		System.out.println(metadata.size());
+		for (ComponentMetadata componentMetadata : metadata) {
+			System.out.println(componentMetadata.getId());
+		}
 	}
 }

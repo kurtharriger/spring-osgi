@@ -16,17 +16,20 @@
 
 package org.springframework.osgi.util;
 
+import java.util.Collection;
+
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Utility class for creating OSGi filters. This class allows filter creation
- * and concatenation from common parameters such as class names.
+ * Utility class for creating OSGi filters. This class allows filter creation and concatenation from common parameters
+ * such as class names.
  * 
  * @author Costin Leau
  */
@@ -40,24 +43,20 @@ public abstract class OsgiFilterUtils {
 
 	private static final String EQUALS = "=";
 
-
 	/**
-	 * Adds the given class as an 'and'(&amp;) {@link Constants#OBJECTCLASS}
-	 * constraint to the given filter. At least one parameter must be valid
-	 * (non-<code>null</code>).
+	 * Adds the given class as an 'and'(&amp;) {@link Constants#OBJECTCLASS} constraint to the given filter. At least
+	 * one parameter must be valid (non-<code>null</code>).
 	 * 
 	 * @param clazz class name (can be <code>null</code>)
 	 * @param filter valid OSGi filter (can be <code>null</code>)
-	 * @return OSGi filter containing the {@link Constants#OBJECTCLASS}
-	 * constraint and the given filter
+	 * @return OSGi filter containing the {@link Constants#OBJECTCLASS} constraint and the given filter
 	 */
 	public static String unifyFilter(String clazz, String filter) {
 		return unifyFilter(new String[] { clazz }, filter);
 	}
 
 	/**
-	 * Adds the given class to the given filter. At least one parameter must be
-	 * valid (non-<code>null</code>).
+	 * Adds the given class to the given filter. At least one parameter must be valid (non-<code>null</code>).
 	 * 
 	 * @param clazz fully qualified class name (can be <code>null</code>)
 	 * @param filter valid OSGi filter (can be <code>null</code>)
@@ -71,11 +70,9 @@ public abstract class OsgiFilterUtils {
 	}
 
 	/**
-	 * Adds the given classes to the given filter. At least one parameter must
-	 * be valid (non-<code>null</code>).
+	 * Adds the given classes to the given filter. At least one parameter must be valid (non-<code>null</code>).
 	 * 
-	 * @param classes array of fully qualified class names (can be
-	 * <code>null</code>/empty)
+	 * @param classes array of fully qualified class names (can be <code>null</code>/empty)
 	 * @param filter valid OSGi filter (can be <code>null</code>)
 	 * @return an OSGi filter concatenating the given parameters
 	 * @see #unifyFilter(String[], String)
@@ -93,12 +90,10 @@ public abstract class OsgiFilterUtils {
 	}
 
 	/**
-	 * Adds the given classes as an 'and'(&amp;) {@link Constants#OBJECTCLASS}
-	 * constraint to the given filter. At least one parameter must be valid
-	 * (non-<code>null</code>).
+	 * Adds the given classes as an 'and'(&amp;) {@link Constants#OBJECTCLASS} constraint to the given filter. At least
+	 * one parameter must be valid (non-<code>null</code>).
 	 * 
-	 * @param classes array of fully qualified class names (can be
-	 * <code>null</code>/empty)
+	 * @param classes array of fully qualified class names (can be <code>null</code>/empty)
 	 * @param filter valid OSGi filter (can be <code>null</code>)
 	 * @return an OSGi filter concatenating the given parameters
 	 */
@@ -107,12 +102,10 @@ public abstract class OsgiFilterUtils {
 	}
 
 	/**
-	 * Concatenates the given strings with an 'and'(&amp;) constraint under the
-	 * given key to the given filter. At least one of the items/filter
-	 * parameters must be valid (non-<code>null</code>).
+	 * Concatenates the given strings with an 'and'(&amp;) constraint under the given key to the given filter. At least
+	 * one of the items/filter parameters must be valid (non-<code>null</code>).
 	 * 
-	 * @param key the key under which the items are being concatenated
-	 * (required)
+	 * @param key the key under which the items are being concatenated (required)
 	 * @param items an array of strings concatenated to the existing filter
 	 * @param filter valid OSGi filter (can be <code>null</code>)
 	 * @return an OSGi filter concatenating the given parameters
@@ -213,16 +206,14 @@ public abstract class OsgiFilterUtils {
 		try {
 			createFilter(filter);
 			return true;
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			return false;
 		}
 	}
 
 	/**
-	 * Creates an OSGi {@link Filter} from the given String. Translates the
-	 * {@link InvalidSyntaxException} checked exception into an unchecked
-	 * {@link IllegalArgumentException}.
+	 * Creates an OSGi {@link Filter} from the given String. Translates the {@link InvalidSyntaxException} checked
+	 * exception into an unchecked {@link IllegalArgumentException}.
 	 * 
 	 * @param filter OSGi filter given as a String
 	 * @return OSGi filter (as <code>Filter</code>)
@@ -231,9 +222,63 @@ public abstract class OsgiFilterUtils {
 		Assert.hasText(filter, "invalid filter");
 		try {
 			return FrameworkUtil.createFilter(filter);
-		}
-		catch (InvalidSyntaxException ise) {
+		} catch (InvalidSyntaxException ise) {
 			throw (RuntimeException) new IllegalArgumentException("invalid filter: " + ise.getFilter()).initCause(ise);
 		}
+	}
+
+	/**
+	 * Creates a filter (as String) that matches the properties (expect the service id) of service reference.
+	 * 
+	 * @param reference
+	 * @return
+	 */
+	public static String getFilter(ServiceReference reference) {
+		String[] propertyKeys = reference.getPropertyKeys();
+		// allocate some space based on the array length
+		StringBuilder sb = new StringBuilder(propertyKeys.length << 3);
+		sb.append("(&");
+		for (String key : propertyKeys) {
+			if (!Constants.SERVICE_ID.equals(key)) {
+				Object value = reference.getProperty(key);
+				Class<?> cl = value.getClass();
+				Iterable it;
+				// array
+				if (cl.isArray()) {
+					Object[] array = ObjectUtils.toObjectArray(value);
+					for (Object item : array) {
+						sb.append("(");
+						sb.append(key);
+						sb.append("=");
+						sb.append(item);
+						sb.append(")");
+					}
+				}
+
+				// collection
+				else if (Collection.class.isAssignableFrom(cl)) {
+					Collection<?> c = (Collection) value;
+					for (Object item : c) {
+						sb.append("(");
+						sb.append(key);
+						sb.append("=");
+						sb.append(item);
+						sb.append(")");
+					}
+				}
+
+				// scalar/primitive
+				else {
+					sb.append("(");
+					sb.append(key);
+					sb.append("=");
+					sb.append(value);
+					sb.append(")");
+				}
+			}
+		}
+
+		sb.append(")");
+		return sb.toString();
 	}
 }

@@ -51,6 +51,9 @@
        <argument>
        	 <value>&#0120;</value>
        </argument>
-    </bean> 
+    </bean>
 
+<!--     
+    <bean id="lazyPrototype" class="java.lang.String" scope="prototype" activation="eager"/>
+ -->
 </blueprint>

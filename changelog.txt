@@ -53,6 +53,7 @@ Package org.springframework.osgi.service
 * fixed service registration listener behaviour by invoking the callbacks before the service gets unregistered
 * improved proxy class generation to avoid introspection problems in concurrent environments
 * improved mandatory reference checkup to lazily request the backing service
+* interface-less importers can be created (useful for OSGi 4.2 remote services)
 
 Package org.springframework.osgi.mock
 * added specific OSGi r4.2 methods

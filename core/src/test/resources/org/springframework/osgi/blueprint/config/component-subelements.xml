@@ -16,11 +16,12 @@
 		<argument index="0" type="int" value="3" />
 	</bean>
 
+	 
 	<bean id="constructor-arg-ref" class="java.lang.String">
 		<description>description2</description>
-		<argument ref="constructor-arg" />
+		<argument type="java.lang.String" ref="constructor-arg" />
 	</bean>
-
+ 	
 	<bean id="propertyValueInline" class="java.net.Socket">
 		<property name="keepAlive" value="false" />
 	</bean>
@@ -216,11 +217,16 @@
 	</bean>
 
 	<!--
-		SPR-5844 <bean id="primitiveArray"
+		SPR-5844  -->
+		
+	<bean id="primitiveArray"
 		class="org.springframework.osgi.blueprint.PrimitiveArrayConstructorInjection">
-		<argument type="int[]"> <array value-type="int"> <value>1</value>
-		</array> </argument> </bean>
-	-->
+		<argument type="int[]">
+			<array value-type="int"> 
+				<value>1</value>
+			</array>
+		</argument> 
+	</bean>
 
 	<bean id="compDateArray" factory-method="makeInstance"
 		class="org.springframework.osgi.blueprint.ConstructorInjectionStaticFactory">
@@ -276,6 +282,15 @@
                 </entry>
             </map>
         </argument>
+    </bean>
+    
+    <bean id="typedItem" class="org.springframework.osgi.blueprint.TestComponent">
+		<property name="propA">
+            <list value-type="java.lang.Double">
+                <value>0.0</value>
+                <value>1.0</value>
+            </list>
+		</property>
     </bean>
 
 </blueprint>

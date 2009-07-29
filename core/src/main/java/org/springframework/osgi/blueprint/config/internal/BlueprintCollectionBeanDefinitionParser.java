@@ -18,7 +18,9 @@ package org.springframework.osgi.blueprint.config.internal;
 
 import java.util.Set;
 
+import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.config.internal.CollectionBeanDefinitionParser;
@@ -26,6 +28,7 @@ import org.springframework.osgi.config.internal.OsgiDefaultsDefinition;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
 import org.springframework.osgi.service.importer.support.CollectionType;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -99,5 +102,16 @@ public abstract class BlueprintCollectionBeanDefinitionParser extends Collection
 				builder.setLazyInit(defs.getDefaultInitialization());
 			}
 		}
+	}
+
+	@Override
+	protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext)
+			throws BeanDefinitionStoreException {
+
+		String id = element.getAttribute(ID_ATTRIBUTE);
+		if (!StringUtils.hasText(id)) {
+			id = generateBeanName("", definition, parserContext);
+		}
+		return id;
 	}
 }

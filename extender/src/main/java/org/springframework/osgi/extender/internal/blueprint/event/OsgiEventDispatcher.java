@@ -139,6 +139,7 @@ class OsgiEventDispatcher implements EventDispatcher, BlueprintConstants {
 		// common properties
 		props.put(TIMESTAMP, System.currentTimeMillis());
 		props.put(EVENT, event);
+		props.put(TYPE, Integer.valueOf(event.getType()));
 
 		props.put(BUNDLE, event.getBundle());
 		props.put(BUNDLE_ID, bundle.getBundleId());
