@@ -29,8 +29,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Utility class for creating nice string representations of various OSGi
- * classes.
+ * Utility class for creating nice string representations of various OSGi classes.
  * 
  * @author Costin Leau
  * 
@@ -51,7 +50,6 @@ public abstract class OsgiStringUtils {
 	private static final String NULL_STRING = "null";
 	private static final String EMPTY_STRING = "";
 
-
 	/**
 	 * Returns a String representation for the given bundle event.
 	 * 
@@ -60,9 +58,8 @@ public abstract class OsgiStringUtils {
 	 */
 	public static String nullSafeBundleEventToString(int eventType) {
 		try {
-			return BUNDLE_EVENTS.toCode(new Integer(eventType), "");
-		}
-		catch (ConstantException cex) {
+			return BUNDLE_EVENTS.toCode(Integer.valueOf(eventType), "");
+		} catch (ConstantException cex) {
 			return UNKNOWN_EVENT_TYPE;
 		}
 
@@ -78,9 +75,8 @@ public abstract class OsgiStringUtils {
 		if (event == null)
 			return NULL_STRING;
 		try {
-			return BUNDLE_EVENTS.toCode(new Integer(event.getType()), EMPTY_STRING);
-		}
-		catch (ConstantException cex) {
+			return BUNDLE_EVENTS.toCode(Integer.valueOf(event.getType()), EMPTY_STRING);
+		} catch (ConstantException cex) {
 			return UNKNOWN_EVENT_TYPE;
 		}
 	}
@@ -95,17 +91,15 @@ public abstract class OsgiStringUtils {
 		if (event == null)
 			return NULL_STRING;
 		try {
-			return SERVICE_EVENTS.toCode(new Integer(event.getType()), EMPTY_STRING);
-		}
-		catch (ConstantException cex) {
+			return SERVICE_EVENTS.toCode(Integer.valueOf(event.getType()), EMPTY_STRING);
+		} catch (ConstantException cex) {
 			return UNKNOWN_EVENT_TYPE;
 		}
 
 	}
 
 	/**
-	 * Returns a String representation for the given <code>FrameworkEvent</code>
-	 * .
+	 * Returns a String representation for the given <code>FrameworkEvent</code> .
 	 * 
 	 * @param event OSGi <code>FrameworkEvent</code> (can be <code>null</code>)
 	 * @return String representation of the given event
@@ -114,16 +108,14 @@ public abstract class OsgiStringUtils {
 		if (event == null)
 			return NULL_STRING;
 		try {
-			return FRAMEWORK_EVENTS.toCode(new Integer(event.getType()), EMPTY_STRING);
-		}
-		catch (ConstantException cex) {
+			return FRAMEWORK_EVENTS.toCode(Integer.valueOf(event.getType()), EMPTY_STRING);
+		} catch (ConstantException cex) {
 			return UNKNOWN_EVENT_TYPE;
 		}
 	}
 
 	/**
-	 * Returns a String representation of the given
-	 * <code>ServiceReference</code>.
+	 * Returns a String representation of the given <code>ServiceReference</code>.
 	 * 
 	 * @param reference OSGi service reference (can be <code>null</code>)
 	 * @return String representation of the given service reference
@@ -168,9 +160,8 @@ public abstract class OsgiStringUtils {
 		int state = bundle.getState();
 
 		try {
-			return BUNDLE_STATES.toCode(new Integer(state), "");
-		}
-		catch (ConstantException cex) {
+			return BUNDLE_STATES.toCode(Integer.valueOf(state), "");
+		} catch (ConstantException cex) {
 			return "UNKNOWN STATE";
 		}
 	}
@@ -215,8 +206,7 @@ public abstract class OsgiStringUtils {
 	}
 
 	/**
-	 * Returns the bundle name and symbolic name - useful when logging bundle
-	 * info.
+	 * Returns the bundle name and symbolic name - useful when logging bundle info.
 	 * 
 	 * @param bundle OSGi bundle (can be null)
 	 * @return the bundle name and symbolic name

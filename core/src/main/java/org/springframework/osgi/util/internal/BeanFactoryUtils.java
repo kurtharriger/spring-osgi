@@ -16,6 +16,7 @@
 
 package org.springframework.osgi.util.internal;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -33,19 +34,16 @@ import org.springframework.util.Assert;
 public abstract class BeanFactoryUtils {
 
 	/**
-	 * Return all beans depending directly or indirectly (transitively), on the
-	 * bean identified by the beanName. When dealing with a FactoryBean, the
-	 * factory itself can be returned or its product. Additional filtering can
-	 * be executed through the type parameter. If no filtering is required, then
-	 * null can be passed.
+	 * Return all beans depending directly or indirectly (transitively), on the bean identified by the beanName. When
+	 * dealing with a FactoryBean, the factory itself can be returned or its product. Additional filtering can be
+	 * executed through the type parameter. If no filtering is required, then null can be passed.
 	 * 
-	 * Note that depending on #rawFactoryBeans parameter, the type of the
-	 * factory or its product can be used when doing the filtering.
+	 * Note that depending on #rawFactoryBeans parameter, the type of the factory or its product can be used when doing
+	 * the filtering.
 	 * 
 	 * @param beanFactory beans bean factory
 	 * @param beanName root bean name
-	 * @param rawFactoryBeans consider the factory bean itself or the its
-	 *        product
+	 * @param rawFactoryBeans consider the factory bean itself or the its product
 	 * @param type type of the beans returned (null to return all beans)
 	 * @return bean names
 	 */
@@ -81,7 +79,7 @@ public abstract class BeanFactoryUtils {
 
 		for (int i = 0; i < beans.length; i++) {
 			String bean = beans[i];
-			// named nested beans are considered as well, filter them out
+			// top-level beans
 			if (beanFactory.containsBean(bean)) {
 				// & if needed
 				if (rawFactoryBeans && beanFactory.isFactoryBean(bean))
@@ -91,6 +89,12 @@ public abstract class BeanFactoryUtils {
 					beanNames.add(bean);
 					getTransitiveBeans(beanFactory, bean, rawFactoryBeans, beanNames);
 				}
+			}
+			// nested-beans are discarded from the list but are tracked for dependencies to
+			// top-level beans
+			else {
+				getTransitiveBeans(beanFactory, bean, rawFactoryBeans, beanNames);
+
 			}
 		}
 	}

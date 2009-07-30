@@ -35,6 +35,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.osgi.blueprint.container.BlueprintConverter;
 import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
 import org.springframework.osgi.blueprint.container.support.BlueprintContainerServicePublisher;
@@ -69,6 +70,7 @@ public class BlueprintContainerProcessor implements
 	class BlueprintWaitingEventDispatcher implements ApplicationListener<ApplicationEvent> {
 		private final BundleContext bundleContext;
 		private volatile boolean enabled = true;
+		private volatile boolean initialized = false;
 
 		BlueprintWaitingEventDispatcher(BundleContext context) {
 			this.bundleContext = context;
@@ -81,14 +83,22 @@ public class BlueprintContainerProcessor implements
 				return;
 			}
 
-			if (event instanceof OsgiServiceDependencyWaitStartingEvent && enabled) {
-				OsgiServiceDependencyWaitStartingEvent evt = (OsgiServiceDependencyWaitStartingEvent) event;
-				String[] filter = new String[] { evt.getServiceDependency().getServiceFilter().toString() };
-				BlueprintEvent waitingEvent =
-						new BlueprintEvent(BlueprintEvent.WAITING, bundleContext.getBundle(), extenderBundle, filter);
+			if (event instanceof ContextRefreshedEvent) {
+				initialized = true;
+				return;
+			}
 
-				listenerManager.blueprintEvent(waitingEvent);
-				dispatcher.waiting(waitingEvent);
+			if (event instanceof OsgiServiceDependencyWaitStartingEvent) {
+				if (enabled) {
+					OsgiServiceDependencyWaitStartingEvent evt = (OsgiServiceDependencyWaitStartingEvent) event;
+					String[] filter = new String[] { evt.getServiceDependency().getServiceFilter().toString() };
+					BlueprintEvent waitingEvent =
+							new BlueprintEvent(BlueprintEvent.WAITING, bundleContext.getBundle(), extenderBundle,
+									filter);
+
+					listenerManager.blueprintEvent(waitingEvent);
+					dispatcher.waiting(waitingEvent);
+				}
 				return;
 			}
 		}

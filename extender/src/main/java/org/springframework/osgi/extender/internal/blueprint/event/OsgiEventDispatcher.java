@@ -110,9 +110,9 @@ class OsgiEventDispatcher implements EventDispatcher, BlueprintConstants {
 		String[] deps = event.getDependencies();
 		if (!ObjectUtils.isEmpty(deps)) {
 			props.put(DEPENDENCIES, deps);
-			props.put(SERVICE_FILTER, deps[0]);
-			props.put(SERVICE_FILTER_2, deps[0]);
-			props.put(SERVICE_OBJECTCLASS, extractObjectClassFromFilter(deps[0]));
+			// props.put(SERVICE_FILTER, deps[0]);
+			// props.put(SERVICE_FILTER_2, deps[0]);
+			// props.put(SERVICE_OBJECTCLASS, extractObjectClassFromFilter(deps[0]));
 			props.put(ALL_DEPENDENCIES, deps);
 		}
 	}
@@ -185,12 +185,14 @@ class OsgiEventDispatcher implements EventDispatcher, BlueprintConstants {
 						String name = names[i];
 						sb.append(name);
 						sb.append("=");
-						sb.append(osgiEvent.getProperty(name));
+						Object value = osgiEvent.getProperty(name);
+						sb.append(ObjectUtils.getDisplayString(value));
 						if (i < names.length - 1)
 							sb.append(",");
 					}
 					sb.append("}");
 
+					System.out.println("Broadcasting OSGi event " + osgiEvent + " w/ props " + sb.toString());
 					log.trace("Broadcasting OSGi event " + osgiEvent + " w/ props " + sb.toString());
 				}
 				publisher.publish(eventAdmin, osgiEvent);

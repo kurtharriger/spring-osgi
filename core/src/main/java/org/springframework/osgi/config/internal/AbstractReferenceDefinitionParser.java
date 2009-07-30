@@ -87,7 +87,6 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 
 			if (AVAILABILITY.equals(name)) {
 				Availability avail = ReferenceParsingUtil.determineAvailability(value);
-				System.out.println("Setting availability to " + avail + " based on attribute value " + value);
 				builder.addPropertyValue(AVAILABILITY_PROP, avail);
 				return false;
 			}
@@ -216,6 +215,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 		def.setBeanClass(BeanReferenceFactoryBean.class);
 		def.setAttribute(GENERATED_REF, true);
 		def.setOriginatingBeanDefinition(actualDef);
+		def.setDependsOn(new String[] { beanName });
 		def.setSynthetic(true);
 		MutablePropertyValues mpv = new MutablePropertyValues();
 		mpv.addPropertyValue(TARGET_BEAN_NAME_PROP, beanName);
@@ -237,7 +237,6 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 		}
 
 		parseNestedElements(element, context, builder);
-
 		handleNestedDefinition(element, context, builder);
 	}
 

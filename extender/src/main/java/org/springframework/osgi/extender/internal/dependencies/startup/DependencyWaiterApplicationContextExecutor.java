@@ -202,7 +202,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		boolean debug = log.isDebugEnabled();
 
 		boolean skipExceptionEvent = true;
-		
+
 		try {
 			if (debug)
 				log.debug("Calling preRefresh on " + getDisplayName());
@@ -243,10 +243,10 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 				};
 
 			skipExceptionEvent = false;
-			
+
 			DependencyServiceManager dl = createDependencyServiceListener(task);
 			dl.findServiceDependencies();
-			
+
 			skipExceptionEvent = true;
 
 			// all dependencies are met, just go with stageTwo
@@ -455,7 +455,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			if (dependencyDetector != null) {
 				dependencyDetector.deregister();
 				events = dependencyDetector.getUnsatisfiedDependenciesAsEvents();
-				filterAsString = dependencyDetector.createDependencyFilter();
+				filterAsString = dependencyDetector.createUnsatisfiedDependencyFilter();
 			}
 		}
 

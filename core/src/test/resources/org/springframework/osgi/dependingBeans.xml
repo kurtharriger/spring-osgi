@@ -35,4 +35,22 @@
 	<bean id="secondBuffer" class="java.lang.StringBuffer">
 		<constructor-arg ref="field"/>
 	</bean>
+	
+	<bean id="nested" class="java.lang.StringBuffer">
+		<constructor-arg>
+			<bean id="nestedBuffer" class="java.lang.StringBuffer">
+				<constructor-arg ref="int"/>
+			</bean>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="nestedFB" class="java.lang.StringBuffer">
+		<constructor-arg>
+			<bean id="nestedFactory" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+			   <property name="targetObject" ref="thread"/>
+		   	   <property name="targetField" value="MAX_PRIORITY"/>
+			 </bean>
+		</constructor-arg>
+	</bean>
+	
 </beans>
