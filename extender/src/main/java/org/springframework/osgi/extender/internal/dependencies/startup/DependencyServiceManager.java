@@ -5,8 +5,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -137,39 +139,45 @@ public class DependencyServiceManager {
 			boolean trace = log.isTraceEnabled();
 			boolean debug = log.isDebugEnabled();
 
-			for (Iterator<MandatoryServiceDependency> i = dependencies.keySet().iterator(); i.hasNext();) {
-				MandatoryServiceDependency dependency = (MandatoryServiceDependency) i.next();
-
-				// check if there is a match on the service
+			for (MandatoryServiceDependency dependency : dependencies.keySet()) {
+				// first, identify the updated service
 				if (dependency.matches(serviceEvent)) {
 					switch (serviceEvent.getType()) {
 
 					case ServiceEvent.REGISTERED:
 					case ServiceEvent.MODIFIED:
-						unsatisfiedDependencies.remove(dependency);
-						if (debug) {
-							log.debug("Found service for " + context.getDisplayName() + "; eliminating " + dependency
-									+ ", remaining [" + unsatisfiedDependencies + "]");
+						if (unsatisfiedDependencies.remove(dependency) != null) {
+							if (debug) {
+								log.debug("Registered dependency for " + context.getDisplayName() + "; eliminating "
+										+ dependency + ", remaining [" + unsatisfiedDependencies + "]");
+							}
+
+							sendDependencySatisfiedEvent(dependency);
+							sendBootstrappingDependenciesEvent(unsatisfiedDependencies.keySet());
+						} else {
+							if (debug) {
+								log.debug("Ignoring (already satistified) service for " + context.getDisplayName()
+										+ "; " + dependency + ", remaining [" + unsatisfiedDependencies + "]");
+							}
 						}
 
-						sendDependencySatisfiedEvent(dependency);
-						sendBootstrappingDependenciesEvent();
-
-						break;
+						return;
 
 					case ServiceEvent.UNREGISTERING:
 						unsatisfiedDependencies.put(dependency, dependency.getBeanName());
 						if (debug) {
-							log.debug("Service unregistered; adding " + dependency);
+							log.debug("Unregistered dependency for " + context.getDisplayName() + " adding "
+									+ dependency + "; total unsatisfied [" + unsatisfiedDependencies + "]");
 						}
+
 						sendDependencyUnsatisfiedEvent(dependency);
-						sendBootstrappingDependenciesEvent();
-						break;
+						sendBootstrappingDependenciesEvent(unsatisfiedDependencies.keySet());
+						return;
 					default: // do nothing
 						if (debug) {
 							log.debug("Unknown service event type for: " + dependency);
 						}
-						break;
+						return;
 					}
 				} else {
 					if (trace) {
@@ -271,16 +279,16 @@ public class DependencyServiceManager {
 			}
 			// add the dependencies one by one
 			if (discoveredDependencies != null)
-				for (Iterator<OsgiServiceDependency> dependencyIterator = discoveredDependencies.iterator(); dependencyIterator
-						.hasNext();) {
-					OsgiServiceDependency dependency = dependencyIterator.next();
-					MandatoryServiceDependency msd = new MandatoryServiceDependency(bundleContext, dependency);
-					dependencies.put(msd, dependency.getBeanName());
+				for (OsgiServiceDependency dependency : discoveredDependencies) {
+					if (dependency.isMandatory()) {
+						MandatoryServiceDependency msd = new MandatoryServiceDependency(bundleContext, dependency);
+						dependencies.put(msd, dependency.getBeanName());
 
-					if (!msd.isServicePresent()) {
-						log.info("Adding OSGi service dependency for importer [" + msd.getBeanName()
-								+ "] matching OSGi filter [" + msd.filterAsString + "]");
-						unsatisfiedDependencies.put(msd, dependency.getBeanName());
+						if (!msd.isServicePresent()) {
+							log.info("Adding OSGi service dependency for importer [" + msd.getBeanName()
+									+ "] matching OSGi filter [" + msd.filterAsString + "]");
+							unsatisfiedDependencies.put(msd, dependency.getBeanName());
+						}
 					}
 				}
 		}
@@ -302,33 +310,53 @@ public class DependencyServiceManager {
 		}
 
 		// send dependency event before registering the filter
-		sendInitialBootstrappingEvents();
+		sendInitialBootstrappingEvents(unsatisfiedDependencies.keySet());
 		OsgiListenerUtils.addServiceListener(bundleContext, listener, filter);
+//		OsgiListenerUtils.addServiceListener(bundleContext, new ServiceListener() {
+//
+//			public void serviceChanged(ServiceEvent event) {
+//				System.out.println("Received event " + OsgiStringUtils.nullSafeToString(event) + " w/ ref "
+//						+ OsgiStringUtils.nullSafeToString(event.getServiceReference()));
+//
+//			}
+//
+//		}, (String) null);
 	}
 
 	/**
-	 * Look at the existing dependencies and create an appropriate filter. This method concatenates the filters into
-	 * one.
+	 * Look at all dependencies and create an appropriate filter. This method concatenates the filters into one. Note
+	 * that not just unsatisfied dependencies are considered since their number can grow.
 	 * 
 	 * @return
 	 */
-	protected String createDependencyFilter() {
-		if (unsatisfiedDependencies.isEmpty()) {
+	private String createDependencyFilter() {
+		return createDependencyFilter(dependencies.keySet());
+	}
+
+	String createUnsatisfiedDependencyFilter() {
+		return createDependencyFilter(unsatisfiedDependencies.keySet());
+	}
+
+	private String createDependencyFilter(Collection<MandatoryServiceDependency> dependencies) {
+		if (dependencies.isEmpty()) {
 			return null;
 		}
 
-		boolean multiple = unsatisfiedDependencies.size() > 1;
-		StringBuilder sb = new StringBuilder(100 * unsatisfiedDependencies.size());
+		boolean multiple = dependencies.size() > 1;
+		StringBuilder sb = new StringBuilder(dependencies.size() << 7);
 		if (multiple) {
 			sb.append("(|");
 		}
-		for (MandatoryServiceDependency dependency : unsatisfiedDependencies.keySet()) {
+		for (MandatoryServiceDependency dependency : dependencies) {
 			sb.append(dependency.filterAsString);
 		}
 		if (multiple) {
 			sb.append(')');
 		}
-		return sb.toString();
+
+		String filter = sb.toString();
+
+		return filter;
 	}
 
 	protected void deregister() {
@@ -340,38 +368,24 @@ public class DependencyServiceManager {
 	}
 
 	List<OsgiServiceDependencyEvent> getUnsatisfiedDependenciesAsEvents() {
-		List<OsgiServiceDependencyEvent> dependencies =
-				new ArrayList<OsgiServiceDependencyEvent>(unsatisfiedDependencies.size());
+		return getUnsatisfiedDependenciesAsEvents(unsatisfiedDependencies.keySet());
+	}
 
-		for (MandatoryServiceDependency entry : unsatisfiedDependencies.keySet()) {
+	private List<OsgiServiceDependencyEvent> getUnsatisfiedDependenciesAsEvents(
+			Collection<MandatoryServiceDependency> deps) {
+		List<OsgiServiceDependencyEvent> dependencies = new ArrayList<OsgiServiceDependencyEvent>(deps.size());
+
+		for (MandatoryServiceDependency entry : deps) {
 			OsgiServiceDependencyEvent nestedEvent =
 					new OsgiServiceDependencyWaitStartingEvent(context, entry.getServiceDependency(), waitTime);
 			dependencies.add(nestedEvent);
 		}
 
 		return Collections.unmodifiableList(dependencies);
+
 	}
 
 	// event notification
-	private void sendInitialBootstrappingEvents() {
-
-		// send the fine grained event
-		List<OsgiServiceDependencyEvent> events = getUnsatisfiedDependenciesAsEvents();
-		for (OsgiServiceDependencyEvent nestedEvent : events) {
-			BootstrappingDependencyEvent dependencyEvent =
-					new BootstrappingDependencyEvent(context, context.getBundle(), nestedEvent);
-			publishEvent(dependencyEvent);
-		}
-
-		// followed by the composite one
-		String filterAsString = createDependencyFilter();
-		Filter filter = (filterAsString != null ? OsgiFilterUtils.createFilter(filterAsString) : null);
-		BootstrappingDependenciesEvent event =
-				new BootstrappingDependenciesEvent(context, context.getBundle(), events, filter, waitTime);
-
-		publishEvent(event);
-	}
-
 	private void sendDependencyUnsatisfiedEvent(MandatoryServiceDependency dependency) {
 		OsgiServiceDependencyEvent nestedEvent =
 				new OsgiServiceDependencyWaitStartingEvent(context, dependency.getServiceDependency(), waitTime);
@@ -388,9 +402,27 @@ public class DependencyServiceManager {
 		publishEvent(dependencyEvent);
 	}
 
-	private void sendBootstrappingDependenciesEvent() {
-		List<OsgiServiceDependencyEvent> events = getUnsatisfiedDependenciesAsEvents();
-		String filterAsString = createDependencyFilter();
+	private void sendInitialBootstrappingEvents(Set<MandatoryServiceDependency> deps) {
+		// send the fine grained event
+		List<OsgiServiceDependencyEvent> events = getUnsatisfiedDependenciesAsEvents(deps);
+		for (OsgiServiceDependencyEvent nestedEvent : events) {
+			BootstrappingDependencyEvent dependencyEvent =
+					new BootstrappingDependencyEvent(context, context.getBundle(), nestedEvent);
+			publishEvent(dependencyEvent);
+		}
+
+		// followed by the composite one
+		String filterAsString = createDependencyFilter(deps);
+		Filter filter = (filterAsString != null ? OsgiFilterUtils.createFilter(filterAsString) : null);
+		BootstrappingDependenciesEvent event =
+				new BootstrappingDependenciesEvent(context, context.getBundle(), events, filter, waitTime);
+
+		publishEvent(event);
+	}
+
+	private void sendBootstrappingDependenciesEvent(Set<MandatoryServiceDependency> deps) {
+		List<OsgiServiceDependencyEvent> events = getUnsatisfiedDependenciesAsEvents(deps);
+		String filterAsString = createDependencyFilter(deps);
 		Filter filter = (filterAsString != null ? OsgiFilterUtils.createFilter(filterAsString) : null);
 		BootstrappingDependenciesEvent event =
 				new BootstrappingDependenciesEvent(context, context.getBundle(), events, filter, waitTime);

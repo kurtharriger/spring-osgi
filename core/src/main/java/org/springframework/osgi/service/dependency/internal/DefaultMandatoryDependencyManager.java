@@ -222,7 +222,8 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 		ImporterStateListener listener = new ImporterDependencyListener(exporter);
 		exporterListener.put(exporter, listener);
 
-		// exclude non-singletons and non-mandatory importers
+		// exclude non-mandatory importers
+		// non-singletons get added only once (as one instance is enough)
 		for (int i = 0; i < importerNames.length; i++) {
 			if (beanFactory.isSingleton(importerNames[i])) {
 				Object importer = beanFactory.getBean(importerNames[i]);

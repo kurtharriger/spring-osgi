@@ -79,4 +79,14 @@ public class BeanFactoryUtilsTest extends AbstractDependencyInjectionSpringConte
 		String[] deps = BeanFactoryUtils.getTransitiveDependenciesForBean(bf, "secondBuffer", true, FactoryBean.class);
 		assertTrue(Arrays.equals(new String[] { "&field" }, deps));
 	}
+
+	public void testNestedDependencies() throws Exception {
+		String[] deps = BeanFactoryUtils.getTransitiveDependenciesForBean(bf, "nested", true, null);
+		assertTrue(Arrays.equals(new String[] { "int", "c", "b" }, deps));
+	}
+
+	public void testNestedFactoryDependencies() throws Exception {
+		String[] deps = BeanFactoryUtils.getTransitiveDependenciesForBean(bf, "nestedFB", true, null);
+		assertTrue(Arrays.equals(new String[] { "thread", "buffer", "int", "c", "b" }, deps));
+	}
 }

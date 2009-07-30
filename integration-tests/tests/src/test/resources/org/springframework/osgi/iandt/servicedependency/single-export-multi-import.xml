@@ -6,7 +6,7 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 		
-	<osgi:reference interface="org.springframework.osgi.iandt.simpleservice.MyService" cardinality="1..1" id="serviceA" />
+	
 	
 	<osgi:reference interface="org.springframework.osgi.iandt.simpleservice2.MyService2" cardinality="1..1" id="serviceB"/>
 
@@ -16,7 +16,9 @@
 	<osgi:service id="exporter" ref="simple-bean" auto-export="all-classes" depends-on="serviceC"/>
 	
 	<bean id="simple-bean" class="org.springframework.osgi.iandt.servicedependency.SimpleBean" depends-on="serviceB">
-		<property name="property" ref="serviceA"/>
+		<property name="property">
+			<osgi:reference interface="org.springframework.osgi.iandt.simpleservice.MyService" cardinality="1..1" id="serviceA" />
+		</property>
 	</bean>
 	
 </beans>
