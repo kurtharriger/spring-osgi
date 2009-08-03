@@ -54,9 +54,11 @@ public abstract class BeanFactoryUtils {
 
 		Assert.isTrue(beanFactory.containsBean(beanName), "no bean by name [" + beanName + "] can be found");
 
-		Set<String> beans = new LinkedHashSet<String>();
+		Set<String> beans = new LinkedHashSet<String>(8);
+		// used to break cycles between nested beans
+		Set<String> innerBeans = new LinkedHashSet<String>(4);
 
-		getTransitiveBeans(beanFactory, beanName, rawFactoryBeans, beans);
+		getTransitiveBeans(beanFactory, beanName, rawFactoryBeans, beans, innerBeans);
 
 		if (type != null) {
 			// filter by type
@@ -72,7 +74,7 @@ public abstract class BeanFactoryUtils {
 	}
 
 	private static void getTransitiveBeans(ConfigurableListableBeanFactory beanFactory, String beanName,
-			boolean rawFactoryBeans, Set<String> beanNames) {
+			boolean rawFactoryBeans, Set<String> beanNames, Set<String> innerBeans) {
 		String transformedBeanName = org.springframework.beans.factory.BeanFactoryUtils.transformedBeanName(beanName);
 		// strip out '&' just in case
 		String[] beans = beanFactory.getDependenciesForBean(transformedBeanName);
@@ -87,14 +89,15 @@ public abstract class BeanFactoryUtils {
 
 				if (!beanNames.contains(bean)) {
 					beanNames.add(bean);
-					getTransitiveBeans(beanFactory, bean, rawFactoryBeans, beanNames);
+					getTransitiveBeans(beanFactory, bean, rawFactoryBeans, beanNames, innerBeans);
 				}
 			}
-			// nested-beans are discarded from the list but are tracked for dependencies to
+			// nested-beans are discarded from the main list but are tracked for dependencies to
 			// top-level beans
 			else {
-				getTransitiveBeans(beanFactory, bean, rawFactoryBeans, beanNames);
-
+				if (innerBeans.add(bean)) {
+					getTransitiveBeans(beanFactory, bean, rawFactoryBeans, beanNames, innerBeans);
+				}
 			}
 		}
 	}

@@ -83,7 +83,7 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 
 				intf = values.iterator().next().getValue();
 			} else {
-				intf = "";
+				intf = null;
 			}
 		}
 
