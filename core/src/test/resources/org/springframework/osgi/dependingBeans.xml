@@ -53,4 +53,16 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="nestedCycle" class="java.lang.Thread">
+		<property name="name">
+			<bean class="java.lang.Integer" depends-on="nestedCycle">
+				<constructor-arg>
+					<bean class="java.lang.Integer" depends-on="thread">
+						<constructor-arg><value>1</value></constructor-arg>
+					</bean>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
 </beans>

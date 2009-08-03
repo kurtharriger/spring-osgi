@@ -16,6 +16,8 @@
 
 package org.springframework.osgi.extender.internal.dependencies.startup;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
@@ -29,7 +31,7 @@ import org.springframework.osgi.util.OsgiServiceReferenceUtils;
  * @author Hal Hildebrand
  * @author Andy Piper
  */
-public class MandatoryServiceDependency implements OsgiServiceDependency {
+class MandatoryServiceDependency implements OsgiServiceDependency {
 
 	protected final Filter filter;
 
@@ -43,8 +45,9 @@ public class MandatoryServiceDependency implements OsgiServiceDependency {
 
 	private OsgiServiceDependency serviceDependency;
 
+	private final AtomicInteger matchingServices = new AtomicInteger(0);
 
-	public MandatoryServiceDependency(BundleContext bc, Filter serviceFilter, boolean isMandatory, String beanName) {
+	MandatoryServiceDependency(BundleContext bc, Filter serviceFilter, boolean isMandatory, String beanName) {
 		filter = serviceFilter;
 		this.filterAsString = filter.toString();
 		this.isMandatory = isMandatory;
@@ -67,18 +70,18 @@ public class MandatoryServiceDependency implements OsgiServiceDependency {
 		};
 	}
 
-	public MandatoryServiceDependency(BundleContext bc, OsgiServiceDependency dependency) {
+	MandatoryServiceDependency(BundleContext bc, OsgiServiceDependency dependency) {
 		this(bc, dependency.getServiceFilter(), dependency.isMandatory(), dependency.getBeanName());
 	}
 
-	public boolean matches(ServiceEvent event) {
+	boolean matches(ServiceEvent event) {
 		return filter.match(event.getServiceReference());
 	}
 
 	/**
 	 * @return
 	 */
-	public boolean isServicePresent() {
+	boolean isServicePresent() {
 		return (!isMandatory || OsgiServiceReferenceUtils.isServicePresent(bundleContext, filterAsString));
 	}
 
@@ -131,5 +134,23 @@ public class MandatoryServiceDependency implements OsgiServiceDependency {
 
 	public OsgiServiceDependency getServiceDependency() {
 		return serviceDependency;
+	}
+
+	/**
+	 * Adds another matching service.
+	 * 
+	 * @return the counter after adding the service.
+	 */
+	int increment() {
+		return matchingServices.incrementAndGet();
+	}
+
+	/**
+	 * Removes a matching service.
+	 * 
+	 * @return the counter after substracting the service.
+	 */
+	int decrement() {
+		return matchingServices.decrementAndGet();
 	}
 }

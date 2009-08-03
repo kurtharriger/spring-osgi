@@ -17,6 +17,7 @@
 package org.springframework.osgi.extender.internal.blueprint.activator;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,6 +27,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.blueprint.container.BlueprintEvent;
 import org.osgi.service.blueprint.container.BlueprintListener;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.support.Availability;
 import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
@@ -45,36 +47,29 @@ class BlueprintListenerManager implements BlueprintListener, DisposableBean {
 
 	private volatile DisposableBean cleanupHook;
 	private volatile List<BlueprintListener> listeners;
-	// FIXME: remove asynch delivery
-	private final Timer eventDispatcher = new Timer("BlueprintEvent Dispatcher", true);
+	private volatile ReplayEventManager replayManager;
 
-	private class Task extends TimerTask {
+	private class RegistrationReplayDelivery implements OsgiServiceLifecycleListener {
 
-		private final BlueprintEvent event;
-
-		Task(BlueprintEvent event) {
-			this.event = event;
+		public void bind(Object service, Map properties) throws Exception {
+			BlueprintListener listener = (BlueprintListener) service;
+			replayManager.dispatchReplayEvents(listener);
 		}
 
-		@Override
-		public void run() {
-			for (BlueprintListener listener : listeners) {
-				try {
-					listener.blueprintEvent(event);
-				} catch (Exception ex) {
-					log.warn("exception encountered when calling listener " + System.identityHashCode(listener), ex);
-				}
-			}
+		public void unbind(Object service, Map properties) throws Exception {
 		}
 	}
 
 	public BlueprintListenerManager(BundleContext context) {
+		this.replayManager = new ReplayEventManager(context);
+
 		OsgiServiceCollectionProxyFactoryBean fb = new OsgiServiceCollectionProxyFactoryBean();
 		fb.setBundleContext(context);
 		fb.setAvailability(Availability.OPTIONAL);
 		fb.setCollectionType(CollectionType.LIST);
 		fb.setInterfaces(new Class[] { BlueprintListener.class });
 		fb.setBeanClassLoader(BundleDelegatingClassLoader.createBundleClassLoaderFor(context.getBundle()));
+		fb.setListeners(new OsgiServiceLifecycleListener[] { new RegistrationReplayDelivery() });
 		fb.afterPropertiesSet();
 
 		cleanupHook = fb;
@@ -82,8 +77,7 @@ class BlueprintListenerManager implements BlueprintListener, DisposableBean {
 	}
 
 	public void destroy() {
-		eventDispatcher.cancel();
-		eventDispatcher.purge();
+		replayManager.destroy();
 
 		if (cleanupHook != null) {
 			try {
@@ -97,7 +91,14 @@ class BlueprintListenerManager implements BlueprintListener, DisposableBean {
 	}
 
 	public void blueprintEvent(BlueprintEvent event) {
-		// schedule for execution right away
-		new Task(event).run();
+		replayManager.addEvent(event);
+
+		for (BlueprintListener listener : listeners) {
+			try {
+				listener.blueprintEvent(event);
+			} catch (Exception ex) {
+				log.warn("exception encountered when calling listener " + System.identityHashCode(listener), ex);
+			}
+		}
 	}
 }

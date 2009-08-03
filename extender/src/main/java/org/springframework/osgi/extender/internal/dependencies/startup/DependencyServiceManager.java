@@ -139,16 +139,29 @@ public class DependencyServiceManager {
 			boolean trace = log.isTraceEnabled();
 			boolean debug = log.isDebugEnabled();
 
+			String referenceToString = null;
+			String contextToString = null;
+
+			if (debug) {
+				referenceToString = OsgiStringUtils.nullSafeToString(serviceEvent.getServiceReference());
+				contextToString = context.getDisplayName();
+			}
+
 			for (MandatoryServiceDependency dependency : dependencies.keySet()) {
-				// first, identify the updated service
+				// check all dependencies (there might be multiple imports for the same service)
 				if (dependency.matches(serviceEvent)) {
+					if (trace) {
+						log.trace(dependency + " matched: " + referenceToString);
+					}
+
 					switch (serviceEvent.getType()) {
 
 					case ServiceEvent.REGISTERED:
 					case ServiceEvent.MODIFIED:
+						dependency.increment();
 						if (unsatisfiedDependencies.remove(dependency) != null) {
 							if (debug) {
-								log.debug("Registered dependency for " + context.getDisplayName() + "; eliminating "
+								log.debug("Registered dependency for " + contextToString + "; eliminating "
 										+ dependency + ", remaining [" + unsatisfiedDependencies + "]");
 							}
 
@@ -156,33 +169,40 @@ public class DependencyServiceManager {
 							sendBootstrappingDependenciesEvent(unsatisfiedDependencies.keySet());
 						} else {
 							if (debug) {
-								log.debug("Ignoring (already satistified) service for " + context.getDisplayName()
-										+ "; " + dependency + ", remaining [" + unsatisfiedDependencies + "]");
+								log.debug("Increasing the number of matching services for " + contextToString + "; "
+										+ dependency + ", remaining [" + unsatisfiedDependencies + "]");
 							}
 						}
 
-						return;
+						break;
 
 					case ServiceEvent.UNREGISTERING:
-						unsatisfiedDependencies.put(dependency, dependency.getBeanName());
-						if (debug) {
-							log.debug("Unregistered dependency for " + context.getDisplayName() + " adding "
-									+ dependency + "; total unsatisfied [" + unsatisfiedDependencies + "]");
-						}
+						int count = dependency.decrement();
+						if (count == 0) {
+							unsatisfiedDependencies.put(dependency, dependency.getBeanName());
+							if (debug) {
+								log.debug("Unregistered dependency for " + contextToString + " adding " + dependency
+										+ "; total unsatisfied [" + unsatisfiedDependencies + "]");
+							}
 
-						sendDependencyUnsatisfiedEvent(dependency);
-						sendBootstrappingDependenciesEvent(unsatisfiedDependencies.keySet());
-						return;
+							sendDependencyUnsatisfiedEvent(dependency);
+							sendBootstrappingDependenciesEvent(unsatisfiedDependencies.keySet());
+						} else {
+							if (debug) {
+								log.debug("Decreasing the number of matching services for " + contextToString + "; "
+										+ dependency + " still has " + count + " matches left");
+							}
+						}
+						break;
 					default: // do nothing
 						if (debug) {
 							log.debug("Unknown service event type for: " + dependency);
 						}
-						return;
+						break;
 					}
 				} else {
 					if (trace) {
-						log.trace(dependency + " does not match: "
-								+ OsgiStringUtils.nullSafeToString(serviceEvent.getServiceReference()));
+						log.trace(dependency + " does not match: " + referenceToString);
 					}
 				}
 			}
@@ -312,15 +332,6 @@ public class DependencyServiceManager {
 		// send dependency event before registering the filter
 		sendInitialBootstrappingEvents(unsatisfiedDependencies.keySet());
 		OsgiListenerUtils.addServiceListener(bundleContext, listener, filter);
-//		OsgiListenerUtils.addServiceListener(bundleContext, new ServiceListener() {
-//
-//			public void serviceChanged(ServiceEvent event) {
-//				System.out.println("Received event " + OsgiStringUtils.nullSafeToString(event) + " w/ ref "
-//						+ OsgiStringUtils.nullSafeToString(event.getServiceReference()));
-//
-//			}
-//
-//		}, (String) null);
 	}
 
 	/**
