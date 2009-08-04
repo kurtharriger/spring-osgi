@@ -26,7 +26,10 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.config.internal.OsgiDefaultsDefinition;
 import org.springframework.osgi.config.internal.ServiceBeanDefinitionParser;
+import org.springframework.osgi.config.internal.util.AttributeCallback;
+import org.springframework.osgi.config.internal.util.ParserUtils;
 import org.springframework.util.xml.DomUtils;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -39,6 +42,24 @@ public class BlueprintServiceDefinitionParser extends ServiceBeanDefinitionParse
 	private static final String INTERFACES = "interfaces";
 	private static final String AUTOEXPORT = "auto-export";
 	private static final String DISABLED = "disabled";
+	private static final String LAZY_LISTENERS = "lazyListeners";
+
+	private static class BlueprintServiceAttributeCallback implements AttributeCallback {
+
+		private static final String ACTIVATION = "activation";
+
+		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
+			String name = attribute.getLocalName();
+			String value = attribute.getValue();
+
+			if (ACTIVATION.equals(name)) {
+				builder.addPropertyValue(LAZY_LISTENERS, Boolean.valueOf(value.startsWith("l")));
+				return false;
+			}
+
+			return true;
+		}
+	}
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
@@ -61,6 +82,16 @@ public class BlueprintServiceDefinitionParser extends ServiceBeanDefinitionParse
 	}
 
 	@Override
+	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks,
+			OsgiDefaultsDefinition defaults) {
+
+		// add BlueprintAttr Callback
+		AttributeCallback blueprintCallback = new BlueprintServiceAttributeCallback();
+		super.parseAttributes(element, builder, ParserUtils.mergeCallbacks(
+				new AttributeCallback[] { blueprintCallback }, callbacks), defaults);
+	}
+
+	@Override
 	protected Map<?, ?> parsePropertyMapElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
 		return BlueprintParser.parsePropertyMapElement(context, beanDef, beanDefinition);
 	}
@@ -78,8 +109,12 @@ public class BlueprintServiceDefinitionParser extends ServiceBeanDefinitionParse
 	@Override
 	protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext)
 			throws BeanDefinitionStoreException {
-		return ParsingUtils.resolveId(element, definition, parserContext, shouldGenerateId(),
-				shouldGenerateIdAsFallback());
+		String id =
+				ParsingUtils.resolveId(element, definition, parserContext, shouldGenerateId(),
+						shouldGenerateIdAsFallback());
+
+		validateServiceReferences(element, id, parserContext);
+		return id;
 	}
 
 	@Override
@@ -99,7 +134,7 @@ public class BlueprintServiceDefinitionParser extends ServiceBeanDefinitionParse
 		if (defaults instanceof BlueprintDefaultsDefinition) {
 			BlueprintDefaultsDefinition defs = (BlueprintDefaultsDefinition) defaults;
 			if (defs.getDefaultInitialization()) {
-				builder.setLazyInit(defs.getDefaultInitialization());
+				builder.addPropertyValue(LAZY_LISTENERS, Boolean.valueOf(defs.getDefaultInitialization()));
 			}
 		}
 	}

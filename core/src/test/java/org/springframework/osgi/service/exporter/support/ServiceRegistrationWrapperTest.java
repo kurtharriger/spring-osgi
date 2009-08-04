@@ -18,6 +18,7 @@ package org.springframework.osgi.service.exporter.support;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import junit.framework.TestCase;
 
@@ -37,13 +38,14 @@ public class ServiceRegistrationWrapperTest extends TestCase {
 
 	private MockControl mc;
 
-
 	protected void setUp() throws Exception {
 		mc = MockControl.createControl(ServiceRegistration.class);
 		actualRegistration = (ServiceRegistration) mc.getMock();
 
-		registration = new ServiceRegistrationDecorator(new Object(), actualRegistration,
-			new OsgiServiceRegistrationListener[] { new SimpleOsgiServiceRegistrationListener() });
+		registration =
+				new ServiceRegistrationDecorator(new Object(), actualRegistration,
+						new OsgiServiceRegistrationListener[] { new SimpleOsgiServiceRegistrationListener() },
+						new AtomicBoolean(true));
 		SimpleOsgiServiceRegistrationListener.REGISTERED = 0;
 		SimpleOsgiServiceRegistrationListener.UNREGISTERED = 0;
 	}
@@ -99,8 +101,7 @@ public class ServiceRegistrationWrapperTest extends TestCase {
 		mc.replay();
 		try {
 			registration.unregister();
-		}
-		catch (IllegalStateException ise) {
+		} catch (IllegalStateException ise) {
 			assertSame(excep, ise);
 		}
 		// check listener hasn't been called

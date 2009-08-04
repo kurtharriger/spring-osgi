@@ -31,6 +31,7 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 	private static final String SERVICE_INSTANCE_PROP = "target";
 	private static final String SERVICE_PROPERTIES_PROP = "serviceProperties";
 	private static final String LISTENERS_PROP = "listeners";
+	private static final String LAZY_LISTENERS = "lazyListeners";
 
 	private final int autoExport;
 	private final List<String> interfaces;
@@ -38,6 +39,7 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 	private final Target component;
 	private final List<MapEntry> serviceProperties;
 	private final Collection<RegistrationListener> listeners;
+	private final int activation;
 
 	/**
 	 * Constructs a new <code>SpringServiceExportComponentMetadata</code> instance.
@@ -114,6 +116,11 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 		}
 
 		listeners = Collections.unmodifiableCollection(foundListeners);
+
+		Boolean bool = (Boolean) MetadataUtils.getValue(pvs, LAZY_LISTENERS);
+		activation =
+				(bool != null ? (bool.booleanValue() ? ACTIVATION_LAZY : ACTIVATION_EAGER) : super.getActivation());
+
 	}
 
 	public int getAutoExport() {
@@ -138,5 +145,10 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 
 	public List<MapEntry> getServiceProperties() {
 		return serviceProperties;
+	}
+
+	@Override
+	public int getActivation() {
+		return activation;
 	}
 }

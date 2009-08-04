@@ -16,7 +16,9 @@
 
 package org.springframework.osgi.config.internal;
 
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -41,6 +43,7 @@ import org.springframework.osgi.config.internal.adapter.OsgiServiceLifecycleList
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
 import org.springframework.osgi.config.internal.util.ReferenceParsingUtil;
+import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 import org.springframework.osgi.service.importer.support.Availability;
 import org.springframework.osgi.service.importer.support.ImportContextClassLoaderEnum;
 import org.springframework.util.Assert;
@@ -389,8 +392,27 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 			RootBeanDefinition wrapperDef = new RootBeanDefinition(OsgiServiceLifecycleListenerAdapter.class);
 
 			// set the target name (if we have one)
-			if (targetName != null)
+			if (targetName != null) {
+				// do some validation
+				BeanDefinitionRegistry registry = context.getRegistry();
+				if (registry.containsBeanDefinition(targetName)) {
+					BeanDefinition beanDefinition = registry.getBeanDefinition(targetName);
+					if (beanDefinition.getBeanClassName().equals(OsgiServiceFactoryBean.class.getName())) {
+						context.getReaderContext()
+								.error("service exporter '" + targetName + "' cannot be used as a reference listener",
+										element);
+					}
+				}
+				// no validation could be performed, save the name for easier retrieval
+				AbstractBeanDefinition bd = builder.getBeanDefinition();
+				Collection<String> str = (Collection<String>) bd.getAttribute(ParserUtils.REFERENCE_LISTENER_REF_ATTR);
+				if (str == null) {
+					str = new LinkedHashSet<String>(2);
+					bd.setAttribute(ParserUtils.REFERENCE_LISTENER_REF_ATTR, str);
+				}
+				str.add(targetName);
 				vals.addPropertyValue(TARGET_BEAN_NAME_PROP, targetName);
+			}
 			// else set the actual target
 			else
 				vals.addPropertyValue(TARGET_PROP, target);

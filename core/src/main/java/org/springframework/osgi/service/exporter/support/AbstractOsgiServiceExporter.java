@@ -17,6 +17,7 @@
 package org.springframework.osgi.service.exporter.support;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.DisposableBean;
@@ -24,8 +25,8 @@ import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener
 import org.springframework.osgi.service.exporter.support.internal.support.ServiceRegistrationDecorator;
 
 /**
- * Base exporter class providing common functionality for registering (also
- * known as exporting) Spring beans as OSGi services.
+ * Base exporter class providing common functionality for registering (also known as exporting) Spring beans as OSGi
+ * services.
  * 
  * @author Costin Leau
  */
@@ -33,41 +34,24 @@ abstract class AbstractOsgiServiceExporter implements DisposableBean {
 
 	/** listeners */
 	private OsgiServiceRegistrationListener[] listeners = new OsgiServiceRegistrationListener[0];
-
+	/** lazy callbacks */
+	private boolean lazyListeners = false;
 
 	/**
-	 * Takes care of notifying the listeners on both startup and shutdown (by
-	 * wrapping the service registration).
+	 * Takes care of notifying the listeners on both startup and shutdown (by wrapping the service registration).
 	 * 
 	 * @param service object published as OSGi service
 	 * @param properties exported OSGi service properties
 	 * @param registration original service registration
 	 * @return
 	 */
-	ServiceRegistration notifyListeners(Object service, Map properties, ServiceRegistration registration) {
-		// notify listeners
-		callRegisteredOnListeners(service, properties);
+	ServiceRegistrationDecorator notifyListeners(Object service, Map properties, ServiceRegistration registration) {
 		// wrap registration to be notified of unregistration
-		return new ServiceRegistrationDecorator(service, registration, listeners);
-	}
+		ServiceRegistrationDecorator decorator =
+				new ServiceRegistrationDecorator(service, registration, listeners, canNotifyListeners());
+		decorator.callRegisterListeners();
 
-	/**
-	 * Call registration on listeners.
-	 * 
-	 * @param properties
-	 */
-	private void callRegisteredOnListeners(Object service, Map properties) {
-		for (int i = 0; i < listeners.length; i++) {
-			if (listeners[i] != null) {
-				try {
-					listeners[i].registered(service, properties);
-				}
-				catch (Exception ex) {
-					// no need to log exceptions, the listener wrapper already
-					// does this for us
-				}
-			}
-		}
+		return decorator;
 	}
 
 	/**
@@ -93,4 +77,31 @@ abstract class AbstractOsgiServiceExporter implements DisposableBean {
 	 * Unregisters/de-exports the OSGi service.
 	 */
 	abstract void unregisterService();
+
+	/**
+	 * Returns a thread-safe, mutable object that indicates whether listeners can be invoked or not at the present time.
+	 * Note that the result of this method will be cached.
+	 * 
+	 * @see #setLazyListeners(boolean)
+	 * @return a thread-safe, mutable object
+	 */
+	abstract AtomicBoolean canNotifyListeners();
+
+	/**
+	 * Sets the laziness of the exporter listeners. Eager listeners (default) will cause the listeners to be called when
+	 * the service is being exported. In contract, if true is passed, the listeners will be called not when the service
+	 * is registered but after the first bundle actually requests it or another component requests the service
+	 * registration. "Lazy listeners" are the equivalent of lazy activated service managers in Blueprint Service (OSGi
+	 * 4.2).
+	 * 
+	 * @param lazyListeners false if the listeners should be called when the service is registered, true if the
+	 * invocations should occur after the first service/factory bean request
+	 */
+	public void setLazyListeners(boolean lazyListeners) {
+		this.lazyListeners = lazyListeners;
+	}
+
+	public boolean getLazyListeners() {
+		return lazyListeners;
+	}
 }

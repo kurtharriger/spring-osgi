@@ -17,6 +17,7 @@ package org.springframework.osgi.util;
 
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -39,8 +40,8 @@ public class BundleDelegatingClassLoaderTest extends TestCase {
 	protected void setUp() throws Exception {
 		bundleCtrl = MockControl.createStrictControl(Bundle.class);
 		bundle = (Bundle) bundleCtrl.getMock();
-		classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle,
-			ProxyFactory.class.getClassLoader());
+		classLoader =
+				BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, ProxyFactory.class.getClassLoader());
 		bundleCtrl.reset();
 	}
 
@@ -56,8 +57,8 @@ public class BundleDelegatingClassLoaderTest extends TestCase {
 
 		assertFalse(classLoader.equals(new Object()));
 		assertEquals(classLoader, classLoader);
-		assertTrue(classLoader.equals(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle,
-			ProxyFactory.class.getClassLoader())));
+		assertTrue(classLoader.equals(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, ProxyFactory.class
+				.getClassLoader())));
 
 		// assertEquals(bundle.hashCode(), clientClassLoader.hashCode());
 	}
@@ -68,14 +69,14 @@ public class BundleDelegatingClassLoaderTest extends TestCase {
 		bundleCtrl.expectAndReturn(bundle.loadClass(className), Object.class);
 		bundleCtrl.expectAndThrow(bundle.loadClass(anotherClassName), new ClassNotFoundException());
 		bundleCtrl.expectAndReturn(bundle.getSymbolicName(), "Test Bundle Symbolic Name");
+		//bundleCtrl.expectAndReturn(bundle.getHeaders(), new Properties());
 		bundleCtrl.replay();
 
 		assertSame(Object.class, classLoader.findClass(className));
 
 		try {
 			classLoader.findClass(anotherClassName);
-		}
-		catch (ClassNotFoundException ex) {
+		} catch (ClassNotFoundException ex) {
 			// expected
 		}
 	}
@@ -100,5 +101,4 @@ public class BundleDelegatingClassLoaderTest extends TestCase {
 
 		assertSame(enumeration, classLoader.findResources(resource));
 	}
-
 }

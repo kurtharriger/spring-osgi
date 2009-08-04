@@ -16,6 +16,7 @@
 package org.springframework.osgi.service.exporter.support;
 
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import junit.framework.TestCase;
 
@@ -41,6 +42,10 @@ public class AbstractListenerAwareExporterTest extends TestCase {
 			protected void unregisterService() {
 			}
 
+			@Override
+			AtomicBoolean canNotifyListeners() {
+				return new AtomicBoolean(true);
+			}
 		};
 		exporter.setListeners(new OsgiServiceRegistrationListener[] { new SimpleOsgiServiceRegistrationListener() });
 	}

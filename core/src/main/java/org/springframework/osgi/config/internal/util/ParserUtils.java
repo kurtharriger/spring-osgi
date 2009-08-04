@@ -45,6 +45,9 @@ public abstract class ParserUtils {
 	private static final AttributeCallback PROPERTY_REF_ATTRS_CALLBACK = new PropertyRefAttributeCallback();
 	private static final AttributeCallback PROPERTY_CONV_ATTRS_CALLBACK = new ConventionsCallback();
 
+	public static final String REFERENCE_LISTENER_REF_ATTR =
+			"org.springframework.osgi.config.internal.reference.listener.ref.attr";
+
 	/**
 	 * Generic attribute callback. Will parse the given callback array, w/o any standard callback.
 	 * 

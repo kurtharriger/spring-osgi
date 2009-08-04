@@ -16,22 +16,25 @@
 
 package org.springframework.osgi.config.internal;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
-import org.springframework.osgi.blueprint.config.internal.BlueprintDefaultsDefinition;
-import org.springframework.osgi.config.internal.ReferenceBeanDefinitionParser.TimeoutAttributeCallback;
 import org.springframework.osgi.config.internal.adapter.OsgiServiceRegistrationListenerAdapter;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
@@ -357,5 +360,32 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 
 	protected Map parsePropertyMapElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
 		return context.getDelegate().parseMapElement(beanDef, beanDefinition);
+	}
+
+	protected void validateServiceReferences(Element element, String serviceId, ParserContext parserContext) {
+		BeanDefinitionRegistry registry = parserContext.getRegistry();
+		String[] names = registry.getBeanDefinitionNames();
+
+		for (String name : names) {
+			BeanDefinition definition = registry.getBeanDefinition(name);
+			Collection<String> exporters =
+					(Collection<String>) definition.getAttribute(ParserUtils.REFERENCE_LISTENER_REF_ATTR);
+
+			if (exporters != null && exporters.contains(serviceId)) {
+				parserContext.getReaderContext()
+						.error(
+								"Service exporter '" + serviceId + "' cannot be used as a reference listener by '"
+										+ name + "'", element);
+			}
+		}
+	}
+
+	@Override
+	protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext)
+			throws BeanDefinitionStoreException {
+
+		String id = super.resolveId(element, definition, parserContext);
+		validateServiceReferences(element, id, parserContext);
+		return id;
 	}
 }
