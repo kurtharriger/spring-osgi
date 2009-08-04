@@ -31,11 +31,11 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.osgi.service.util.internal.aop.ProxyUtils;
 import org.springframework.osgi.service.util.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.util.DebugUtils;
+import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
- * ServiceFactory used for publishing the service beans. Acts as a a wrapper
- * around special beans (such as ServiceFactory). Additionally, used to create
- * TCCL managing proxies.
+ * ServiceFactory used for publishing the service beans. Acts as a a wrapper around special beans (such as
+ * ServiceFactory). Additionally, used to create TCCL managing proxies.
  * 
  * @author Costin Leau
  */
@@ -43,9 +43,6 @@ public class PublishingServiceFactory implements ServiceFactory {
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(PublishingServiceFactory.class);
-
-	// synchronization monitor
-	private final Object monitor = new Object();
 
 	/** proxy cache in case the given bean has a non-singleton scope */
 	private final Map<Object, WeakReference<Object>> proxyCache;
@@ -58,12 +55,11 @@ public class PublishingServiceFactory implements ServiceFactory {
 	private final ClassLoader classLoader;
 	private final ClassLoader aopClassLoader;
 	private final BundleContext bundleContext;
-
+	private final Runnable notifyListeners;
 
 	/**
-	 * Constructs a new <code>PublishingServiceFactory</code> instance. Since
-	 * its an internal class, this constructor accepts a number of parameters to
-	 * sacrifice readability for thread-safety.
+	 * Constructs a new <code>PublishingServiceFactory</code> instance. Since its an internal class, this constructor
+	 * accepts a number of parameters to sacrifice readability for thread-safety.
 	 * 
 	 * @param classes
 	 * @param target
@@ -75,7 +71,8 @@ public class PublishingServiceFactory implements ServiceFactory {
 	 * @param bundleContext
 	 */
 	public PublishingServiceFactory(Class<?>[] classes, Object target, BeanFactory beanFactory, String targetBeanName,
-			boolean createTCCLProxy, ClassLoader classLoader, ClassLoader aopClassLoader, BundleContext bundleContext) {
+			boolean createTCCLProxy, ClassLoader classLoader, ClassLoader aopClassLoader, BundleContext bundleContext,
+			Runnable notifyListeners) {
 		super();
 		this.classes = classes;
 
@@ -88,17 +85,29 @@ public class PublishingServiceFactory implements ServiceFactory {
 		this.bundleContext = bundleContext;
 
 		proxyCache = (createTCCLProxy ? new WeakHashMap<Object, WeakReference<Object>>(4) : null);
+		this.notifyListeners = notifyListeners;
 	}
 
 	private Object getBean() {
-		synchronized (monitor) {
-			// no instance given
-			// use container lookup
-			return (target == null ? beanFactory.getBean(targetBeanName) : target);
-		}
+		// if no instance given use container lookup
+		return (target == null ? beanFactory.getBean(targetBeanName) : target);
+	}
+
+	private Class<?> getBeanType() {
+		return (target == null ? (beanFactory.isSingleton(targetBeanName) ? beanFactory.getBean(targetBeanName)
+				.getClass() : beanFactory.getType(targetBeanName)) : target.getClass());
 	}
 
 	public Object getService(Bundle bundle, ServiceRegistration serviceRegistration) {
+		if (notifyListeners != null) {
+			notifyListeners.run();
+		}
+
+		if (log.isTraceEnabled()) {
+			log.trace("Get service called by bundle " + OsgiStringUtils.nullSafeName(bundle) + " on registration "
+					+ OsgiStringUtils.nullSafeToString(serviceRegistration.getReference()));
+		}
+
 		Object bn = getBean();
 		// handle SF beans
 		if (bn instanceof ServiceFactory) {
@@ -113,8 +122,7 @@ public class PublishingServiceFactory implements ServiceFactory {
 					Object proxy = createCLLProxy(bn);
 					proxyCache.put(bn, new WeakReference<Object>(proxy));
 					bn = proxy;
-				}
-				else {
+				} else {
 					bn = value.get();
 				}
 			}
@@ -124,10 +132,9 @@ public class PublishingServiceFactory implements ServiceFactory {
 	}
 
 	/**
-	 * Proxy the target object with an interceptor that manages the context
-	 * classloader. This should be applied only if such management is needed.
-	 * Additionally, this method uses a cache to prevent multiple proxies to be
-	 * created for the same object.
+	 * Proxy the target object with an interceptor that manages the context classloader. This should be applied only if
+	 * such management is needed. Additionally, this method uses a cache to prevent multiple proxies to be created for
+	 * the same object.
 	 * 
 	 * @param target
 	 * @return
@@ -135,9 +142,8 @@ public class PublishingServiceFactory implements ServiceFactory {
 	private Object createCLLProxy(final Object target) {
 		try {
 			return ProxyUtils.createProxy(classes, target, aopClassLoader, bundleContext,
-				new Advice[] { new ServiceTCCLInterceptor(classLoader) });
-		}
-		catch (Throwable th) {
+					new Advice[] { new ServiceTCCLInterceptor(classLoader) });
+		} catch (Throwable th) {
 			log.error("Cannot create TCCL managed proxy; falling back to the naked object", th);
 			if (th instanceof NoClassDefFoundError) {
 				NoClassDefFoundError ncdfe = (NoClassDefFoundError) th;
@@ -152,15 +158,23 @@ public class PublishingServiceFactory implements ServiceFactory {
 	}
 
 	public void ungetService(Bundle bundle, ServiceRegistration serviceRegistration, Object service) {
-		Object bn = getBean();
+
+		if (log.isTraceEnabled()) {
+			log.trace("Unget service called by bundle " + OsgiStringUtils.nullSafeName(bundle) + " on registration "
+					+ OsgiStringUtils.nullSafeToString(serviceRegistration.getReference()));
+		}
+
+		Class<?> type = getBeanType();
 		// handle SF beans
-		if (bn instanceof ServiceFactory) {
-			((ServiceFactory) bn).ungetService(bundle, serviceRegistration, service);
+		if (ServiceFactory.class.isAssignableFrom(type)) {
+			ServiceFactory sf = (ServiceFactory) getBean();
+			sf.ungetService(bundle, serviceRegistration, service);
 		}
 
 		if (createTCCLProxy) {
 			synchronized (proxyCache) {
-				proxyCache.values().remove(new WeakReference<Object>(service));
+				// trigger purging of unused entries
+				proxyCache.size();
 			}
 		}
 	}

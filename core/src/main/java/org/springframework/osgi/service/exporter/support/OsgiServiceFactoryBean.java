@@ -22,6 +22,7 @@ import java.util.Dictionary;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,8 +37,10 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.Ordered;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
@@ -46,6 +49,7 @@ import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterController;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterInternalActions;
 import org.springframework.osgi.service.exporter.support.internal.support.PublishingServiceFactory;
+import org.springframework.osgi.service.exporter.support.internal.support.ServiceRegistrationDecorator;
 import org.springframework.osgi.service.exporter.support.internal.support.ServiceRegistrationWrapper;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.internal.ClassUtils;
@@ -123,9 +127,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	private volatile BundleContext bundleContext;
 	private volatile OsgiServicePropertiesResolver propertiesResolver;
 	private volatile BeanFactory beanFactory;
-	private volatile ServiceRegistration serviceRegistration;
+	private volatile ServiceRegistrationDecorator serviceRegistration;
 	private final ServiceRegistrationWrapper safeServiceRegistration = new ServiceRegistrationWrapper(null);
-
 	private volatile Map serviceProperties;
 	private volatile ServicePropertiesChangeListener propertiesListener;
 	private volatile int ranking;
@@ -141,7 +144,6 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	private ClassLoader classLoader;
 	/** class loader used by the aop infrastructure */
 	private ClassLoader aopClassLoader;
-
 	/** exporter bean name */
 	private String beanName;
 	/** registration sanity flag */
@@ -154,6 +156,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	private final Object lock = new Object();
 	/** internal behaviour controller */
 	private final ExporterController controller;
+	private final AtomicBoolean canNotifyListeners = new AtomicBoolean(false);
 
 	public OsgiServiceFactoryBean() {
 		controller = new ExporterController(new Executor());
@@ -177,13 +180,22 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 					+ "' inside the running bean factory.");
 
 			if (beanFactory.isSingleton(targetBeanName)) {
-				target = beanFactory.getBean(targetBeanName);
-				targetClass = target.getClass();
-			} else {
+				if (beanFactory instanceof ConfigurableListableBeanFactory) {
+					ConfigurableListableBeanFactory clbf = (ConfigurableListableBeanFactory) beanFactory;
+					BeanDefinition definition = clbf.getBeanDefinition(targetBeanName);
+					if (!definition.isLazyInit()) {
+						target = beanFactory.getBean(targetBeanName);
+						targetClass = target.getClass();
+					}
+				}
+			}
+
+			if (targetClass == null) {
 				// lazily get the target class
 				targetClass = beanFactory.getType(targetBeanName);
 			}
 
+			// cache the result if dealing with a ServiceFactory prototype
 			if (targetClass != null) {
 				if ((ServiceFactory.class.isAssignableFrom(targetClass)) && beanFactory.isPrototype(targetBeanName)) {
 					target = beanFactory.getBean(targetBeanName);
@@ -193,8 +205,9 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 			// when running inside a container, add the dependency between this bean and the target one
 			addBeanFactoryDependency();
-		} else
+		} else {
 			targetClass = target.getClass();
+		}
 
 		if (propertiesResolver == null) {
 			propertiesResolver = new BeanNameServicePropertiesResolver();
@@ -229,6 +242,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		synchronized (lock) {
 			shouldRegisterAtStartup = registerAtStartup;
 		}
+
+		canNotifyListeners.set(!getLazyListeners());
 
 		if (shouldRegisterAtStartup)
 			registerService();
@@ -285,6 +300,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * Publishes the given object as an OSGi service. It simply assembles the classes required for publishing and then
 	 * delegates the actual registration to a dedicated method.
 	 */
+	@Override
 	void registerService() {
 
 		synchronized (lock) {
@@ -342,10 +358,16 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		log.info("Publishing service under classes [" + ObjectUtils.nullSafeToString(names) + "]");
 
+		Runnable notifyListenersCallback = (canNotifyListeners.get() ? null : new Runnable() {
+			public void run() {
+				activateLazyListeners();
+			}
+		});
+
 		ServiceFactory serviceFactory =
 				new PublishingServiceFactory(classes, target, beanFactory, targetBeanName,
 						(ExportContextClassLoaderEnum.SERVICE_PROVIDER.equals(contextClassLoader)), classLoader,
-						aopClassLoader, bundleContext);
+						aopClassLoader, bundleContext, notifyListenersCallback);
 
 		if (isBeanBundleScoped())
 			serviceFactory = new OsgiBundleScope.BundleScopeServiceFactory(serviceFactory);
@@ -371,6 +393,21 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		return bundleScoped;
 	}
 
+	@Override
+	AtomicBoolean canNotifyListeners() {
+		return canNotifyListeners;
+	}
+
+	private void activateLazyListeners() {
+		if (canNotifyListeners.compareAndSet(false, true)) {
+			if (log.isDebugEnabled())
+				log.debug("Activating lazy registration listeners for exporter " + beanName);
+			if (serviceRegistration != null) {
+				serviceRegistration.callRegisterListeners();
+			}
+		}
+	}
+
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
 		this.aopClassLoader = ClassLoaderFactory.getAopClassLoaderFor(classLoader);
@@ -382,6 +419,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * <p/> Returns a {@link ServiceRegistration} to the OSGi service for the target object.
 	 */
 	public ServiceRegistration getObject() throws Exception {
+		activateLazyListeners();
 		return safeServiceRegistration;
 	}
 
@@ -390,7 +428,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	}
 
 	public boolean isSingleton() {
-		return false;
+		return true;
 	}
 
 	void unregisterService() {
@@ -640,4 +678,5 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	public void setBeanName(String name) {
 		this.beanName = name;
 	}
+
 }

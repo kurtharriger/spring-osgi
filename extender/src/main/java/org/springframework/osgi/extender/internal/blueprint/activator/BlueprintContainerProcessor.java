@@ -104,34 +104,6 @@ public class BlueprintContainerProcessor implements
 		}
 	};
 
-	class ExceptionHandlingBlueprintContainer extends SpringBlueprintContainer {
-
-		private final Bundle bundle;
-
-		public ExceptionHandlingBlueprintContainer(ConfigurableApplicationContext applicationContext,
-				BundleContext bundleContext) {
-			super(applicationContext, bundleContext);
-			this.bundle = bundleContext.getBundle();
-		}
-
-		@Override
-		public Object getComponentInstance(String name) throws NoSuchComponentException {
-			try {
-				return super.getComponentInstance(name);
-			} catch (RuntimeException th) {
-				if (!(th instanceof NoSuchComponentException)) {
-					BlueprintEvent failureEvent =
-							new BlueprintEvent(BlueprintEvent.FAILURE, bundle, extenderBundle, th);
-
-					listenerManager.blueprintEvent(failureEvent);
-					dispatcher.refreshFailure(failureEvent);
-				}
-
-				throw th;
-			}
-		}
-	}
-
 	public BlueprintContainerProcessor(EventAdminDispatcher dispatcher, BlueprintListenerManager listenerManager,
 			Bundle extenderBundle) {
 		this.dispatcher = dispatcher;

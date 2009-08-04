@@ -460,8 +460,8 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		assertEquals(listener.unregistered.size(), 0);
 
 		exporter.afterPropertiesSet();
-		assertEquals(listener.registered.size(), 1);
-		assertEquals(listener.unregistered.size(), 0);
+		assertEquals(1, listener.registered.size());
+		assertEquals(0, listener.unregistered.size());
 
 		assertNull(listener.registered.keySet().iterator().next());
 		exporter.destroy();

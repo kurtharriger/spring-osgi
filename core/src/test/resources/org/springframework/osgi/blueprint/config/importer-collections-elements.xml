@@ -12,20 +12,21 @@
 
 	<bean id="compa" class="org.springframework.osgi.blueprint.DummyComparator" />
 
-	<reference-list id="simpleList" interface="java.lang.Cloneable"/>
-	
+	<reference-list id="simpleList" interface="java.lang.Cloneable" />
+
 	<bean id="listener" class="org.springframework.osgi.blueprint.ImporterListener" />
-		
+
 	<reference-list id="listeners" interface="java.io.Serializable">
-		<reference-listener bind-method="bindM" unbind-method="unbindM" ref="listener" />
+		<reference-listener bind-method="bindM"
+			unbind-method="unbindM" ref="listener" />
 
 		<reference-listener bind-method="up" unbind-method="down">
 			<bean class="org.springframework.osgi.blueprint.ImporterListener" />
 		</reference-listener>
-		<reference-listener bind-method="refBind" unbind-method="refUnbind">
+		<reference-listener bind-method="refBind"
+			unbind-method="refUnbind">
 			<ref component-id="listener" />
 		</reference-listener>
 	</reference-list>
-
 
 </blueprint>
