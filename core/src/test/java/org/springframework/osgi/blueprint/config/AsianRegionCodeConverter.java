@@ -26,14 +26,19 @@ import org.osgi.service.blueprint.container.ReifiedType;
  */
 public class AsianRegionCodeConverter implements Converter {
 
-	private Class<?> targetClass = RegionCode.class;
-
-	public boolean canConvert(Object fromValue, ReifiedType toType) {
-		return (fromValue instanceof String && targetClass.equals(toType));
-
+	public Object convert(Object source, ReifiedType toType) throws Exception {
+		Class toClass = (Class) toType.getRawClass();
+		if (source instanceof String
+				&& (RegionCode.class.isAssignableFrom(toClass) && toClass.isAssignableFrom(AsianRegionCode.class))) {
+			return new AsianRegionCode((String) source);
+		}
+		// we're supposed to throw an exception if we can't convert
+		throw new Exception("Unconvertable object type");
 	}
 
-	public Object convert(Object fromValue, ReifiedType toType) throws Exception {
-		return new AsianRegionCode((String) fromValue);
+	public boolean canConvert(Object value, ReifiedType toType) {
+		Class toClass = (Class) toType.getRawClass();
+		return (RegionCode.class.isAssignableFrom(toClass) && toClass.isAssignableFrom(AsianRegionCode.class))
+				&& value instanceof String;
 	}
 }

@@ -28,7 +28,7 @@ import org.osgi.service.blueprint.container.ReifiedType;
 public class ComponentHolderConverter implements Converter {
 
 	public boolean canConvert(Object fromValue, ReifiedType toType) {
-		return ComponentHolder.class.equals(toType);
+		return ComponentHolder.class.equals(toType.getRawClass());
 	}
 
 	public Object convert(Object fromValue, ReifiedType toType) throws Exception {

@@ -15,6 +15,9 @@
 		<ref component-id="converterB" />
 		<bean id="asianRegionCodeConverter" 
 			class="org.springframework.osgi.blueprint.config.AsianRegionCodeConverter"/>
+			
+		<bean id="customBooleanConverter" 
+			class="org.springframework.osgi.blueprint.config.CustomBooleanConverter"/>
 	</type-converters>
 
 	<bean id="asianCodeExample" class="org.springframework.osgi.blueprint.config.RegionCodeComponent"> 
@@ -34,10 +37,30 @@
 		</property>
 	</bean>
 	
+	<bean id="booleanConversion" class="org.springframework.osgi.blueprint.TestComponent" activation="lazy">
+		<property name="bool" value="T"/>
+	</bean>
+	
 	<bean id="serviceReference" class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="serviceReference" ref="referenceFactory"/>
 	</bean>
 	
 	<bean id="referenceFactory" class="org.springframework.osgi.blueprint.ReferenceDelegateFactory"/>
+	
+	<bean id="invalidInjection1" class="org.springframework.osgi.blueprint.TestComponent" activation="lazy">
+		<property name="list">
+			<map>
+				<entry key="foo">
+					<value>bar</value>
+				</entry>
+			</map> 
+		</property>
+	</bean>
+
+	<bean id="invalidInjection2" class="org.springframework.osgi.blueprint.TestComponent" activation="lazy">
+		<property name="collection">
+			<ref component-id="referenceFactory"/>
+		</property>
+	</bean>
 	
 </blueprint>

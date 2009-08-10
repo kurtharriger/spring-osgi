@@ -97,5 +97,4 @@ public class NestedReferencesTest extends TestCase {
 		Holder holder = (Holder) appContext.getBean("nestedAnonymousCollection", Holder.class);
 		assertSame(bean, holder.data);
 	}
-
 }

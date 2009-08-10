@@ -22,6 +22,7 @@ import java.util.List;
 import org.osgi.service.blueprint.container.Converter;
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.CustomEditorConfigurer;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -31,7 +32,7 @@ import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.blueprint.config.internal.BlueprintParser;
 import org.springframework.osgi.blueprint.config.internal.ParsingUtils;
-import org.springframework.osgi.blueprint.container.CoverterPropertyEditorRegistrar;
+import org.springframework.osgi.blueprint.container.BlueprintConverterConfigurer;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
@@ -54,7 +55,7 @@ public class TypeConverterBeanDefinitionParser extends AbstractBeanDefinitionPar
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 
 		BeanDefinitionBuilder registrarDefinitionBuilder =
-				BeanDefinitionBuilder.genericBeanDefinition(CoverterPropertyEditorRegistrar.class);
+				BeanDefinitionBuilder.genericBeanDefinition(BlueprintConverterConfigurer.class);
 
 		List<Element> components = DomUtils.getChildElementsByTagName(element, BlueprintParser.BEAN);
 		List<Element> componentRefs =
@@ -74,10 +75,11 @@ public class TypeConverterBeanDefinitionParser extends AbstractBeanDefinitionPar
 		}
 		// add the list to the registrar definition
 		registrarDefinitionBuilder.addConstructorArgValue(converterList);
+		registrarDefinitionBuilder.setRole(BeanDefinition.ROLE_SUPPORT);
+		registrarDefinitionBuilder.getRawBeanDefinition().setSynthetic(true);
 
 		// build the CustomEditorConfigurer
-		return BeanDefinitionBuilder.genericBeanDefinition(CustomEditorConfigurer.class).addPropertyValue(
-				EDITOR_CONFIGURER_PROPERTY, registrarDefinitionBuilder.getBeanDefinition()).getBeanDefinition();
+		return registrarDefinitionBuilder.getBeanDefinition();
 	}
 
 	@Override

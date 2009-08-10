@@ -54,6 +54,8 @@ public class TestLazyBeansTest extends TestCase {
 
 			public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 				beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
+				beanFactory.registerSingleton("blueprintContainer",
+						new SpringBlueprintContainer(context, bundleContext));
 			}
 		});
 
@@ -69,12 +71,12 @@ public class TestLazyBeansTest extends TestCase {
 		context.close();
 		context = null;
 	}
-	
+
 	public void testConvertersAvailable() throws Exception {
 		System.out.println(blueprintContainer.getComponentIds());
 		blueprintContainer.getComponentInstance("lazyCollection");
 	}
-	
+
 	public void testBeanCount() throws Exception {
 		Collection<ComponentMetadata> metadata = blueprintContainer.getMetadata(ComponentMetadata.class);
 		System.out.println(metadata.size());

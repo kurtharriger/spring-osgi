@@ -16,6 +16,9 @@
 
 package org.springframework.osgi.blueprint;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.osgi.framework.ServiceReference;
 
 /**
@@ -62,12 +65,24 @@ public class TestComponent implements java.io.Serializable {
 		this.propB = propB;
 	}
 
+	public void setList(List list) {
+		this.propA = list;
+	}
+
+	public void setCollection(Collection col) {
+		this.propA = col;
+	}
+
 	public ServiceReference getServiceReference() {
 		return serviceReference;
 	}
 
 	public void setServiceReference(ServiceReference serviceReference) {
 		this.serviceReference = serviceReference;
+	}
+	
+	public void setBool(boolean bool) {
+		this.propA = Boolean.valueOf(bool);
 	}
 
 	public void init() {

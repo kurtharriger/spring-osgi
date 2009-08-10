@@ -24,8 +24,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.container.BlueprintEvent;
-import org.osgi.service.blueprint.container.NoSuchComponentException;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
@@ -33,11 +33,10 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.osgi.blueprint.container.BlueprintConverter;
 import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
+import org.springframework.osgi.blueprint.container.SpringBlueprintConverter;
 import org.springframework.osgi.blueprint.container.support.BlueprintContainerServicePublisher;
 import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.blueprint.reflect.EnvironmentManagerFactoryBean;
@@ -177,7 +176,7 @@ public class BlueprintContainerProcessor implements
 				addPredefinedBlueprintBean(beanFactory, BLUEPRINT_BUNDLE_CONTEXT, bundleContext, logger);
 				addPredefinedBlueprintBean(beanFactory, BLUEPRINT_CONTAINER, blueprintContainer, logger);
 				// addPredefinedBlueprintBean(beanFactory, BLUEPRINT_EXTENDER, extenderBundle, logger);
-				addPredefinedBlueprintBean(beanFactory, BLUEPRINT_CONVERTER, new BlueprintConverter(), logger);
+				addPredefinedBlueprintBean(beanFactory, BLUEPRINT_CONVERTER, new SpringBlueprintConverter(beanFactory), logger);
 
 				// add Blueprint built-in converters
 				beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
@@ -196,6 +195,7 @@ public class BlueprintContainerProcessor implements
 						cav.addIndexedArgumentValue(0, value);
 						def.setConstructorArgumentValues(cav);
 						def.setLazyInit(false);
+						def.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 						registry.registerBeanDefinition(beanName, def);
 
 					} else {
