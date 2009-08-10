@@ -16,32 +16,17 @@
 package org.springframework.osgi.context.support;
 
 import java.security.AccessControlContext;
-import java.security.AccessController;
-import java.security.DomainCombiner;
 import java.security.Permission;
 import java.security.ProtectionDomain;
 
 import org.osgi.framework.Bundle;
 
 /**
- * Security utility.
+ * Security utility for wrapping an AccessControlContext around a Bundle.
  * 
  * @author Costin Leau
  */
 abstract class AccessControlFactory {
-
-	private static class BundleDomainCombiner implements DomainCombiner {
-
-		private final BundleProtectionDomain bpd;
-
-		BundleDomainCombiner(Bundle bundle) {
-			bpd = new BundleProtectionDomain(bundle);
-		}
-
-		public ProtectionDomain[] combine(ProtectionDomain[] currentDomains, ProtectionDomain[] assignedDomains) {
-			return new ProtectionDomain[] { bpd };
-		}
-	};
 
 	private static class BundleProtectionDomain extends ProtectionDomain {
 
@@ -66,6 +51,6 @@ abstract class AccessControlFactory {
 	 * @return
 	 */
 	static AccessControlContext createContext(Bundle bundle) {
-		return new AccessControlContext(AccessController.getContext(), new BundleDomainCombiner(bundle));
+		return new AccessControlContext(new ProtectionDomain[] { new BundleProtectionDomain(bundle) });
 	}
 }

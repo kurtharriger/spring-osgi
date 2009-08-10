@@ -20,11 +20,15 @@ import junit.framework.TestCase;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.blueprint.container.Converter;
+import org.osgi.service.blueprint.container.ReifiedType;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.blueprint.TestComponent;
+import org.springframework.osgi.blueprint.container.SpringBlueprintConverter;
+import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.service.importer.support.ServiceReferenceEditor;
 import org.springframework.util.ObjectUtils;
 
@@ -32,7 +36,7 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  * 
  */
-public class TypeConverterTst extends TestCase {
+public class TypeConverterTest extends TestCase {
 
 	private static final String CONFIG = "type-converters.xml";
 
@@ -42,13 +46,14 @@ public class TypeConverterTst extends TestCase {
 	protected void setUp() throws Exception {
 		context = new GenericApplicationContext();
 		context.setClassLoader(getClass().getClassLoader());
-		context.getBeanFactory().registerCustomEditor(ServiceReference.class, ServiceReferenceEditor.class);
+		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+
+		beanFactory.registerCustomEditor(ServiceReference.class, ServiceReferenceEditor.class);
+		beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
+
 		reader = new XmlBeanDefinitionReader(context);
 		reader.loadBeanDefinitions(new ClassPathResource(CONFIG, getClass()));
 		context.refresh();
-		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
-		// beanFactory.registerSingleton("converter", new SpringConversionService(beanFactory));
-		throw new UnsupportedOperationException("Conversion not yet implemented");
 	}
 
 	protected void tearDown() throws Exception {
@@ -76,15 +81,38 @@ public class TypeConverterTst extends TestCase {
 	}
 
 	public void testConversionService() throws Exception {
-		Converter cs = context.getBean("converter", Converter.class);
-		// FIXME
-		Object converted = cs.convert("1", null);
+		SpringBlueprintConverter cs = new SpringBlueprintConverter(context.getBeanFactory());
+		
+		Object converted = cs.convert("1", new ReifiedType(Long.class));
 		assertNotNull(converted);
 		assertEquals(Long.valueOf("1"), converted);
+
+		assertEquals(Boolean.TRUE, cs.convert("T", new ReifiedType(Boolean.class)));
+	}
+
+	public void testBooleanConversion() throws Exception {
+		TestComponent comp = (TestComponent) context.getBean("booleanConversion");
+		assertEquals(Boolean.TRUE, comp.getPropA());
 	}
 
 	public void testReferenceDelegate() throws Exception {
 		TestComponent comp = (TestComponent) context.getBean("serviceReference");
 		assertNotNull(comp.getServiceReference());
+	}
+
+	public void testInvalidInjection1() throws Exception {
+		try {
+			TestComponent comp = (TestComponent) context.getBean("invalidInjection1");
+			fail("expected exception");
+		} catch (Exception ex) {
+		}
+	}
+
+	public void testInvalidInjection2() throws Exception {
+		try {
+			TestComponent comp = (TestComponent) context.getBean("invalidInjection2");
+			fail("expected exception");
+		} catch (Exception ex) {
+		}
 	}
 }

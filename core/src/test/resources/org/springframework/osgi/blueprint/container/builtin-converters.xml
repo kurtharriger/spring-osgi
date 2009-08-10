@@ -7,6 +7,7 @@
         conversions (no type converters)
     </description>
 
+	
     <bean id="setToCollection" class="org.springframework.osgi.blueprint.CollectionTestComponent">
         <property name="collection">
             <set>
@@ -400,13 +401,12 @@
             </map>
         </property>
     </bean>
-
-    <bean id="mapToQueue" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+	
+    <bean id="arrayToQueue" class="org.springframework.osgi.blueprint.CollectionTestComponent">
         <property name="queue">
-            <map>
-                <entry key="abc" value="1"/>
-                <entry key="def" value="2"/>
-            </map>
+            <array>
+                <value>abc</value>
+            </array>
         </property>
     </bean>
     

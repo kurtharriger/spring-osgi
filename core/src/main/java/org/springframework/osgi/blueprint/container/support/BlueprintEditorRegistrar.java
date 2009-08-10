@@ -65,6 +65,15 @@ public class BlueprintEditorRegistrar implements PropertyEditorRegistrar {
 		}
 
 		@Override
+		public void setValue(Object value) {
+			if (value != null && (!(value instanceof Collection)) && (!value.getClass().isArray())) {
+				throw new IllegalArgumentException("Cannot create collection from type " + value.getClass()
+						+ " of instance " + value);
+			}
+			super.setValue(value);
+		}
+
+		@Override
 		protected Collection createCollection(Class collectionType, int initialCapacity) {
 			if (!collectionType.isInterface()) {
 				try {
@@ -75,6 +84,8 @@ public class BlueprintEditorRegistrar implements PropertyEditorRegistrar {
 				}
 			} else if (List.class.equals(collectionType)) {
 				return new ArrayList(initialCapacity);
+			} else if (Set.class.equals(collectionType)) {
+				return new LinkedHashSet(initialCapacity);
 			} else if (SortedSet.class.equals(collectionType)) {
 				return new TreeSet();
 			} else {
@@ -87,23 +98,23 @@ public class BlueprintEditorRegistrar implements PropertyEditorRegistrar {
 		// Date
 		registry.registerCustomEditor(Date.class, new DateEditor());
 		// Collection concrete types
-		registry.registerCustomEditor(Stack.class, new CustomCollectionEditor(Stack.class));
-		registry.registerCustomEditor(Vector.class, new CustomCollectionEditor(Vector.class));
+		registry.registerCustomEditor(Stack.class, new BlueprintCustomCollectionEditor(Stack.class));
+		registry.registerCustomEditor(Vector.class, new BlueprintCustomCollectionEditor(Vector.class));
 
 		// Spring creates a LinkedHashSet for Collection, RFC mandates an ArrayList
 		// reinitialize default editors
 		registry.registerCustomEditor(Collection.class, new BlueprintCustomCollectionEditor(Collection.class));
-		registry.registerCustomEditor(Set.class, new CustomCollectionEditor(Set.class));
-		registry.registerCustomEditor(SortedSet.class, new CustomCollectionEditor(SortedSet.class));
-		registry.registerCustomEditor(List.class, new CustomCollectionEditor(List.class));
+		registry.registerCustomEditor(Set.class, new BlueprintCustomCollectionEditor(Set.class));
+		registry.registerCustomEditor(SortedSet.class, new BlueprintCustomCollectionEditor(SortedSet.class));
+		registry.registerCustomEditor(List.class, new BlueprintCustomCollectionEditor(List.class));
 		registry.registerCustomEditor(SortedMap.class, new CustomMapEditor(SortedMap.class));
 
-		registry.registerCustomEditor(HashSet.class, new CustomCollectionEditor(HashSet.class));
-		registry.registerCustomEditor(LinkedHashSet.class, new CustomCollectionEditor(LinkedHashSet.class));
-		registry.registerCustomEditor(TreeSet.class, new CustomCollectionEditor(TreeSet.class));
+		registry.registerCustomEditor(HashSet.class, new BlueprintCustomCollectionEditor(HashSet.class));
+		registry.registerCustomEditor(LinkedHashSet.class, new BlueprintCustomCollectionEditor(LinkedHashSet.class));
+		registry.registerCustomEditor(TreeSet.class, new BlueprintCustomCollectionEditor(TreeSet.class));
 
-		registry.registerCustomEditor(ArrayList.class, new CustomCollectionEditor(ArrayList.class));
-		registry.registerCustomEditor(LinkedList.class, new CustomCollectionEditor(LinkedList.class));
+		registry.registerCustomEditor(ArrayList.class, new BlueprintCustomCollectionEditor(ArrayList.class));
+		registry.registerCustomEditor(LinkedList.class, new BlueprintCustomCollectionEditor(LinkedList.class));
 
 		// Map concrete types
 		registry.registerCustomEditor(HashMap.class, new CustomMapEditor(HashMap.class));
@@ -115,7 +126,7 @@ public class BlueprintEditorRegistrar implements PropertyEditorRegistrar {
 		// JDK 5 types
 		registry.registerCustomEditor(ConcurrentMap.class, new CustomMapEditor(ConcurrentHashMap.class));
 		registry.registerCustomEditor(ConcurrentHashMap.class, new CustomMapEditor(ConcurrentHashMap.class));
-		registry.registerCustomEditor(Queue.class, new CustomCollectionEditor(LinkedList.class));
+		registry.registerCustomEditor(Queue.class, new BlueprintCustomCollectionEditor(LinkedList.class));
 
 		// Legacy types
 		registry.registerCustomEditor(Dictionary.class, new CustomMapEditor(Hashtable.class));

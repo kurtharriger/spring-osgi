@@ -56,7 +56,9 @@ public class ParsingUtils {
 
 	public static BeanDefinitionHolder register(Element ele, BeanDefinitionHolder bdHolder, ParserContext parserContext) {
 		if (bdHolder != null) {
-			checkReservedName(bdHolder.getBeanName(), ele, parserContext);
+			String name = bdHolder.getBeanName();
+			checkReservedName(name, ele, parserContext);
+			checkUniqueName(name, parserContext.getRegistry());
 			try {
 				// add non-lenient constructor resolution
 				BeanDefinition beanDefinition = bdHolder.getBeanDefinition();
@@ -65,10 +67,9 @@ public class ParsingUtils {
 					abd.setLenientConstructorResolution(false);
 					abd.setNonPublicAccessAllowed(false);
 				}
-				
+
 				// Register the final decorated instance.
-				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, parserContext.getReaderContext()
-						.getRegistry());
+				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, parserContext.getRegistry());
 			} catch (BeanDefinitionStoreException ex) {
 				parserContext.getReaderContext().error(
 						"Failed to register bean definition with name '" + bdHolder.getBeanName() + "'", ele, ex);
@@ -77,6 +78,12 @@ public class ParsingUtils {
 			parserContext.registerComponent(new BeanComponentDefinition(bdHolder));
 		}
 		return bdHolder;
+	}
+
+	private static void checkUniqueName(String beanName, BeanDefinitionRegistry registry) {
+		if (registry.containsBeanDefinition(beanName)) {
+			throw new BeanDefinitionStoreException(beanName, "Duplicate definitions named [" + beanName + "] detected.");
+		}
 	}
 
 	public static BeanDefinitionHolder decorateBeanDefinitionIfRequired(Element ele,

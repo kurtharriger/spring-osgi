@@ -13,28 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.osgi.blueprint.config;
 
 import org.osgi.service.blueprint.container.Converter;
 import org.osgi.service.blueprint.container.ReifiedType;
-import org.springframework.osgi.blueprint.TestComponent;
 
 /**
- * Dummy converter used for testing.
- * 
  * @author Costin Leau
- * 
  */
-public class TestComponentConverter implements Converter {
+public class CustomBooleanConverter implements Converter {
 
-	public boolean canConvert(Object fromValue, ReifiedType toType) {
-		return TestComponent.class.equals(toType.getRawClass());
+	public Object convert(Object source, ReifiedType toType) throws Exception {
+		if (source instanceof String && toType.getRawClass() == Boolean.class) {
+			String strValue = (String) source;
+			if (strValue.equals("T")) {
+				return new Boolean(true);
+			} else if (strValue.equals("F")) {
+				return new Boolean(false);
+			}
+			// this make the module context only support converting T/F to Boolean?
+		}
+
+		// we're supposed to throw an exception if we can't convert
+		throw new Exception("Unconvertable object type");
 	}
 
-	public Object convert(Object fromValue, ReifiedType toType) throws Exception {
-		TestComponent comp = new TestComponent();
-		comp.setPropA(fromValue);
-		return comp;
+	public boolean canConvert(Object value, ReifiedType toType) {
+		return toType.getRawClass() == Boolean.class && value instanceof String;
 	}
 }
