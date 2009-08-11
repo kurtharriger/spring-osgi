@@ -37,7 +37,7 @@ public class Cardinality0to1Test extends BaseIntegrationTest {
 			simpleService2Bundle.getState()));
 
 		assertEquals("Unxpected initial binding of service", 0, MyListener.BOUND_COUNT);
-		assertEquals("Unexpected initial unbinding of service", 0, MyListener.UNBOUND_COUNT);
+		assertEquals("Unexpected initial unbinding of service", 1, MyListener.UNBOUND_COUNT);
 		assertNotNull("Service reference should be not null", ReferenceContainer.service);
 
 		try {
@@ -51,7 +51,7 @@ public class Cardinality0to1Test extends BaseIntegrationTest {
 		startDependency(simpleService2Bundle);
 
 		assertEquals("Expected initial binding of service", 1, MyListener.BOUND_COUNT);
-		assertEquals("Unexpected initial unbinding of service", 0, MyListener.UNBOUND_COUNT);
+		assertEquals("Unexpected initial unbinding of service", 1, MyListener.UNBOUND_COUNT);
 		assertNotNull("Service reference should be not null", ReferenceContainer.service);
 
 		assertNotNull(ReferenceContainer.service.stringValue());

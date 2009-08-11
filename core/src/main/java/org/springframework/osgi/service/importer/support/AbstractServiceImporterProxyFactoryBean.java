@@ -40,7 +40,7 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 		SmartFactoryBean<Object> {
 
 	private boolean initialized = false;
-	private Object proxy;
+	protected Object proxy;
 	private boolean useBlueprintException = false;
 	private volatile boolean lazyProxy = false;
 
@@ -203,13 +203,16 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 	 */
 	public void setBeanClassLoader(final ClassLoader classLoader) {
 		super.setBeanClassLoader(classLoader);
-		AccessController.doPrivileged(new PrivilegedAction<Object>() {
-
-			public Object run() {
-				aopClassLoader = ClassLoaderFactory.getAopClassLoaderFor(classLoader);
-				return null;
-			}
-		});
+		if (System.getSecurityManager() != null) {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
+				public Object run() {
+					aopClassLoader = ClassLoaderFactory.getAopClassLoaderFor(classLoader);
+					return null;
+				}
+			});
+		} else {
+			aopClassLoader = ClassLoaderFactory.getAopClassLoaderFor(classLoader);
+		}
 	}
 
 	/**

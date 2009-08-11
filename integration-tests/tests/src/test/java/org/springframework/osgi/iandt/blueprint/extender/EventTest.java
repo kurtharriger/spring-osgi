@@ -121,6 +121,8 @@ public class EventTest extends BaseBlueprintIntegrationTest {
 
 		assertEquals(1, failedBundles.size());
 		assertEquals(failingBundle, failedBundles.keySet().iterator().next());
+		
+		failingBundle.uninstall();
 	}
 
 	public void testFailureOnDependenciesEvent() throws Exception {
@@ -133,7 +135,7 @@ public class EventTest extends BaseBlueprintIntegrationTest {
 
 		failingBundle.start();
 		Thread.sleep(1000 * 5);
-		assertEquals(1, failedBundles.size());
+		assertEquals(failedBundles.size(), 1);
 		System.out.println("Failed bundles are " + failedBundles.values());
 	}
 }

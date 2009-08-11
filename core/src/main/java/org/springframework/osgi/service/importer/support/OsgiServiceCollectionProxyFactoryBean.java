@@ -104,11 +104,6 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 
 	private static final Log log = LogFactory.getLog(OsgiServiceCollectionProxyFactoryBean.class);
 
-	/**
-	 * actual proxy - acts as a shield around the spring managed collection to limit the number of exposed methods
-	 */
-	private Collection proxy;
-
 	/** proxy casted to a specific interface to allow specific method calls */
 	private CollectionProxy exposedProxy;
 
@@ -194,6 +189,10 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 			throw new IllegalArgumentException("Unknown collection type:" + collectionType);
 		}
 
+		// assign the proxy early to avoid multiple collection creation
+		// when calling the listeners
+		proxy = delegate;
+
 		collection.setRequiredAtStartup(Availability.MANDATORY.equals(getAvailability()));
 		collection.setListeners(getListeners());
 		collection.setStateListeners(stateListeners);
@@ -213,7 +212,6 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 			};
 		}
 
-		proxy = delegate;
 		exposedProxy = collection;
 		proxyDestructionCallback = new DisposableBeanRunnableAdapter(collection);
 

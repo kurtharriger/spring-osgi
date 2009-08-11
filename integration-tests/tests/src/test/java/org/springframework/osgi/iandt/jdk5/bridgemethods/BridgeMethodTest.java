@@ -37,17 +37,17 @@ public class BridgeMethodTest extends BaseIntegrationTest {
 
 	public void testGenerifiedListener() throws Exception {
 		assertEquals(Listener.BIND_CALLS, 0);
-		assertEquals(Listener.UNBIND_CALLS, 0);
+		assertEquals(Listener.UNBIND_CALLS, 1);
 
 		// register a point
 		ServiceRegistration reg = bundleContext.registerService(Shape.class.getName(), new Area(), null);
 		List list = (List) applicationContext.getBean("collection");
 		assertEquals(1, list.size());
 		assertEquals(Listener.BIND_CALLS, 1);
-		assertEquals(Listener.UNBIND_CALLS, 0);
+		assertEquals(Listener.UNBIND_CALLS, 1);
 
 		reg.unregister();
 		assertEquals(Listener.BIND_CALLS, 1);
-		assertEquals(Listener.UNBIND_CALLS, 1);
+		assertEquals(Listener.UNBIND_CALLS, 2);
 	}
 }

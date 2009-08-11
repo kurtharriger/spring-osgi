@@ -48,12 +48,10 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 		}
 
 		public Object next() {
-			mandatoryServiceCheck();
 			return iter.next();
 		}
 
 		public Object previous() {
-			mandatoryServiceCheck();
 			return iter.previous();
 		}
 
@@ -61,22 +59,18 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 		// index operations
 		//
 		public boolean hasNext() {
-			mandatoryServiceCheck();
 			return iter.hasNext();
 		}
 
 		public boolean hasPrevious() {
-			mandatoryServiceCheck();
 			return iter.hasPrevious();
 		}
 
 		public int nextIndex() {
-			mandatoryServiceCheck();
 			return iter.nextIndex();
 		}
 
 		public int previousIndex() {
-			mandatoryServiceCheck();
 			return iter.previousIndex();
 		}
 
@@ -113,7 +107,6 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 	}
 
 	public Object get(int index) {
-		mandatoryServiceCheck();
 		return storage.get(index);
 	}
 

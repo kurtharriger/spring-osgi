@@ -140,7 +140,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 				new ServiceDynamicInterceptor(getBundleContext(), filterClassName, getUnifiedFilter(),
 						getAopClassLoader());
 
-		lookupAdvice.setRequiredAtStartup(Availability.MANDATORY.equals(getAvailability()));
+		lookupAdvice.setMandatoryService(Availability.MANDATORY.equals(getAvailability()));
 		lookupAdvice.setUseBlueprintExceptions(isUseBlueprintExceptions());
 		lookupAdvice.setSticky(sticky);
 

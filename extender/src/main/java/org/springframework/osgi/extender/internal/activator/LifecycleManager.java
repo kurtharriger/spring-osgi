@@ -168,7 +168,7 @@ class LifecycleManager implements DisposableBean {
 		final DelegatedExecutionOsgiBundleApplicationContext localApplicationContext;
 
 		if (debug)
-			log.debug("Creating an application context for bundle " + bundleString);
+			log.debug("Inspecting bundle " + bundleString);
 
 		try {
 			localApplicationContext = contextCreator.createApplicationContext(localBundleContext);

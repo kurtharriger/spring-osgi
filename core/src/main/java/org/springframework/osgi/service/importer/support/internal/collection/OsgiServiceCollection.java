@@ -93,7 +93,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 					state = addService(serviceId, ref);
 					// inform listeners
 					if (state.collectionModified) {
-						OsgiServiceBindingUtils.callListenersBind(context, state.proxy, ref, listeners);
+						OsgiServiceBindingUtils.callListenersBind(state.proxy, ref, listeners);
 
 						if (serviceRequiredAtStartup && state.shouldInformStateListeners)
 							notifySatisfiedStateListeners();
@@ -106,7 +106,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 					state = canRemoveService(serviceId, ref);
 
 					if (state.collectionModified) {
-						OsgiServiceBindingUtils.callListenersUnbind(context, state.proxy, ref, listeners);
+						OsgiServiceBindingUtils.callListenersUnbind(state.proxy, ref, listeners);
 						state = removeService(serviceId, ref);
 
 						if (serviceRequiredAtStartup && state.shouldInformStateListeners)
@@ -239,12 +239,10 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		private final Iterator<Object> iter = services.iterator();
 
 		public boolean hasNext() {
-			mandatoryServiceCheck();
 			return iter.hasNext();
 		}
 
 		public Object next() {
-			mandatoryServiceCheck();
 			return iter.next();
 		}
 
@@ -328,17 +326,10 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 			log.trace("Adding osgi listener for services matching [" + filter + "]");
 		OsgiListenerUtils.addServiceListener(context, listener, filter);
 
-		if (serviceRequiredAtStartup) {
-
-			if (log.isDebugEnabled())
-				log.debug("1..x cardinality - looking for service [" + filter + "] at startup...");
-
-			PUBLIC_LOGGER.info("Looking for mandatory OSGi service dependency for bean [" + sourceName
-					+ "] matching filter " + filter);
-
-			mandatoryServiceCheck();
-
-			PUBLIC_LOGGER.info("Found mandatory OSGi service for bean [" + sourceName + "]");
+		synchronized (lock) {
+			if (services.isEmpty()) {
+				OsgiServiceBindingUtils.callListenersUnbind(null, null, listeners);
+			}
 		}
 	}
 
@@ -415,12 +406,10 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	}
 
 	public int size() {
-		mandatoryServiceCheck();
 		return services.size();
 	}
 
 	public String toString() {
-		mandatoryServiceCheck();
 		synchronized (services) {
 			return services.toString();
 		}
@@ -454,27 +443,22 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	}
 
 	public boolean contains(Object o) {
-		mandatoryServiceCheck();
 		return services.contains(o);
 	}
 
 	public boolean containsAll(Collection c) {
-		mandatoryServiceCheck();
 		return services.containsAll(c);
 	}
 
 	public boolean isEmpty() {
-		mandatoryServiceCheck();
 		return size() == 0;
 	}
 
 	public Object[] toArray() {
-		mandatoryServiceCheck();
 		return services.toArray();
 	}
 
 	public Object[] toArray(Object[] array) {
-		mandatoryServiceCheck();
 		return services.toArray(array);
 	}
 

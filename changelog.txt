@@ -52,7 +52,8 @@ Package org.springframework.osgi.service
 * fixed reference collection listener behaviour by invoking the callbacks before items are removed from the collection
 * fixed service registration listener behaviour by invoking the callbacks before the service gets unregistered
 * improved proxy class generation to avoid introspection problems in concurrent environments
-* improved mandatory reference checkup to lazily request the backing service
+* changed behaviour for mandatory services to retrieve the backing service only when a method is being invoked
+* removed mandatory service check for service collection to allow status checks
 * added interface-less importers (useful for OSGi 4.2 remote services)
 * improved detection of transitive dependencies when traversing nested beans
 

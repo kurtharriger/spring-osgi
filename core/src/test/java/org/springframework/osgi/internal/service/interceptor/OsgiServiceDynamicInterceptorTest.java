@@ -115,7 +115,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 	private void createInterceptor(Filter filter) {
 		interceptor = new ServiceDynamicInterceptor(ctx, null, filter, getClass().getClassLoader());
 
-		interceptor.setRequiredAtStartup(false);
+		interceptor.setMandatoryService(false);
 
 		interceptor.setRetryTimeout(1);
 		interceptor.setProxy(new Object());

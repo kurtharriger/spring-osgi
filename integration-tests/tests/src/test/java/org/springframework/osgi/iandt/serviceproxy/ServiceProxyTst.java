@@ -65,7 +65,7 @@ public abstract class ServiceProxyTst extends AbstractConfigurableBundleCreatorT
 		ServiceDynamicInterceptor interceptor = new ServiceDynamicInterceptor(bundleContext, null,
 			OsgiFilterUtils.createFilter(OsgiFilterUtils.unifyFilter(clazz, null)), classLoader);
 		// fast retry
-		interceptor.setRequiredAtStartup(true);
+		interceptor.setMandatoryService(true);
 		interceptor.afterPropertiesSet();
 		interceptor.getRetryTemplate().reset(1);
 		return interceptor;

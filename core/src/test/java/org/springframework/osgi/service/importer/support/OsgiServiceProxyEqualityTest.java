@@ -138,7 +138,7 @@ public class OsgiServiceProxyEqualityTest extends TestCase {
 
 	private ServiceDynamicInterceptor createInterceptorWServiceRequired() {
 		ServiceDynamicInterceptor interceptor = new ServiceDynamicInterceptor(bundleContext, null, null, classLoader);
-		interceptor.setRequiredAtStartup(true);
+		interceptor.setMandatoryService(true);
 		interceptor.setProxy(new Object());
 		interceptor.setServiceImporter(new Object());
 
@@ -148,7 +148,7 @@ public class OsgiServiceProxyEqualityTest extends TestCase {
 
 	private ServiceDynamicInterceptor createInterceptorWOServiceRequired() {
 		ServiceDynamicInterceptor interceptor = new ServiceDynamicInterceptor(bundleContext, null, null, classLoader);
-		interceptor.setRequiredAtStartup(false);
+		interceptor.setMandatoryService(false);
 		interceptor.setProxy(new Object());
 		interceptor.setServiceImporter(new Object());
 		interceptor.afterPropertiesSet();
