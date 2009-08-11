@@ -97,7 +97,7 @@ public class OsgiServiceDynamicInterceptorSyntheticEventsTest extends TestCase {
 		};
 
 		interceptor = new ServiceDynamicInterceptor(bundleContext, null, null, getClass().getClassLoader());
-		interceptor.setRequiredAtStartup(false);
+		interceptor.setMandatoryService(false);
 		interceptor.setProxy(serviceProxy);
 		interceptor.setListeners(new OsgiServiceLifecycleListener[] { listener });
 		interceptor.setServiceImporter(new Object());

@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
@@ -35,8 +34,7 @@ public abstract class OsgiServiceBindingUtils {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceBindingUtils.class);
 
-
-	public static void callListenersBind(BundleContext context, Object serviceProxy, ServiceReference reference,
+	public static void callListenersBind(Object serviceProxy, ServiceReference reference,
 			OsgiServiceLifecycleListener[] listeners) {
 		if (!ObjectUtils.isEmpty(listeners)) {
 			boolean debug = log.isDebugEnabled();
@@ -48,8 +46,7 @@ public abstract class OsgiServiceBindingUtils {
 					log.debug("Calling bind on " + listeners[i] + " w/ reference " + reference);
 				try {
 					listeners[i].bind(serviceProxy, (Map) properties);
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					log.warn("Bind method on listener " + listeners[i] + " threw exception ", ex);
 				}
 				if (debug)
@@ -58,19 +55,19 @@ public abstract class OsgiServiceBindingUtils {
 		}
 	}
 
-	public static void callListenersUnbind(BundleContext context, Object serviceProxy, ServiceReference reference,
+	public static void callListenersUnbind(Object serviceProxy, ServiceReference reference,
 			OsgiServiceLifecycleListener[] listeners) {
 		if (!ObjectUtils.isEmpty(listeners)) {
 			boolean debug = log.isDebugEnabled();
 			// get a Dictionary implementing a Map
-			Dictionary properties = OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference);
+			Dictionary properties =
+					(reference != null ? OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference) : null);
 			for (int i = 0; i < listeners.length; i++) {
 				if (debug)
 					log.debug("Calling unbind on " + listeners[i] + " w/ reference " + reference);
 				try {
 					listeners[i].unbind(serviceProxy, (Map) properties);
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					log.warn("Unbind method on listener " + listeners[i] + " threw exception ", ex);
 				}
 				if (debug)

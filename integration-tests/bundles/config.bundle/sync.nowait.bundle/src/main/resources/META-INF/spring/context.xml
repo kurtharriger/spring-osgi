@@ -7,4 +7,8 @@
 
     <!-- import shape -->
     <osgi:reference id="shape" interface="java.awt.Shape" timeout="300"/>
+    
+    <bean id="user" class="org.springframework.osgi.iandt.wait.User">
+        <property name="target" ref="shape"/>
+    </bean>
 </beans>

@@ -17,7 +17,6 @@
 package org.springframework.osgi.service.importer.support.internal.aop;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -148,7 +147,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 					if (updateWrapperIfNecessary(ref)) {
 						// inform listeners
-						OsgiServiceBindingUtils.callListenersBind(bundleContext, proxy, ref, listeners);
+						OsgiServiceBindingUtils.callListenersBind(proxy, ref, listeners);
 						// we have a bind
 						if (!servicePresent) {
 							notifySatisfiedStateListeners();
@@ -201,7 +200,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 						holder = oldHolder;
 
 						// inform listeners
-						OsgiServiceBindingUtils.callListenersUnbind(bundleContext, proxy, ref, listeners);
+						OsgiServiceBindingUtils.callListenersUnbind(proxy, ref, listeners);
 
 						holder = null;
 
@@ -313,7 +312,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	private final ServiceListener listener;
 
 	/** mandatory flag */
-	private boolean serviceRequiredAtStartup = true;
+	private boolean mandatoryService = true;
 
 	/** flag indicating whether the destruction has started or not */
 	private boolean isDuringDestruction = false;
@@ -437,24 +436,17 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 		boolean debug = log.isDebugEnabled();
 
-		dependency = new DefaultOsgiServiceDependency(sourceName, filter, serviceRequiredAtStartup);
+		dependency = new DefaultOsgiServiceDependency(sourceName, filter, mandatoryService);
 
 		if (debug)
 			log.debug("Adding OSGi mandatoryListeners for services matching [" + filter + "]");
 		OsgiListenerUtils.addSingleServiceListener(bundleContext, listener, filter);
 
-		if (serviceRequiredAtStartup) {
-			if (debug)
-				log.debug("1..x cardinality - looking for service [" + filter + "] at startup...");
-
-			PUBLIC_LOGGER.info("Looking for mandatory OSGi service dependency for bean [" + sourceName
-					+ "] matching filter " + filter);
-
-			ServiceReference ref = getTargetReference();
-			if (debug)
-				log.debug("Retrieved service reference " + ref);
-
-			PUBLIC_LOGGER.info("Found mandatory OSGi service for bean [" + sourceName + "]");
+		// inform listeners (in case no service is available)
+		synchronized (lock) {
+			if (referenceDelegate.getTargetServiceReference() == null) {
+				OsgiServiceBindingUtils.callListenersUnbind(null, null, listeners);
+			}
 		}
 	}
 
@@ -510,8 +502,8 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		this.sourceName = name;
 	}
 
-	public void setRequiredAtStartup(boolean requiredAtStartup) {
-		this.serviceRequiredAtStartup = requiredAtStartup;
+	public void setMandatoryService(boolean mandatoryService) {
+		this.mandatoryService = mandatoryService;
 	}
 
 	public void setProxy(Object proxy) {
@@ -540,9 +532,9 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			return true;
 		if (other instanceof ServiceDynamicInterceptor) {
 			ServiceDynamicInterceptor oth = (ServiceDynamicInterceptor) other;
-			return (serviceRequiredAtStartup == oth.serviceRequiredAtStartup
-					&& ObjectUtils.nullSafeEquals(holder, oth.holder) && ObjectUtils.nullSafeEquals(filter, oth.filter) && ObjectUtils
-					.nullSafeEquals(retryTemplate, oth.retryTemplate));
+			return (mandatoryService == oth.mandatoryService && ObjectUtils.nullSafeEquals(holder, oth.holder)
+					&& ObjectUtils.nullSafeEquals(filter, oth.filter) && ObjectUtils.nullSafeEquals(retryTemplate,
+					oth.retryTemplate));
 		} else
 			return false;
 	}

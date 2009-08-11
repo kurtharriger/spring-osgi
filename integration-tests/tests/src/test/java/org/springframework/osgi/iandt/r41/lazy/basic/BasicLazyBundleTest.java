@@ -23,7 +23,6 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.iandt.r41.lazy.BaseR41IntegrationTest;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
-import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
  * Integration test that checks basic assertions against a lazy bundle.
@@ -33,7 +32,6 @@ import org.springframework.osgi.util.OsgiStringUtils;
 public class BasicLazyBundleTest extends BaseR41IntegrationTest {
 
 	private static final String SYM_NAME = "org.springframework.osgi.iandt.lazy.basic";
-
 
 	@Override
 	protected String[] lazyBundles() {
@@ -48,8 +46,7 @@ public class BasicLazyBundleTest extends BaseR41IntegrationTest {
 		// trigger class loading
 		try {
 			bnd.loadClass("@");
-		}
-		catch (Exception expected) {
+		} catch (Exception expected) {
 		}
 
 		assertFalse("Bundle has not been actived", OsgiBundleUtils.isBundleLazyActivated(bnd));
@@ -58,7 +55,8 @@ public class BasicLazyBundleTest extends BaseR41IntegrationTest {
 	}
 
 	private ServiceReference getReference() {
-		return OsgiServiceReferenceUtils.getServiceReference(bundleContext, Shape.class.getName(), "(lazy.marker=true)");
+		return OsgiServiceReferenceUtils
+				.getServiceReference(bundleContext, Shape.class.getName(), "(lazy.marker=true)");
 	}
 
 	private void checkThatBundleIsStillLazy(Bundle bundle) {

@@ -36,8 +36,11 @@ public class CollectionCycleTest extends BaseImporterCycleTest {
 	protected void onSetUp() throws Exception {
 		super.onSetUp();
 		importer = (Collection) applicationContext.getBean("importer");
+		assertTrue(applicationContext.isSingleton("importer"));
+		assertTrue(applicationContext.isSingleton("&importer"));
 	}
 
+	
 	public void testListenerA() throws Exception {
 		assertEquals(importer.toString(), listenerA.getTarget().toString());
 	}
@@ -47,6 +50,8 @@ public class CollectionCycleTest extends BaseImporterCycleTest {
 	}
 
 	public void testListenersBetweenThem() throws Exception {
+		Object a = listenerA.getTarget();
+		Object b = listenerB.getTarget();
 		assertSame(listenerA.getTarget(), listenerB.getTarget());
 	}
 

@@ -63,27 +63,22 @@ public class OsgiServiceSortedSet extends OsgiServiceSet implements SortedSet {
 	}
 
 	public Object first() {
-		mandatoryServiceCheck();
 		return storage.first();
 	}
 
 	public Object last() {
-		mandatoryServiceCheck();
 		return storage.last();
 	}
 
 	public SortedSet tailSet(Object fromElement) {
-		mandatoryServiceCheck();
 		return storage.tailSet(fromElement);
 	}
 
 	public SortedSet headSet(Object toElement) {
-		mandatoryServiceCheck();
 		return storage.headSet(toElement);
 	}
 
 	public SortedSet subSet(Object fromElement, Object toElement) {
-		mandatoryServiceCheck();
 		return storage.subSet(fromElement, toElement);
 	}
 }
