@@ -18,11 +18,9 @@ package org.springframework.osgi.service.exporter.support.internal.support;
 
 import java.util.Dictionary;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.util.Assert;
 
@@ -36,17 +34,15 @@ public class ServiceRegistrationDecorator implements ServiceRegistration {
 
 	/** actual service registration */
 	private final ServiceRegistration delegate;
-	private final OsgiServiceRegistrationListener[] listeners;
-	private final Object service;
-	private final AtomicBoolean bool;
+	private volatile UnregistrationNotifier notifier;
 
-	public ServiceRegistrationDecorator(Object service, ServiceRegistration registration,
-			OsgiServiceRegistrationListener[] listeners, AtomicBoolean bool) {
+	public ServiceRegistrationDecorator(ServiceRegistration registration) {
 		Assert.notNull(registration);
 		this.delegate = registration;
-		this.listeners = (listeners == null ? new OsgiServiceRegistrationListener[0] : listeners);
-		this.service = service;
-		this.bool = bool;
+	}
+
+	void setNotifier(UnregistrationNotifier notifier) {
+		this.notifier = notifier;
 	}
 
 	public ServiceReference getReference() {
@@ -60,52 +56,16 @@ public class ServiceRegistrationDecorator implements ServiceRegistration {
 	// call unregister on the actual service but inform also listeners
 	public void unregister() {
 		// if the delegate is unregistered then an exception will be thrown
-		callUnregisterListeners();
+		ServiceReference reference = delegate.getReference();
+
+		Map properties =
+				(reference != null ? (Map) OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference) : null);
+
+		if (notifier != null) {
+			notifier.unregister(properties);
+		}
 		delegate.unregister();
 	}
-
-	public void callRegisterListeners() {
-		// if the delegate is unregistered then an exception will be thrown
-		ServiceReference reference = delegate.getReference();
-
-		Map properties = (Map) OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference);
-
-		// if no exception has been thrown (i.e. the delegate is properly
-		// unregistered), the listeners will be informed, if allowed
-		if (bool.get()) {
-			for (OsgiServiceRegistrationListener listener : listeners) {
-				if (listener != null) {
-					try {
-						listener.registered(service, properties);
-					} catch (Exception ex) {
-						// no need to log exceptions, the wrapper already does this
-					}
-				}
-			}
-		}
-	}
-	
-	private void callUnregisterListeners() {
-		// if the delegate is unregistered then an exception will be thrown
-		ServiceReference reference = delegate.getReference();
-
-		Map properties = (reference != null ? (Map) OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference) : null);
-
-		// if no exception has been thrown (i.e. the delegate is properly
-		// unregistered), the listeners will be informed, if allowed
-		if (bool.get()) {
-			for (OsgiServiceRegistrationListener listener : listeners) {
-				if (listener != null) {
-					try {
-						listener.unregistered(service, properties);
-					} catch (Exception ex) {
-						// no need to log exceptions, the wrapper already does this
-					}
-				}
-			}
-		}
-	}
-	
 
 	public String toString() {
 		return "ServiceRegistrationWrapper for " + delegate.toString();

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.service.exporter.support;
+package org.springframework.osgi.service.exporter.support.internal.support;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -28,7 +28,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.service.exporter.SimpleOsgiServiceRegistrationListener;
-import org.springframework.osgi.service.exporter.support.internal.support.ServiceRegistrationDecorator;
 
 public class ServiceRegistrationWrapperTest extends TestCase {
 
@@ -42,10 +41,20 @@ public class ServiceRegistrationWrapperTest extends TestCase {
 		mc = MockControl.createControl(ServiceRegistration.class);
 		actualRegistration = (ServiceRegistration) mc.getMock();
 
-		registration =
-				new ServiceRegistrationDecorator(new Object(), actualRegistration,
-						new OsgiServiceRegistrationListener[] { new SimpleOsgiServiceRegistrationListener() },
-						new AtomicBoolean(true));
+		final ListenerNotifier notifier =
+				new ListenerNotifier(
+						new OsgiServiceRegistrationListener[] { new SimpleOsgiServiceRegistrationListener() });
+
+		ServiceRegistrationDecorator registrationDecorator = new ServiceRegistrationDecorator(actualRegistration);
+		registrationDecorator.setNotifier(new UnregistrationNotifier() {
+
+			public void unregister(Map properties) {
+				notifier.callUnregister(null, properties);
+			}
+		});
+
+		registration = registrationDecorator;
+
 		SimpleOsgiServiceRegistrationListener.REGISTERED = 0;
 		SimpleOsgiServiceRegistrationListener.UNREGISTERED = 0;
 	}

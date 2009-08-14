@@ -24,6 +24,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.mock.MockServiceRegistration;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.service.exporter.SimpleOsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.support.internal.support.ListenerNotifier;
 import org.springframework.osgi.service.exporter.support.internal.support.ServiceRegistrationDecorator;
 
 public class AbstractListenerAwareExporterTest extends TestCase {
@@ -42,10 +43,6 @@ public class AbstractListenerAwareExporterTest extends TestCase {
 			protected void unregisterService() {
 			}
 
-			@Override
-			AtomicBoolean canNotifyListeners() {
-				return new AtomicBoolean(true);
-			}
 		};
 		exporter.setListeners(new OsgiServiceRegistrationListener[] { new SimpleOsgiServiceRegistrationListener() });
 	}
@@ -58,7 +55,8 @@ public class AbstractListenerAwareExporterTest extends TestCase {
 		assertEquals(0, SimpleOsgiServiceRegistrationListener.REGISTERED);
 		assertEquals(0, SimpleOsgiServiceRegistrationListener.UNREGISTERED);
 
-		exporter.notifyListeners(new Object(), new HashMap(), new MockServiceRegistration());
+		ListenerNotifier notifier = exporter.getNotifier();
+		notifier.callRegister(new Object(), new HashMap());
 
 		assertEquals(1, SimpleOsgiServiceRegistrationListener.REGISTERED);
 		assertEquals(0, SimpleOsgiServiceRegistrationListener.UNREGISTERED);
@@ -67,12 +65,10 @@ public class AbstractListenerAwareExporterTest extends TestCase {
 	public void testNotifyListenersOnUnregistration() {
 		assertEquals(0, SimpleOsgiServiceRegistrationListener.REGISTERED);
 		assertEquals(0, SimpleOsgiServiceRegistrationListener.UNREGISTERED);
+		ListenerNotifier notifier = exporter.getNotifier();
+		notifier.callUnregister(new Object(), new HashMap());
 
-		ServiceRegistration reg = exporter.notifyListeners(new Object(), new HashMap(), new MockServiceRegistration());
-		assertTrue(reg instanceof ServiceRegistrationDecorator);
-		reg.unregister();
-
-		assertEquals(1, SimpleOsgiServiceRegistrationListener.REGISTERED);
+		assertEquals(0, SimpleOsgiServiceRegistrationListener.REGISTERED);
 		assertEquals(1, SimpleOsgiServiceRegistrationListener.UNREGISTERED);
 	}
 
