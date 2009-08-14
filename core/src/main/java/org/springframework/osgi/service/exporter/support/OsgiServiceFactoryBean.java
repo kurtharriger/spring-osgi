@@ -162,6 +162,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	/** internal behaviour controller */
 	private final ExporterController controller;
 	private final AtomicBoolean canNotifyListeners = new AtomicBoolean(false);
+	private boolean cacheService = false;
 
 	public OsgiServiceFactoryBean() {
 		controller = new ExporterController(new Executor());
@@ -198,14 +199,6 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 			if (targetClass == null) {
 				// lazily get the target class
 				targetClass = beanFactory.getType(targetBeanName);
-			}
-
-			// cache the result if dealing with a ServiceFactory prototype
-			if (targetClass != null) {
-				if ((ServiceFactory.class.isAssignableFrom(targetClass)) && beanFactory.isPrototype(targetBeanName)) {
-					target = beanFactory.getBean(targetBeanName);
-					targetClass = target.getClass();
-				}
 			}
 
 			// when running inside a container, add the dependency between this bean and the target one
@@ -252,8 +245,6 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		if (shouldRegisterAtStartup) {
 			registerService();
-		} else {
-
 		}
 	}
 
@@ -320,6 +311,11 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		// if we have a nested bean / non-Spring managed object
 		String beanName = (!hasNamedBean ? null : targetBeanName);
+
+		// check service caching
+		if (cacheService && target == null) {
+			target = beanFactory.getBean(beanName);
+		}
 
 		Dictionary serviceProperties = mergeServiceProperties(this.serviceProperties, beanName);
 
@@ -692,4 +688,14 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		this.beanName = name;
 	}
 
+	/**
+	 * Sets the caching of the exported service. When enabled, the exporter will ignore the scope of the target bean and
+	 * use only the first resolved instance for registration. When disabled (default), the scope of the target bean is
+	 * considered and each request for a service, will be directed to the container.
+	 * 
+	 * Set this option to 'true' to obtain OSGi 4.2 blueprint behaviour.
+	 */
+	public void setCacheService(boolean cacheService) {
+		this.cacheService = cacheService;
+	}
 }

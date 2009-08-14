@@ -21,10 +21,12 @@ import junit.framework.TestCase;
 
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
+import org.osgi.service.blueprint.reflect.ServiceReferenceMetadata;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -78,7 +80,7 @@ public class NestedDefinitionMetadataTest extends TestCase {
 		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(name, def);
 		assertEquals(2, metadata.size());
 	}
-	
+
 	public void testDeeplyNested() throws Exception {
 		String name = "deeply-nested";
 		BeanDefinition def = context.getBeanDefinition(name);
@@ -98,5 +100,29 @@ public class NestedDefinitionMetadataTest extends TestCase {
 		BeanDefinition def = context.getBeanDefinition(name);
 		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(name, def);
 		assertEquals(4, metadata.size());
+	}
+
+	public void testNestedServices() throws Exception {
+		String name = "nested-references";
+		BeanDefinition def = context.getBeanDefinition(name);
+		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(name, def);
+		assertEquals(2, metadata.size());
+	}
+
+	public void testOverallMetadata() throws Exception {
+
+		BeanDefinition def = new GenericBeanDefinition();
+		assertEquals(new SpringComponentMetadata(null, def), new SpringComponentMetadata("foo", def));
+
+		Collection<ComponentMetadata> metadata = blueprintContainer.getMetadata(ComponentMetadata.class);
+
+		for (ComponentMetadata componentMetadata : metadata) {
+			if (componentMetadata instanceof ServiceReferenceMetadata) {
+				System.out.println(componentMetadata.getId());
+			}
+		}
+		// 1+1+3+4+4+5+3+1=22
+		assertEquals(22, metadata.size());
+		System.out.println(blueprintContainer.getComponentIds());
 	}
 }

@@ -43,6 +43,7 @@ public class BlueprintServiceDefinitionParser extends ServiceBeanDefinitionParse
 	private static final String AUTOEXPORT = "auto-export";
 	private static final String DISABLED = "disabled";
 	private static final String LAZY_LISTENERS = "lazyListeners";
+	private static final String CACHE_SERVICE = "cacheService";
 
 	private static class BlueprintServiceAttributeCallback implements AttributeCallback {
 
@@ -78,6 +79,7 @@ public class BlueprintServiceDefinitionParser extends ServiceBeanDefinitionParse
 
 		}
 
+		builder.addPropertyValue(CACHE_SERVICE, true);
 		super.doParse(element, parserContext, builder);
 	}
 

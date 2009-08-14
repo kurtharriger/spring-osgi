@@ -79,7 +79,11 @@ public class BlueprintReferenceBeanDefinitionParser extends ReferenceBeanDefinit
 
 	@Override
 	protected String generateBeanName(String id, BeanDefinition def, ParserContext parserContext) {
-		return super.generateBeanName(ParsingUtils.BLUEPRINT_GENERATED_NAME_PREFIX + id, def, parserContext);
+		String name = super.generateBeanName(ParsingUtils.BLUEPRINT_GENERATED_NAME_PREFIX + id, def, parserContext);
+		if (parserContext.isNested()) {
+			name = name.concat("#generated");
+		}
+		return name;
 	}
 
 	@Override

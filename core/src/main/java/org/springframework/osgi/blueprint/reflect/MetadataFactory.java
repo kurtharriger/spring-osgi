@@ -17,9 +17,12 @@
 package org.springframework.osgi.blueprint.reflect;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
  * Adapter factory that allows translating Spring metadata into Blueprint {@link ComponentMetadata}.
@@ -52,5 +55,13 @@ public class MetadataFactory {
 	public static Collection<ComponentMetadata> buildNestedComponentMetadataFor(String beanName,
 			BeanDefinition beanDefinition) {
 		return blueprintFactory.buildNestedMetadata(beanName, beanDefinition);
+	}
+
+	public static List<ComponentMetadata> buildComponentMetadataFor(ConfigurableListableBeanFactory factory) {
+		return blueprintFactory.buildComponentMetadataFor(factory);
+	}
+
+	public static Set<String> filterIds(Set<String> components) {
+		return blueprintFactory.filterIds(components);
 	}
 }

@@ -82,7 +82,8 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 		String[] names = applicationContext.getBeanDefinitionNames();
 		Set<String> components = new LinkedHashSet<String>(names.length);
 		CollectionUtils.mergeArrayIntoCollection(names, components);
-		return Collections.unmodifiableSet(components);
+		Set<String> filtered = MetadataFactory.filterIds(components);
+		return Collections.unmodifiableSet(filtered);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -93,7 +94,7 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 	@SuppressWarnings("unchecked")
 	private <T extends ComponentMetadata> Collection<T> getComponentMetadata(Class<T> clazz) {
 		List<ComponentMetadata> metadatas = getComponentMetadataForAllComponents();
-		List<T> filteredMetadata = new ArrayList<T>(metadatas.size());
+		Collection<T> filteredMetadata = new ArrayList<T>(metadatas.size());
 
 		for (ComponentMetadata metadata : metadatas) {
 			if (clazz.isInstance(metadata)) {
@@ -105,17 +106,7 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 	}
 
 	private List<ComponentMetadata> getComponentMetadataForAllComponents() {
-		List<ComponentMetadata> metadata = new ArrayList<ComponentMetadata>();
-		String[] components = applicationContext.getBeanDefinitionNames();
-		ConfigurableListableBeanFactory factory = getBeanFactory();
-		for (String beanName : components) {
-			BeanDefinition definition = factory.getBeanDefinition(beanName);
-			// add metadata for top-level definitions
-			metadata.add(MetadataFactory.buildComponentMetadataFor(beanName, definition));
-			// look for nested ones
-			metadata.addAll(MetadataFactory.buildNestedComponentMetadataFor(beanName, definition));
-		}
-		return metadata;
+		return MetadataFactory.buildComponentMetadataFor(getBeanFactory());
 	}
 
 	private ConfigurableListableBeanFactory getBeanFactory() {

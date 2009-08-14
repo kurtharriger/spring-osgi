@@ -82,4 +82,41 @@ public class SpringComponentMetadata implements ComponentMetadata {
 	public int getActivation() {
 		return activation;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((beanDefinition == null) ? 0 : beanDefinition.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj instanceof SpringComponentMetadata) {
+			SpringComponentMetadata other = (SpringComponentMetadata) obj;
+			if (beanDefinition == null) {
+				if (other.beanDefinition != null)
+					return false;
+			}
+			return beanDefinition == other.beanDefinition;
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("ComponentMetadata for bean name=");
+		sb.append(name);
+		sb.append("; activation=");
+		sb.append(activation);
+		sb.append("; dependsOn=");
+		sb.append(dependsOn);
+		sb.append("; target definition");
+		sb.append(beanDefinition);
+		return sb.toString();
+	}
 }

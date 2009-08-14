@@ -242,7 +242,7 @@ public abstract class AbstractServiceDependencySorterTest extends TestCase {
 		testDependencyTreeWithShuffle(new Bundle[]{E, D, C, B, A}, new Bundle[]{E, D, C, B, A});
 	}
 
-	public void testCircularReferenceIdMulti() throws Exception {
+	public void tstCircularReferenceIdMulti() throws Exception {
 		DependencyMockBundle A = new DependencyMockBundle("A");
 		DependencyMockBundle B = new DependencyMockBundle("B");
 		DependencyMockBundle C = new DependencyMockBundle("C");

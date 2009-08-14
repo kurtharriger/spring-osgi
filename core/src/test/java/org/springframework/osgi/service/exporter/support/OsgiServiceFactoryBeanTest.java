@@ -327,7 +327,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		String beanName = "fooBar";
 
 		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), false);
-		beanFactoryControl.expectAndReturn(beanFactory.isPrototype(beanName), false);
+		//beanFactoryControl.expectAndReturn(beanFactory.isPrototype(beanName), false);
 		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
 		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), service.getClass());

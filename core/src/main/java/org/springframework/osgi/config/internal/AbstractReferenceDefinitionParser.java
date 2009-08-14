@@ -151,6 +151,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	private static final String M = "m";
 
 	public static final String GENERATED_REF = "org.springframework.osgi.config.reference.generated";
+	public static final String PROMOTED_REF = "org.springframework.osgi.config.reference.promoted";
 
 	/**
 	 * Get OSGi defaults (in case they haven't been resolved).
@@ -192,6 +193,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 			def.setLazyInit(true);
 			// disable autowiring for promoted bean
 			def.setAutowireCandidate(false);
+			def.setAttribute(PROMOTED_REF, Boolean.TRUE);
 
 			BeanDefinitionHolder holder = new BeanDefinitionHolder(def, generatedName);
 			BeanDefinitionReaderUtils.registerBeanDefinition(holder, parserContext.getRegistry());
@@ -216,7 +218,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	private AbstractBeanDefinition createBeanReferenceDefinition(String beanName, BeanDefinition actualDef) {
 		GenericBeanDefinition def = new GenericBeanDefinition();
 		def.setBeanClass(BeanReferenceFactoryBean.class);
-		def.setAttribute(GENERATED_REF, true);
+		def.setAttribute(GENERATED_REF, Boolean.TRUE);
 		def.setOriginatingBeanDefinition(actualDef);
 		def.setDependsOn(new String[] { beanName });
 		def.setSynthetic(true);
