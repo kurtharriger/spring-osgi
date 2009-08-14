@@ -29,7 +29,7 @@ public class AsianRegionCodeConverter implements Converter {
 	public Object convert(Object source, ReifiedType toType) throws Exception {
 		Class toClass = (Class) toType.getRawClass();
 		if (source instanceof String
-				|| (RegionCode.class.isAssignableFrom(toClass) || toClass.isAssignableFrom(AsianRegionCode.class))) {
+				&& ((RegionCode.class.isAssignableFrom(toClass) || AsianRegionCode.class.isAssignableFrom(toClass)))) {
 			return new AsianRegionCode((String) source);
 		}
 		// we're supposed to throw an exception if we can't convert
@@ -38,7 +38,7 @@ public class AsianRegionCodeConverter implements Converter {
 
 	public boolean canConvert(Object value, ReifiedType toType) {
 		Class toClass = (Class) toType.getRawClass();
-		return (RegionCode.class.isAssignableFrom(toClass) || toClass.isAssignableFrom(AsianRegionCode.class))
-				|| value instanceof String;
+		return (value instanceof String && ((RegionCode.class.isAssignableFrom(toClass) || AsianRegionCode.class
+				.isAssignableFrom(toClass))));
 	}
 }

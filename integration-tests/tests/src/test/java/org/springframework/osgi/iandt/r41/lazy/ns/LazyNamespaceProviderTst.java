@@ -23,7 +23,7 @@ import org.springframework.osgi.iandt.r41.lazy.BaseR41IntegrationTest;
  * 
  * @author Costin Leau
  */
-public class LazyNamespaceProviderTest extends BaseR41IntegrationTest {
+public class LazyNamespaceProviderTst extends BaseR41IntegrationTest {
 
 	@Override
 	protected String[] lazyBundles() {

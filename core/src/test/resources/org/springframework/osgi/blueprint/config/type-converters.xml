@@ -28,11 +28,13 @@
 		</property>
 	</bean>
 
+	 
 	<bean id="asianCodeExample" class="org.springframework.osgi.blueprint.config.RegionCodeComponent"> 
 		<argument value="blaBla"/>
 		<argument value="CN+86"/>
 	</bean>
 	
+	 
 	<bean id="converterB"
 		class="org.springframework.osgi.blueprint.config.ComponentHolderConverter" />
 
