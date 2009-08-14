@@ -6,6 +6,7 @@
 
     <bean id="dependsleaf2" class="org.springframework.osgi.blueprint.TestComponent" init-method="init" activation="lazy"/>
 
+	<!--  3 metadatas -->
     <bean id="first-level" class="org.springframework.osgi.blueprint.TestComponent">
     	<property name="propA">
     		<service ref="dependsleaf1" auto-export="all-classes"/>
@@ -15,6 +16,7 @@
     	</property>
     </bean>
 
+	<!-- 4 metadatas -->
     <bean id="deeply-nested" class="org.springframework.osgi.blueprint.TestComponent">
     	<property name="propA">
     		<bean class="org.springframework.osgi.blueprint.TestComponent">
@@ -29,6 +31,7 @@
     	</property>
     </bean>
 
+	<!-- 4 metadatas -->
     <bean id="nested-collection" class="org.springframework.osgi.blueprint.TestComponent">
     	<property name="propA">
     		<list>
@@ -39,7 +42,7 @@
     	</property>
     </bean>
     
-    
+    <!-- 5 metadatas -->
     <bean id="nested-beans" class="org.springframework.osgi.blueprint.TestComponent">
     	<property name="propA">
     		<array>
@@ -53,4 +56,17 @@
     		</array>
     	</property>
     </bean>
+    
+    <!-- 3 metadatas -->
+    <bean id="nested-references" class="org.springframework.osgi.blueprint.TestComponent">
+    	<property name="propA">
+    		<list>
+    			<reference-list interface="java.awt.Shape" availability="optional"/>
+	   			<reference interface="java.awt.Shape" availability="optional"/>
+    		</list>
+    	</property>
+    </bean>
+    
+    <!-- 1 -->
+    <reference interface="java.awt.Shape" availability="optional"/>
 </blueprint>

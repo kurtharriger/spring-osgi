@@ -7,6 +7,21 @@
 
 	<description>Configuration with sub-elements</description>
 
+	<bean id="bf" class="org.springframework.osgi.blueprint.BeanFactoryFB"/>
+
+	<!-- 
+	<bean id="self" class="org.springframework.osgi.blueprint.DynamicCycleComponent" scope="prototype">
+		<argument value="self"/>
+		<argument ref="bf"/>
+		<property name="prop" ref="char"/>
+	</bean>
+	
+	<bean id="trigger" class="org.springframework.osgi.blueprint.TestComponent">
+		<property name="propA" ref="self"/>
+	</bean>
+	 -->
+	 
+ 
 	<bean id="char" class="java.lang.Character">
 		<argument type="char" value="\u0000" />
 	</bean>

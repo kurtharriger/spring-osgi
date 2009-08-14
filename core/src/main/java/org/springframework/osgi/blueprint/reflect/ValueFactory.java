@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.MapEntry;
 import org.osgi.service.blueprint.reflect.Metadata;
 import org.osgi.service.blueprint.reflect.NonNullMetadata;
@@ -35,14 +34,12 @@ import org.springframework.beans.factory.config.BeanReferenceFactoryBean;
 import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.config.TypedStringValue;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.ManagedArray;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.ManagedProperties;
 import org.springframework.beans.factory.support.ManagedSet;
 import org.springframework.osgi.blueprint.reflect.SimpleCollectionMetadata.CollectionType;
-import org.springframework.osgi.config.internal.AbstractReferenceDefinitionParser;
 
 /**
  * Adapter between Spring {@link BeanMetadataElement} and OSGi's Blueprint {@link Value}.
@@ -54,7 +51,6 @@ class ValueFactory {
 
 	private static final String BEAN_REF_FB_CLASS_NAME = BeanReferenceFactoryBean.class.getName();
 	private static final String BEAN_REF_NAME_PROP = "targetBeanName";
-	private static final String GENERATED_REF = AbstractReferenceDefinitionParser.GENERATED_REF;
 
 	/**
 	 * Creates the equivalent value for the given Spring metadata. Since Spring's metadata is a superset of the
@@ -92,14 +88,9 @@ class ValueFactory {
 				BeanDefinition def = (BeanDefinition) metadata;
 
 				if (BEAN_REF_FB_CLASS_NAME.equals(def.getBeanClassName())) {
-					// check special DM case of nested mandatory
-					// references being promoted to top level beans
-					if (def instanceof AbstractBeanDefinition) {
-						AbstractBeanDefinition abd = (AbstractBeanDefinition) def;
-						if (abd.isSynthetic() && abd.hasAttribute(GENERATED_REF)) {
-							BeanDefinition actual = abd.getOriginatingBeanDefinition();
-							return ComponentMetadataFactory.buildMetadata(null, actual);
-						}
+					BeanDefinition unwrapped = ComponentMetadataFactory.unwrapImporterReference(def);
+					if (unwrapped != null) {
+						return ComponentMetadataFactory.buildMetadata(null, unwrapped);
 					} else {
 						return new SimpleRefMetadata((String) MetadataUtils.getValue(def.getPropertyValues(),
 								BEAN_REF_NAME_PROP));

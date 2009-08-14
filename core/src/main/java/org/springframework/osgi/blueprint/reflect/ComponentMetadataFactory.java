@@ -18,8 +18,12 @@ package org.springframework.osgi.blueprint.reflect;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.springframework.beans.BeanMetadataElement;
@@ -28,9 +32,12 @@ import org.springframework.beans.PropertyValue;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.BeanReferenceFactoryBean;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.osgi.config.internal.AbstractReferenceDefinitionParser;
 
 /**
  * Internal class used for adapting Spring's bean definition to OSGi Blueprint metadata. Used by {@link MetadataFactory}
@@ -40,6 +47,16 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
  * @author Costin Leau
  */
 class ComponentMetadataFactory implements MetadataConstants {
+
+	private static final String BEAN_REF_FB_CLASS_NAME = BeanReferenceFactoryBean.class.getName();
+	private static final String GENERATED_REF = AbstractReferenceDefinitionParser.GENERATED_REF;
+	private static final String PROMOTED_REF = AbstractReferenceDefinitionParser.PROMOTED_REF;
+	private static final String REGEX =
+			"\\.org\\.springframework\\.osgi\\.service\\.importer\\.support\\.OsgiService(?:Collection)*ProxyFactoryBean#\\d+#\\d+";
+	private static final Pattern PATTERN = Pattern.compile(REGEX);
+	private static final String GENERATED_END = "#generated";
+	private static final String GENERATED_START = ".org.springframework.osgi.service.importer.support.OsgiService";
+	private static final String GENERATED_MIDDLE = "ProxyFactoryBean#";
 
 	/**
 	 * Builds a component metadata from the given bean definition.
@@ -70,6 +87,11 @@ class ComponentMetadataFactory implements MetadataConstants {
 			return new SpringReferenceListMetadata(name, beanDefinition);
 		}
 
+		BeanDefinition original = unwrapImporterReference(beanDefinition);
+		if (original != null) {
+			return buildMetadata(null, original);
+		}
+
 		if (isEnvironmentManager(beanDefinition)) {
 			return new EnvironmentManagerMetadata(name);
 		}
@@ -87,6 +109,22 @@ class ComponentMetadataFactory implements MetadataConstants {
 
 	private static boolean isCollectionImporter(BeanDefinition beanDefinition) {
 		return checkBeanDefinitionClassCompatibility(beanDefinition, MULTI_SERVICE_IMPORTER_CLASS);
+	}
+
+	static BeanDefinition unwrapImporterReference(BeanDefinition beanDefinition) {
+		if (BEAN_REF_FB_CLASS_NAME.equals(beanDefinition.getBeanClassName())) {
+			// check special DM case of nested mandatory
+			// references being promoted to top level beans
+			if (beanDefinition instanceof AbstractBeanDefinition) {
+				AbstractBeanDefinition abd = (AbstractBeanDefinition) beanDefinition;
+				if (abd.isSynthetic() && abd.hasAttribute(GENERATED_REF)) {
+					BeanDefinition actual = abd.getOriginatingBeanDefinition();
+					return actual;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	private static boolean isEnvironmentManager(BeanDefinition beanDefinition) {
@@ -125,7 +163,6 @@ class ComponentMetadataFactory implements MetadataConstants {
 		else if (metadata instanceof Mergeable && metadata instanceof Iterable) {
 			processIterable((Iterable) metadata, to);
 		}
-
 	}
 
 	private static void processBeanDefinition(BeanDefinition definition, Collection<ComponentMetadata> to) {
@@ -166,5 +203,42 @@ class ComponentMetadataFactory implements MetadataConstants {
 				processBeanMetadata((BeanMetadataElement) value, to);
 			}
 		}
+	}
+
+	public List<ComponentMetadata> buildComponentMetadataFor(ConfigurableListableBeanFactory factory) {
+		List<ComponentMetadata> metadata = new ArrayList<ComponentMetadata>();
+		String[] components = factory.getBeanDefinitionNames();
+
+		for (String beanName : components) {
+			BeanDefinition definition = factory.getBeanDefinition(beanName);
+
+			// filter generated definitions
+			if (!definition.hasAttribute(PROMOTED_REF)) {
+				// add metadata for top-level definitions
+				metadata.add(MetadataFactory.buildComponentMetadataFor(beanName, definition));
+				// look for nested ones
+				metadata.addAll(MetadataFactory.buildNestedComponentMetadataFor(beanName, definition));
+			}
+		}
+
+		return metadata;
+	}
+
+	// eliminate the names of promoted importers
+	public Set<String> filterIds(Set<String> components) {
+		// search for pattern "
+		// .org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean#N#N and
+		// .org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean#N#N
+
+		Set<String> filtered = new LinkedHashSet<String>(components.size());
+
+		for (String string : components) {
+			if (!(string.startsWith(GENERATED_START) && string.endsWith(GENERATED_END) && string
+					.contains(GENERATED_MIDDLE))) {
+				filtered.add(string);
+			}
+		}
+
+		return filtered;
 	}
 }
