@@ -47,4 +47,8 @@ public class ExporterController implements ExporterInternalActions {
 	public void unregisterService() {
 		executor.unregisterService();
 	}
+
+	public void callUnregisterOnStartup() {
+		executor.callUnregisterOnStartup();
+	}
 }

@@ -34,4 +34,10 @@ public class ExportImportTest extends BaseIntegrationTest {
 		assertEquals(2, list.size());
 		assertEquals(2, Listener.bind);
 	}
+	
+	public void testExportNA() throws Exception {
+		applicationContext.getBean("export-na");
+		System.out.println(Listener.unbind);
+		assertEquals(1, Listener.unbind);		
+	}
 }

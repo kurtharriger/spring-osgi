@@ -82,7 +82,7 @@ public class TypeConverterTest extends TestCase {
 
 	public void testConversionService() throws Exception {
 		SpringBlueprintConverter cs = new SpringBlueprintConverter(context.getBeanFactory());
-		
+
 		Object converted = cs.convert("1", new ReifiedType(Long.class));
 		assertNotNull(converted);
 		assertEquals(Long.valueOf("1"), converted);
@@ -93,6 +93,11 @@ public class TypeConverterTest extends TestCase {
 	public void testBooleanConversion() throws Exception {
 		TestComponent comp = (TestComponent) context.getBean("booleanConversion");
 		assertEquals(Boolean.TRUE, comp.getPropA());
+	}
+
+	public void testArrayConversion() throws Exception {
+		TestComponent comp = (TestComponent) context.getBean("arrayConversion");
+		assertTrue(comp.getPropA() instanceof RegionCode[]);
 	}
 
 	public void testReferenceDelegate() throws Exception {

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
@@ -19,4 +21,18 @@
 			<bean class="org.springframework.osgi.iandt.exportimport.Listener" />
 		</osgi:listener>
 	</osgi:list>
+	
+	<osgi:reference id="na" interface="java.util.Queue"/>
+	
+	<osgi:service id="export-na" auto-export="interfaces" ref="map" depends-on="na">
+		<osgi:registration-listener 
+			registration-method="bind" 
+			unregistration-method="unbind">
+			<bean class="org.springframework.osgi.iandt.exportimport.Listener" />
+		</osgi:registration-listener>
+		<osgi:service-properties>
+			<entry key="use" value="case"/>
+		</osgi:service-properties>
+	</osgi:service>
+	
 </beans>

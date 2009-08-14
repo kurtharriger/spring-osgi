@@ -32,6 +32,7 @@ Package org.springframework.osgi.compendium
 Package org.springframework.osgi.extender
 * added JavaBean cache initialization for known types to reduce the number of class lookups during startup
 * improved importers detection by avoiding early initialization of lazy beans
+* align the bundles shutdown algorithm with the OSGi 4.2 Blueprint spec 
 
 Package org.springframework.osgi.service
 * improved serviceability by using NamedInheritableThreadLocal
@@ -56,6 +57,8 @@ Package org.springframework.osgi.service
 * removed mandatory service check for service collection to allow status checks
 * added interface-less importers (useful for OSGi 4.2 remote services)
 * improved detection of transitive dependencies when traversing nested beans
+* added cleanup for services on destruction to avoid postponing bundle shutdown
+* improved static service importers by adding caching of the service to ease service cleanup
 
 Package org.springframework.osgi.mock
 * added specific OSGi r4.2 methods

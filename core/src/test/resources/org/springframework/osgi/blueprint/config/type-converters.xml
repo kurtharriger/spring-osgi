@@ -20,6 +20,14 @@
 			class="org.springframework.osgi.blueprint.config.CustomBooleanConverter"/>
 	</type-converters>
 
+	<bean id="arrayConversion" class="org.springframework.osgi.blueprint.TestComponent" activation="lazy">
+		<property name="array">
+			<array>
+				<value>CN+76</value>
+			</array>
+		</property>
+	</bean>
+
 	<bean id="asianCodeExample" class="org.springframework.osgi.blueprint.config.RegionCodeComponent"> 
 		<argument value="blaBla"/>
 		<argument value="CN+86"/>
@@ -40,7 +48,9 @@
 	<bean id="booleanConversion" class="org.springframework.osgi.blueprint.TestComponent" activation="lazy">
 		<property name="bool" value="T"/>
 	</bean>
-	
+
+
+		
 	<bean id="serviceReference" class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="serviceReference" ref="referenceFactory"/>
 	</bean>

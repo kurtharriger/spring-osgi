@@ -95,6 +95,8 @@ public class ContextLoaderListener implements BundleActivator {
 	private abstract class BaseListener implements SynchronousBundleListener {
 
 		static final int LAZY_ACTIVATION_EVENT_TYPE = 0x00000200;
+		
+		protected final Log log = LogFactory.getLog(getClass());
 
 		/**
 		 * common cache used for tracking down bundles started lazily so they don't get processed twice (once when

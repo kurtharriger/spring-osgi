@@ -24,9 +24,6 @@ import org.springframework.osgi.extender.internal.dependencies.shutdown.ServiceD
  */
 public class ComparatorServiceDependencySorterTest extends AbstractServiceDependencySorterTest {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.osgi.extender.dependencies.AbstractServiceDependencySorterTest#createSorter()
-	 */
 	protected ServiceDependencySorter createSorter() {
 		return new ComparatorServiceDependencySorter();
 	}

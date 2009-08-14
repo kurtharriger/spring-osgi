@@ -54,6 +54,22 @@ abstract class AbstractOsgiServiceExporter implements DisposableBean {
 		return decorator;
 	}
 
+	// shortcut method used for calling the listener with a null value during startup
+	// when dealing with non lazy listeners
+	void callUnregisterOnStartup() {
+		if (!lazyListeners) {
+			for (OsgiServiceRegistrationListener listener : listeners) {
+				if (listener != null) {
+					try {
+						listener.unregistered(null, null);
+					} catch (Exception ex) {
+						// no need to log exceptions, the wrapper already does this
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * Sets the listeners interested in registration and unregistration events.
 	 * 

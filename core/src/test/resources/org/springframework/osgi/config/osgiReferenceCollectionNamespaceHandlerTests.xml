@@ -10,7 +10,7 @@
 
 
 	<!-- simple collection types -->
-
+	
 	<osgi:list id="simpleList" interface="java.io.Serializable"
 		cardinality="0..N" />
 	<osgi:set id="simpleSet" interface="java.io.Serializable"

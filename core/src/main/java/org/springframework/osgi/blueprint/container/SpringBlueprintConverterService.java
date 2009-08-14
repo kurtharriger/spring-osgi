@@ -18,6 +18,7 @@ package org.springframework.osgi.blueprint.container;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.service.blueprint.container.Converter;
 import org.osgi.service.blueprint.container.ReifiedType;
@@ -66,10 +67,18 @@ public class SpringBlueprintConverterService implements ConversionService {
 	}
 
 	public boolean canConvert(Class<?> sourceType, Class<?> targetType) {
+		if (targetType.isArray() || Collection.class.isAssignableFrom(targetType)
+				|| Map.class.isAssignableFrom(targetType)) {
+			return false;
+		}
 		return true;
 	}
 
 	public boolean canConvert(Class<?> sourceType, TypeDescriptor targetType) {
+		Class<?> target = targetType.getType();
+		if (targetType.isArray() || Collection.class.isAssignableFrom(target) || Map.class.isAssignableFrom(target)) {
+			return false;
+		}
 		return true;
 	}
 
