@@ -47,15 +47,13 @@ public class PublishingServiceFactory implements ServiceFactory {
 	/** proxy cache in case the given bean has a non-singleton scope */
 	private final Map<Object, WeakReference<Object>> proxyCache;
 
+	private final LazyTargetResolver targetResolver;
 	private final Class<?>[] classes;
-	private final Object target;
-	private final BeanFactory beanFactory;
-	private final String targetBeanName;
 	private final boolean createTCCLProxy;
 	private final ClassLoader classLoader;
 	private final ClassLoader aopClassLoader;
 	private final BundleContext bundleContext;
-	private final Runnable notifyListeners;
+	private final Object lock = new Object();
 
 	/**
 	 * Constructs a new <code>PublishingServiceFactory</code> instance. Since its an internal class, this constructor
@@ -70,45 +68,30 @@ public class PublishingServiceFactory implements ServiceFactory {
 	 * @param aopClassLoader
 	 * @param bundleContext
 	 */
-	public PublishingServiceFactory(Class<?>[] classes, Object target, BeanFactory beanFactory, String targetBeanName,
-			boolean createTCCLProxy, ClassLoader classLoader, ClassLoader aopClassLoader, BundleContext bundleContext,
-			Runnable notifyListeners) {
+	public PublishingServiceFactory(LazyTargetResolver targetResolver, Class<?>[] classes, boolean createTCCLProxy,
+			ClassLoader classLoader, ClassLoader aopClassLoader, BundleContext bundleContext) {
 		super();
+
+		this.targetResolver = targetResolver;
 		this.classes = classes;
 
-		this.target = target;
-		this.beanFactory = beanFactory;
-		this.targetBeanName = targetBeanName;
 		this.createTCCLProxy = createTCCLProxy;
 		this.classLoader = classLoader;
 		this.aopClassLoader = aopClassLoader;
 		this.bundleContext = bundleContext;
 
 		proxyCache = (createTCCLProxy ? new WeakHashMap<Object, WeakReference<Object>>(4) : null);
-		this.notifyListeners = notifyListeners;
-	}
-
-	private Object getBean() {
-		// if no instance given use container lookup
-		return (target == null ? beanFactory.getBean(targetBeanName) : target);
-	}
-
-	private Class<?> getBeanType() {
-		return (target == null ? (beanFactory.isSingleton(targetBeanName) ? beanFactory.getBean(targetBeanName)
-				.getClass() : beanFactory.getType(targetBeanName)) : target.getClass());
 	}
 
 	public Object getService(Bundle bundle, ServiceRegistration serviceRegistration) {
-		if (notifyListeners != null) {
-			notifyListeners.run();
-		}
-
 		if (log.isTraceEnabled()) {
 			log.trace("Get service called by bundle " + OsgiStringUtils.nullSafeName(bundle) + " on registration "
 					+ OsgiStringUtils.nullSafeToString(serviceRegistration.getReference()));
 		}
 
-		Object bn = getBean();
+		targetResolver.activate();
+		Object bn = targetResolver.getBean();
+
 		// handle SF beans
 		if (bn instanceof ServiceFactory) {
 			bn = ((ServiceFactory) bn).getService(bundle, serviceRegistration);
@@ -164,10 +147,10 @@ public class PublishingServiceFactory implements ServiceFactory {
 					+ OsgiStringUtils.nullSafeToString(serviceRegistration.getReference()));
 		}
 
-		Class<?> type = getBeanType();
+		Class<?> type = targetResolver.getType();
 		// handle SF beans
 		if (ServiceFactory.class.isAssignableFrom(type)) {
-			ServiceFactory sf = (ServiceFactory) getBean();
+			ServiceFactory sf = (ServiceFactory) targetResolver.getBean();
 			sf.ungetService(bundle, serviceRegistration, service);
 		}
 

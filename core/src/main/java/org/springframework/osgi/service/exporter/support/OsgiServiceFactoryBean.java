@@ -40,18 +40,18 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.Ordered;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
 import org.springframework.osgi.context.support.internal.OsgiBundleScope;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
-import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterController;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterInternalActions;
+import org.springframework.osgi.service.exporter.support.internal.support.ListenerNotifier;
 import org.springframework.osgi.service.exporter.support.internal.support.PublishingServiceFactory;
 import org.springframework.osgi.service.exporter.support.internal.support.ServiceRegistrationDecorator;
 import org.springframework.osgi.service.exporter.support.internal.support.ServiceRegistrationWrapper;
+import org.springframework.osgi.service.exporter.support.internal.support.LazyTargetResolver;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.internal.ClassUtils;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
@@ -107,7 +107,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		}
 
 		public void callUnregisterOnStartup() {
-			OsgiServiceFactoryBean.this.callUnregisterOnStartup();
+			OsgiServiceFactoryBean.this.resolver.startupUnregisterIfPossible();
 		}
 	};
 
@@ -161,7 +161,10 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	private final Object lock = new Object();
 	/** internal behaviour controller */
 	private final ExporterController controller;
-	private final AtomicBoolean canNotifyListeners = new AtomicBoolean(false);
+	private volatile LazyTargetResolver resolver;
+	private ListenerNotifier notifier;
+	private final AtomicBoolean activated = new AtomicBoolean(false);
+	/** should the service be cached or not */
 	private boolean cacheService = false;
 
 	public OsgiServiceFactoryBean() {
@@ -241,7 +244,9 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 			shouldRegisterAtStartup = registerAtStartup;
 		}
 
-		canNotifyListeners.set(!getLazyListeners());
+		resolver =
+				new LazyTargetResolver(target, beanFactory, targetBeanName, cacheService, getNotifier(),
+						getLazyListeners());
 
 		if (shouldRegisterAtStartup) {
 			registerService();
@@ -312,11 +317,6 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		// if we have a nested bean / non-Spring managed object
 		String beanName = (!hasNamedBean ? null : targetBeanName);
 
-		// check service caching
-		if (cacheService && target == null) {
-			target = beanFactory.getBean(beanName);
-		}
-
 		Dictionary serviceProperties = mergeServiceProperties(this.serviceProperties, beanName);
 
 		Class<?>[] intfs = interfaces;
@@ -339,9 +339,11 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		Class<?>[] mergedClasses = (Class[]) classes.toArray(new Class[classes.size()]);
 
 		ServiceRegistration reg = registerService(mergedClasses, serviceProperties);
-
-		serviceRegistration = notifyListeners(target, (Map) serviceProperties, reg);
+		serviceRegistration = new ServiceRegistrationDecorator(reg);
 		safeServiceRegistration.swap(serviceRegistration);
+
+		resolver.setDecorator(serviceRegistration);
+		resolver.notifyIfPossible();
 	}
 
 	/**
@@ -362,16 +364,9 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		log.info("Publishing service under classes [" + ObjectUtils.nullSafeToString(names) + "]");
 
-		Runnable notifyListenersCallback = (canNotifyListeners.get() ? null : new Runnable() {
-			public void run() {
-				activateLazyListeners();
-			}
-		});
-
 		ServiceFactory serviceFactory =
-				new PublishingServiceFactory(classes, target, beanFactory, targetBeanName,
-						(ExportContextClassLoaderEnum.SERVICE_PROVIDER.equals(contextClassLoader)), classLoader,
-						aopClassLoader, bundleContext, notifyListenersCallback);
+				new PublishingServiceFactory(resolver, classes, (ExportContextClassLoaderEnum.SERVICE_PROVIDER
+						.equals(contextClassLoader)), classLoader, aopClassLoader, bundleContext);
 
 		if (isBeanBundleScoped())
 			serviceFactory = new OsgiBundleScope.BundleScopeServiceFactory(serviceFactory);
@@ -397,23 +392,6 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		return bundleScoped;
 	}
 
-	@Override
-	AtomicBoolean canNotifyListeners() {
-		return canNotifyListeners;
-	}
-
-	private void activateLazyListeners() {
-		if (canNotifyListeners.compareAndSet(false, true)) {
-			if (log.isDebugEnabled())
-				log.debug("Activating lazy registration listeners for exporter " + beanName);
-			if (serviceRegistration != null) {
-				serviceRegistration.callRegisterListeners();
-			} else {
-				callUnregisterOnStartup();
-			}
-		}
-	}
-
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
 		this.aopClassLoader = ClassLoaderFactory.getAopClassLoaderFor(classLoader);
@@ -425,10 +403,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * <p/> Returns a {@link ServiceRegistration} to the OSGi service for the target object.
 	 */
 	public ServiceRegistration getObject() throws Exception {
-		activateLazyListeners();
-		if (!serviceRegistered) {
-
-		}
+		// activate
+		resolver.activate();
 		return safeServiceRegistration;
 	}
 
@@ -460,6 +436,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	void unregisterService(ServiceRegistration registration) {
 		if (OsgiServiceUtils.unregisterService(registration)) {
 			log.info("Unregistered service [" + registration + "]");
+			if (resolver != null)
+				resolver.setDecorator(null);
 		}
 	}
 

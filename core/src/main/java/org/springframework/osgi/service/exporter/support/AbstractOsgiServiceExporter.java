@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.support.internal.support.ListenerNotifier;
 import org.springframework.osgi.service.exporter.support.internal.support.ServiceRegistrationDecorator;
 
 /**
@@ -36,38 +37,10 @@ abstract class AbstractOsgiServiceExporter implements DisposableBean {
 	private OsgiServiceRegistrationListener[] listeners = new OsgiServiceRegistrationListener[0];
 	/** lazy callbacks */
 	private boolean lazyListeners = false;
+	private ListenerNotifier notifier;
 
-	/**
-	 * Takes care of notifying the listeners on both startup and shutdown (by wrapping the service registration).
-	 * 
-	 * @param service object published as OSGi service
-	 * @param properties exported OSGi service properties
-	 * @param registration original service registration
-	 * @return
-	 */
-	ServiceRegistrationDecorator notifyListeners(Object service, Map properties, ServiceRegistration registration) {
-		// wrap registration to be notified of unregistration
-		ServiceRegistrationDecorator decorator =
-				new ServiceRegistrationDecorator(service, registration, listeners, canNotifyListeners());
-		decorator.callRegisterListeners();
-
-		return decorator;
-	}
-
-	// shortcut method used for calling the listener with a null value during startup
-	// when dealing with non lazy listeners
-	void callUnregisterOnStartup() {
-		if (!lazyListeners) {
-			for (OsgiServiceRegistrationListener listener : listeners) {
-				if (listener != null) {
-					try {
-						listener.unregistered(null, null);
-					} catch (Exception ex) {
-						// no need to log exceptions, the wrapper already does this
-					}
-				}
-			}
-		}
+	ListenerNotifier getNotifier() {
+		return notifier;
 	}
 
 	/**
@@ -76,8 +49,10 @@ abstract class AbstractOsgiServiceExporter implements DisposableBean {
 	 * @param listeners registration/unregistration listeners.
 	 */
 	public void setListeners(OsgiServiceRegistrationListener[] listeners) {
-		if (listeners != null)
+		if (listeners != null) {
 			this.listeners = listeners;
+			this.notifier = new ListenerNotifier(listeners);
+		}
 	}
 
 	public void destroy() {
@@ -93,15 +68,6 @@ abstract class AbstractOsgiServiceExporter implements DisposableBean {
 	 * Unregisters/de-exports the OSGi service.
 	 */
 	abstract void unregisterService();
-
-	/**
-	 * Returns a thread-safe, mutable object that indicates whether listeners can be invoked or not at the present time.
-	 * Note that the result of this method will be cached.
-	 * 
-	 * @see #setLazyListeners(boolean)
-	 * @return a thread-safe, mutable object
-	 */
-	abstract AtomicBoolean canNotifyListeners();
 
 	/**
 	 * Sets the laziness of the exporter listeners. Eager listeners (default) will cause the listeners to be called when
