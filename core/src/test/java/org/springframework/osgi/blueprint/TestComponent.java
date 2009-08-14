@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.blueprint.config.RegionCode;
 
 /**
  * Just a simple component used by the namespace tests.
@@ -73,6 +74,10 @@ public class TestComponent implements java.io.Serializable {
 		this.propA = col;
 	}
 
+	public void setArray(RegionCode[] reg) {
+		this.propA = reg;
+	}
+	
 	public ServiceReference getServiceReference() {
 		return serviceReference;
 	}

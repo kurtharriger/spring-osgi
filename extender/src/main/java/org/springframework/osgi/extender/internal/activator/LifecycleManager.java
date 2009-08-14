@@ -17,6 +17,7 @@
 package org.springframework.osgi.extender.internal.activator;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -43,6 +44,7 @@ import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.BundleDependencyComparator;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ComparatorServiceDependencySorter;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ServiceDependencySorter;
+import org.springframework.osgi.extender.internal.dependencies.shutdown.ShutdownSorter;
 import org.springframework.osgi.extender.internal.dependencies.startup.DependencyWaiterApplicationContextExecutor;
 import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
 import org.springframework.osgi.extender.internal.support.OsgiBeanFactoryPostProcessorAdapter;
@@ -336,83 +338,63 @@ class LifecycleManager implements DisposableBean {
 		// first stop the watchdog
 		stopTimer();
 
-		// destroy bundles
-		Bundle[] bundles = new Bundle[managedContexts.size()];
+		// get hold of the needed bundles
+		List<Bundle> bundles = new ArrayList<Bundle>(managedContexts.size());
 
-		int i = 0;
-		for (Iterator<ConfigurableOsgiBundleApplicationContext> it = managedContexts.values().iterator(); it.hasNext();) {
-			ConfigurableOsgiBundleApplicationContext context = it.next();
-			bundles[i++] = context.getBundle();
+		for (ConfigurableOsgiBundleApplicationContext context : managedContexts.values()) {
+			bundles.add(context.getBundle());
 		}
-
-		bundles = shutdownDependencySorter.computeServiceDependencyGraph(bundles);
 
 		boolean debug = log.isDebugEnabled();
 
-		StringBuilder buffer = new StringBuilder();
-
 		if (debug) {
-			buffer.append("Shutdown order is: {");
-			for (i = 0; i < bundles.length; i++) {
-				buffer.append("\nBundle [" + bundles[i].getSymbolicName() + "]");
-				ServiceReference[] services = bundles[i].getServicesInUse();
-				Set<Bundle> usedBundles = new LinkedHashSet<Bundle>();
-				if (services != null) {
-					for (int j = 0; j < services.length; j++) {
-						if (BundleDependencyComparator.isSpringManagedService(services[j])) {
-							Bundle used = services[j].getBundle();
-							if (!used.equals(bundleContext.getBundle()) && !usedBundles.contains(used)) {
-								usedBundles.add(used);
-								buffer.append("\n  Using [" + used.getSymbolicName() + "]");
-							}
+			log.debug("Starting shutdown procedure for bundles " + bundles);
+		}
+		while (!bundles.isEmpty()) {
+			Collection<Bundle> candidates = ShutdownSorter.getBundles(bundles);
+			if (debug)
+				log.debug("Staging shutdown for bundles " + candidates);
+
+			final List<Runnable> taskList = new ArrayList<Runnable>(candidates.size());
+			final List<ConfigurableOsgiBundleApplicationContext> closedContexts =
+					Collections.synchronizedList(new ArrayList<ConfigurableOsgiBundleApplicationContext>());
+			final Object[] contextClosingDown = new Object[1];
+
+			for (Bundle shutdownBundle : candidates) {
+				Long id = new Long(shutdownBundle.getBundleId());
+				final ConfigurableOsgiBundleApplicationContext context =
+						(ConfigurableOsgiBundleApplicationContext) managedContexts.get(id);
+				if (context != null) {
+					closedContexts.add(context);
+					// add a new runnable
+					taskList.add(new Runnable() {
+
+						private final String toString = "Closing runnable for context " + context.getDisplayName();
+
+						public void run() {
+							contextClosingDown[0] = context;
+							// eliminate context
+							closedContexts.remove(context);
+							closeApplicationContext(context);
 						}
 
-					}
+						public String toString() {
+							return toString;
+						}
+					});
 				}
 			}
-			buffer.append("\n}");
-			log.debug(buffer);
-		}
 
-		final List<Runnable> taskList = new ArrayList<Runnable>(managedContexts.size());
-		final List<ConfigurableOsgiBundleApplicationContext> closedContexts =
-				Collections.synchronizedList(new ArrayList<ConfigurableOsgiBundleApplicationContext>());
-		final Object[] contextClosingDown = new Object[1];
+			// tasks
+			final Runnable[] tasks = (Runnable[]) taskList.toArray(new Runnable[taskList.size()]);
 
-		for (i = 0; i < bundles.length; i++) {
-			Long id = new Long(bundles[i].getBundleId());
-			final ConfigurableOsgiBundleApplicationContext context =
-					(ConfigurableOsgiBundleApplicationContext) managedContexts.get(id);
-			if (context != null) {
-				closedContexts.add(context);
-				// add a new runnable
-				taskList.add(new Runnable() {
-
-					private final String toString = "Closing runnable for context " + context.getDisplayName();
-
-					public void run() {
-						contextClosingDown[0] = context;
-						// eliminate context
-						closedContexts.remove(context);
-						closeApplicationContext(context);
+			// start the ripper >:)
+			for (int j = 0; j < tasks.length; j++) {
+				if (RunnableTimedExecution.execute(tasks[j], extenderConfiguration.getShutdownWaitTime(),
+						shutdownTaskExecutor)) {
+					if (debug) {
+						log.debug(contextClosingDown[0] + " context did not close successfully; forcing shutdown...");
 					}
-
-					public String toString() {
-						return toString;
-					}
-				});
-			}
-		}
-
-		// tasks
-		final Runnable[] tasks = (Runnable[]) taskList.toArray(new Runnable[taskList.size()]);
-
-		// start the ripper >:)
-		for (int j = 0; j < tasks.length; j++) {
-			if (RunnableTimedExecution.execute(tasks[j], extenderConfiguration.getShutdownWaitTime(),
-					shutdownTaskExecutor)) {
-				if (debug) {
-					log.debug(contextClosingDown[0] + " context did not close successfully; forcing shutdown...");
 				}
 			}
 		}

@@ -15,11 +15,17 @@
  */
 package org.springframework.osgi.extender.internal;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockBundle;
@@ -35,14 +41,14 @@ import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 public class DependencyMockBundle extends MockBundle {
 
 	// bundles which depend on the current one
-	protected Bundle[] dependentOn;
+	protected List<Bundle> dependentOn = new ArrayList<Bundle>();
 
 	// bundles on which the current bundle depends on
-	protected Bundle[] dependsOn;
+	protected List<Bundle> dependsOn = new ArrayList<Bundle>();
 
-	private ServiceReference[] inUseServices;
+	private Map<Bundle, ServiceReference> inUseServices = new LinkedHashMap<Bundle, ServiceReference>();
 
-	private ServiceReference[] registeredServices;
+	private Map<Bundle, ServiceReference> registeredServices = new LinkedHashMap<Bundle, ServiceReference>();
 
 	public DependencyMockBundle() {
 		super();
@@ -84,20 +90,26 @@ public class DependencyMockBundle extends MockBundle {
 	 * 
 	 * @param dependent
 	 */
-	public void setDependentOn(final Bundle[] dependent, int[] serviceRanking, long[] serviceId) {
-		this.dependentOn = dependent;
+	public void setDependentOn(final Bundle[] dependents, int[] serviceRanking, long[] serviceId) {
+		this.dependentOn.addAll(Arrays.asList(dependents));
+
+		for (Bundle dependent : dependents) {
+			if (dependent instanceof DependencyMockBundle) {
+				((DependencyMockBundle) dependent).dependsOn.add(this);
+			}
+		}
 
 		// initialise registered services
-		registeredServices = new ServiceReference[dependent.length];
+		registeredServices.clear();
 
-		for (int i = 0; i < registeredServices.length; i++) {
-			registeredServices[i] = new MockServiceReference(DependencyMockBundle.this, createProps(i, serviceRanking,
-				serviceId), null) {
+		for (int i = 0; i < dependents.length; i++) {
+			registeredServices.put(dependents[i], new MockServiceReference(DependencyMockBundle.this, createProps(i,
+					serviceRanking, serviceId), null) {
 
 				public Bundle[] getUsingBundles() {
-					return dependent;
+					return DependencyMockBundle.this.dependentOn.toArray(new Bundle[dependentOn.size()]);
 				}
-			};
+			});
 		}
 	}
 
@@ -118,27 +130,25 @@ public class DependencyMockBundle extends MockBundle {
 	}
 
 	protected void setDependsOn(Bundle[] depends) {
-		this.dependsOn = depends;
+		this.dependsOn.addAll(Arrays.asList(depends));
 
 		// initialize InUseServices
-		inUseServices = new ServiceReference[depends.length];
+		inUseServices.clear();
 
 		final Bundle[] usingBundles = new Bundle[] { this };
 
-		for (int i = 0; i < dependsOn.length; i++) {
-			final Bundle dependencyBundle = dependsOn[i];
-
+		for (final Bundle dependencyBundle : dependsOn) {
 			// make connection from the opposite side also
 			if (dependencyBundle instanceof DependencyMockBundle) {
 				((DependencyMockBundle) dependencyBundle).setDependentOn(this);
 			}
 
 			Properties props = new Properties();
-			
-			props.put(OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY, new Long(
-					System.identityHashCode(dependencyBundle)));
-			
-			inUseServices[i] = new MockServiceReference() {
+
+			props.put(OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY, new Long(System
+					.identityHashCode(dependencyBundle)));
+
+			inUseServices.put(dependencyBundle, new MockServiceReference() {
 				public Bundle getBundle() {
 					return dependencyBundle;
 				}
@@ -146,7 +156,7 @@ public class DependencyMockBundle extends MockBundle {
 				public Bundle[] getUsingBundles() {
 					return usingBundles;
 				}
-			};
+			});
 		}
 	}
 
@@ -155,11 +165,38 @@ public class DependencyMockBundle extends MockBundle {
 	}
 
 	public ServiceReference[] getRegisteredServices() {
-		return registeredServices;
+		return registeredServices.values().toArray(new ServiceReference[registeredServices.size()]);
 	}
 
 	public ServiceReference[] getServicesInUse() {
-		return inUseServices;
+		return inUseServices.values().toArray(new ServiceReference[registeredServices.size()]);
 	}
 
+	@Override
+	public void stop(int options) throws BundleException {
+		if (dependentOn != null)
+			for (Bundle dependent : dependentOn) {
+				if (dependent instanceof DependencyMockBundle) {
+					DependencyMockBundle dep = ((DependencyMockBundle) dependent);
+					List<Bundle> list = dep.dependsOn;
+					if (list != null)
+						list.remove(this);
+					dep.inUseServices.remove(dependent);
+				}
+			}
+		dependentOn = null;
+
+		if (dependsOn != null)
+			for (Bundle dependent : dependsOn) {
+				if (dependent instanceof DependencyMockBundle) {
+					DependencyMockBundle dep = ((DependencyMockBundle) dependent);
+					List<Bundle> list = dep.dependentOn;
+					if (list != null)
+						list.remove(this);
+				}
+			}
+		dependsOn = null;
+		inUseServices.clear();
+		registeredServices.clear();
+	}
 }

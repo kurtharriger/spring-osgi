@@ -45,10 +45,6 @@ public abstract class AbstractServiceDependencySorterTest extends TestCase {
 
 	protected abstract ServiceDependencySorter createSorter();
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
 	protected void tearDown() throws Exception {
 		sorter = null;
 	}

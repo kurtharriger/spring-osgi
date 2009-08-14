@@ -60,23 +60,7 @@ public class ServiceRegistrationDecorator implements ServiceRegistration {
 	// call unregister on the actual service but inform also listeners
 	public void unregister() {
 		// if the delegate is unregistered then an exception will be thrown
-		ServiceReference reference = delegate.getReference();
-
-		Map properties = (Map) OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference);
-
-		// if no exception has been thrown (i.e. the delegate is properly
-		// unregistered), the listeners will be informed, if allowed
-		if (bool.get()) {
-			for (OsgiServiceRegistrationListener listener : listeners) {
-				if (listener != null) {
-					try {
-						listener.unregistered(service, properties);
-					} catch (Exception ex) {
-						// no need to log exceptions, the wrapper already does this
-					}
-				}
-			}
-		}
+		callUnregisterListeners();
 		delegate.unregister();
 	}
 
@@ -100,6 +84,28 @@ public class ServiceRegistrationDecorator implements ServiceRegistration {
 			}
 		}
 	}
+	
+	private void callUnregisterListeners() {
+		// if the delegate is unregistered then an exception will be thrown
+		ServiceReference reference = delegate.getReference();
+
+		Map properties = (reference != null ? (Map) OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference) : null);
+
+		// if no exception has been thrown (i.e. the delegate is properly
+		// unregistered), the listeners will be informed, if allowed
+		if (bool.get()) {
+			for (OsgiServiceRegistrationListener listener : listeners) {
+				if (listener != null) {
+					try {
+						listener.unregistered(service, properties);
+					} catch (Exception ex) {
+						// no need to log exceptions, the wrapper already does this
+					}
+				}
+			}
+		}
+	}
+	
 
 	public String toString() {
 		return "ServiceRegistrationWrapper for " + delegate.toString();

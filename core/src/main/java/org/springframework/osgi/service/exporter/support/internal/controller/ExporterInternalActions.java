@@ -29,4 +29,6 @@ public interface ExporterInternalActions {
 	void registerService();
 
 	void unregisterService();
+
+	void callUnregisterOnStartup();
 }

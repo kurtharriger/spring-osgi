@@ -44,6 +44,7 @@ public class ServiceStaticInterceptor extends ServiceInvoker {
 	/** standard exception flag */
 	private boolean useBlueprintExceptions = false;
 	private final Filter filter;
+	private volatile Object target = null;
 
 	public ServiceStaticInterceptor(BundleContext context, ServiceReference reference) {
 		Assert.notNull(context);
@@ -63,9 +64,14 @@ public class ServiceStaticInterceptor extends ServiceInvoker {
 		if (reference.getBundle() != null) {
 			// since requesting for a service requires additional work
 			// from the OSGi platform
-			Object target = bundleContext.getService(reference);
-			if (target != null)
-				return target;
+			if (target == null) {
+				synchronized (lock) {
+					if (target == null && !destroyed) {
+						target = bundleContext.getService(reference);
+					}
+				}
+			}
+			return target;
 		}
 		// throw exception
 		throw (useBlueprintExceptions ? BlueprintExceptionFactory.createServiceUnavailableException(filter)
@@ -85,6 +91,13 @@ public class ServiceStaticInterceptor extends ServiceInvoker {
 			// set this flag first to make sure after destruction, the OSGi service is not used any more
 			destroyed = true;
 		}
+		try {
+			bundleContext.ungetService(reference);
+		} catch (IllegalStateException ex) {
+			// in case the context is not valid anymore
+		}
+
+		target = null;
 	}
 
 	public boolean equals(Object other) {

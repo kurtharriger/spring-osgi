@@ -46,6 +46,7 @@ import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
 import org.springframework.osgi.context.support.internal.OsgiBundleScope;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
+import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterController;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterInternalActions;
 import org.springframework.osgi.service.exporter.support.internal.support.PublishingServiceFactory;
@@ -103,6 +104,10 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		public void unregisterService() {
 			OsgiServiceFactoryBean.this.unregisterService();
+		}
+
+		public void callUnregisterOnStartup() {
+			OsgiServiceFactoryBean.this.callUnregisterOnStartup();
 		}
 	};
 
@@ -245,8 +250,11 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		canNotifyListeners.set(!getLazyListeners());
 
-		if (shouldRegisterAtStartup)
+		if (shouldRegisterAtStartup) {
 			registerService();
+		} else {
+
+		}
 	}
 
 	public void destroy() {
@@ -404,6 +412,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 				log.debug("Activating lazy registration listeners for exporter " + beanName);
 			if (serviceRegistration != null) {
 				serviceRegistration.callRegisterListeners();
+			} else {
+				callUnregisterOnStartup();
 			}
 		}
 	}
@@ -420,6 +430,9 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 */
 	public ServiceRegistration getObject() throws Exception {
 		activateLazyListeners();
+		if (!serviceRegistered) {
+
+		}
 		return safeServiceRegistration;
 	}
 

@@ -35,6 +35,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterControllerUtils;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterInternalActions;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
+import org.springframework.osgi.service.importer.support.AbstractOsgiServiceImportFactoryBean;
+import org.springframework.osgi.service.importer.support.Availability;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.internal.controller.ImporterControllerUtils;
@@ -229,7 +231,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 				Object importer = beanFactory.getBean(importerNames[i]);
 
 				// create an importer -> exporter association
-				if (isSatisfied(importer)) {
+				if (isMandatory(importer)) {
 					dependingImporters.put(importer, importerNames[i]);
 					importerToName.putIfAbsent(importer, importerNames[i]);
 				}
@@ -257,19 +259,22 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 				addListener(importer, listener);
 			}
 			exporterToImporterDeps.put(exporter, importerStatuses);
-			checkIfExporterShouldStart(exporter, importerStatuses);
+			if (!checkIfExporterShouldStart(exporter, importerStatuses)) {
+				callUnregisterOnStartup(exporter);
+			}
 		}
 	}
 
-	private void checkIfExporterShouldStart(Object exporter, Map<Object, Boolean> importers) {
+	private boolean checkIfExporterShouldStart(Object exporter, Map<Object, Boolean> importers) {
 
 		if (!importers.containsValue(Boolean.FALSE)) {
 			startExporter(exporter);
 
 			if (log.isDebugEnabled())
-				log
-						.trace("Exporter [" + exporterToName.get(exporter)
-								+ "] started; all its dependencies are satisfied");
+				log.trace("Exporter [" + exporterToName.get(exporter) + "] started; "
+						+ "all its dependencies are satisfied");
+			return true;
+
 		} else {
 			List<String> unsatisfiedDependencies = new ArrayList<String>(importers.size());
 
@@ -281,8 +286,10 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 
 			if (log.isTraceEnabled()) {
 				log.trace("Exporter [" + exporterToName.get(exporter)
-						+ "] not started; there are still has unsatisfied dependencies " + unsatisfiedDependencies);
+						+ "] not started; there are still unsatisfied dependencies " + unsatisfiedDependencies);
 			}
+
+			return false;
 		}
 	}
 
@@ -330,6 +337,10 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 		ExporterControllerUtils.getControllerFor(exporter).unregisterService();
 	}
 
+	private void callUnregisterOnStartup(Object exporter) {
+		ExporterControllerUtils.getControllerFor(exporter).callUnregisterOnStartup();
+	}
+
 	private void addListener(Object importer, ImporterStateListener stateListener) {
 		ImporterInternalActions controller = ImporterControllerUtils.getControllerFor(importer);
 		controller.addStateListener(stateListener);
@@ -342,5 +353,13 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 
 	private boolean isSatisfied(Object importer) {
 		return ImporterControllerUtils.getControllerFor(importer).isSatisfied();
+	}
+
+	private boolean isMandatory(Object importer) {
+		if (importer instanceof OsgiServiceProxyFactoryBean) {
+			return Availability.MANDATORY.equals(((OsgiServiceProxyFactoryBean) importer).getAvailability());
+		} else {
+			return Availability.MANDATORY.equals(((OsgiServiceCollectionProxyFactoryBean) importer).getAvailability());
+		}
 	}
 }

@@ -452,12 +452,13 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 	public void destroy() {
 		OsgiListenerUtils.removeServiceListener(bundleContext, listener);
+		ServiceReference ref = null;
 		synchronized (lock) {
 			// set this flag first to make sure no rebind is done
 			destroyed = true;
 			isDuringDestruction = true;
 			if (holder != null) {
-				ServiceReference ref = holder.getReference();
+				ref = holder.getReference();
 				// send unregistration event to the listener
 				listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, ref));
 			}
@@ -466,6 +467,16 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			// notify also any proxies that still wait on the service
 			lock.notifyAll();
 		}
+
+		// unget the service (help sorting out the bundles during shutdown)
+		if (ref != null) {
+			try {
+				bundleContext.ungetService(ref);
+			} catch (IllegalStateException ex) {
+				// it's okay if the context is invalid
+			}
+		}
+
 	}
 
 	/**
