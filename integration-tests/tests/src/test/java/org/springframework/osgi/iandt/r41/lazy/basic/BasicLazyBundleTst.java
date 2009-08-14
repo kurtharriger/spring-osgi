@@ -29,7 +29,7 @@ import org.springframework.osgi.util.OsgiServiceReferenceUtils;
  * 
  * @author Costin Leau
  */
-public class BasicLazyBundleTest extends BaseR41IntegrationTest {
+public class BasicLazyBundleTst extends BaseR41IntegrationTest {
 
 	private static final String SYM_NAME = "org.springframework.osgi.iandt.lazy.basic";
 
