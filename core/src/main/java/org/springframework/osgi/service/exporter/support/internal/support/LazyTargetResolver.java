@@ -62,7 +62,13 @@ public class LazyTargetResolver implements UnregistrationNotifier {
 	}
 
 	private Object getBeanIfPossible() {
-		return (target != null ? target : (beanFactory.isSingleton(beanName) ? getBean() : null));
+		if (target == null) {
+			if (cacheService || beanFactory.isSingleton(beanName)) {
+				getBean();
+			}
+		}
+
+		return target;
 	}
 
 	public Object getBean() {
