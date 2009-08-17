@@ -180,7 +180,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 
 	private Method findServiceReferenceMethod(Class<?> clazz, String methodName) {
 		Method method =
-				org.springframework.util.ReflectionUtils.findMethod(clazz, bindMethod,
+				org.springframework.util.ReflectionUtils.findMethod(clazz, methodName,
 						new Class[] { ServiceReference.class });
 		if (method != null) {
 			org.springframework.util.ReflectionUtils.makeAccessible(method);
