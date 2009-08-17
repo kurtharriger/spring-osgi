@@ -46,5 +46,4 @@ public abstract class OsgiServiceUtils {
 		}
 		return false;
 	}
-
 }

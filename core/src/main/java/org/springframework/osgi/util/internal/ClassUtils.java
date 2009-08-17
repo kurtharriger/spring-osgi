@@ -609,9 +609,20 @@ public abstract class ClassUtils {
 	 * @return a 'particular' (non JDK/OSGi) class if one is found. Else the first available entry is returned.
 	 */
 	public static Class<?> getParticularClass(Class<?>[] classes) {
+		boolean hasSecurity = (System.getSecurityManager() != null);
 		for (int i = 0; i < classes.length; i++) {
-			Class<?> clazz = classes[i];
-			ClassLoader loader = clazz.getClassLoader();
+			final Class<?> clazz = classes[i];
+			ClassLoader loader = null;
+			if (hasSecurity) {
+				loader = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+					public ClassLoader run() {
+						return clazz.getClassLoader();
+					}
+				});
+			}
+			else {
+				loader = clazz.getClassLoader(); 
+			}
 			// quick boot/system check
 			if (loader != null) {
 				// consider known loaders

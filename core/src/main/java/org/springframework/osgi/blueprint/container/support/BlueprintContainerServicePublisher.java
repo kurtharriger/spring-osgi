@@ -16,6 +16,9 @@
 
 package org.springframework.osgi.blueprint.container.support;
 
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -32,6 +35,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.osgi.context.internal.security.SecurityUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.ObjectUtils;
@@ -72,14 +76,14 @@ public class BlueprintContainerServicePublisher implements ApplicationListener<A
 	public void onApplicationEvent(ApplicationContextEvent event) {
 		// publish
 		if (event instanceof ContextRefreshedEvent) {
-			registerService();
+			registerService(event.getApplicationContext());
 		} else if (event instanceof ContextClosedEvent) {
 			unregisterService();
 		}
 	}
 
-	private void registerService() {
-		Dictionary<String, Object> serviceProperties = new Hashtable<String, Object>();
+	private void registerService(ApplicationContext applicationContext) {
+		final Dictionary<String, Object> serviceProperties = new Hashtable<String, Object>();
 
 		Bundle bundle = bundleContext.getBundle();
 		// add RFC124 properties
@@ -95,13 +99,23 @@ public class BlueprintContainerServicePublisher implements ApplicationListener<A
 		log.info("Publishing BlueprintContainer as OSGi service with properties " + serviceProperties);
 
 		// export just the interface
-		String[] serviceNames = new String[] { BlueprintContainer.class.getName() };
+		final String[] serviceNames = new String[] { BlueprintContainer.class.getName() };
 
 		if (log.isDebugEnabled())
 			log.debug("Publishing service under classes " + ObjectUtils.nullSafeToString(serviceNames));
 
+		AccessControlContext acc = SecurityUtils.getAccFrom(applicationContext);
+
 		// publish service
-		registration = bundleContext.registerService(serviceNames, blueprintContainer, serviceProperties);
+		if (System.getSecurityManager() != null) {
+			registration = AccessController.doPrivileged(new PrivilegedAction<ServiceRegistration>() {
+				public ServiceRegistration run() {
+					return bundleContext.registerService(serviceNames, blueprintContainer, serviceProperties);
+				}
+			}, acc);
+		} else {
+			registration = bundleContext.registerService(serviceNames, blueprintContainer, serviceProperties);
+		}
 	}
 
 	private void unregisterService() {

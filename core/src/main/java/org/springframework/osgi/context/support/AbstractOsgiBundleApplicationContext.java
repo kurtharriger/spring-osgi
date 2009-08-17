@@ -19,6 +19,7 @@ package org.springframework.osgi.context.support;
 import java.beans.PropertyEditor;
 import java.io.IOException;
 import java.security.AccessControlContext;
+import java.security.AccessControlException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Dictionary;
@@ -347,12 +348,16 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 			boolean hasSecurity = (System.getSecurityManager() != null);
 
 			if (hasSecurity) {
-				serviceRegistration = AccessController.doPrivileged(new PrivilegedAction<ServiceRegistration>() {
-					public ServiceRegistration run() {
-						return getBundleContext().registerService(serviceNames, this, serviceProperties);
-					}
-				}, acc);
-
+				try {
+					serviceRegistration = AccessController.doPrivileged(new PrivilegedAction<ServiceRegistration>() {
+						public ServiceRegistration run() {
+							return getBundleContext().registerService(serviceNames, this, serviceProperties);
+						}
+					}, acc);
+				} catch (AccessControlException ex) {
+					logger.error("Application context service publication aborted due to security issues "
+							+ "- does the bundle has the rights to publish the service ? ", ex);
+				}
 			} else {
 				serviceRegistration = getBundleContext().registerService(serviceNames, this, serviceProperties);
 			}

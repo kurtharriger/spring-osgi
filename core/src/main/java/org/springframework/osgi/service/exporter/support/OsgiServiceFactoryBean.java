@@ -17,6 +17,9 @@
 
 package org.springframework.osgi.service.exporter.support;
 
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.LinkedHashSet;
@@ -43,6 +46,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.Ordered;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
+import org.springframework.osgi.context.internal.security.SecurityUtils;
 import org.springframework.osgi.context.support.internal.OsgiBundleScope;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterController;
@@ -353,12 +357,12 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * @param serviceProperties
 	 * @return the ServiceRegistration
 	 */
-	ServiceRegistration registerService(Class<?>[] classes, Dictionary serviceProperties) {
+	ServiceRegistration registerService(Class<?>[] classes, final Dictionary serviceProperties) {
 		Assert.notEmpty(classes, "at least one class has to be specified for exporting "
 				+ "(if autoExport is enabled then maybe the object doesn't implement any interface)");
 
 		// create an array of classnames (used for registering the service)
-		String[] names = ClassUtils.toStringArray(classes);
+		final String[] names = ClassUtils.toStringArray(classes);
 		// sort the names in alphabetical order (eases debugging)
 		Arrays.sort(names);
 
@@ -371,7 +375,18 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		if (isBeanBundleScoped())
 			serviceFactory = new OsgiBundleScope.BundleScopeServiceFactory(serviceFactory);
 
-		return bundleContext.registerService(names, serviceFactory, serviceProperties);
+		AccessControlContext acc = SecurityUtils.getAccFrom(beanFactory);
+
+		if (System.getSecurityManager() != null) {
+			final ServiceFactory serviceFactoryFinal = serviceFactory;
+			return AccessController.doPrivileged(new PrivilegedAction<ServiceRegistration>() {
+				public ServiceRegistration run() {
+					return bundleContext.registerService(names, serviceFactoryFinal, serviceProperties);
+				}
+			}, acc);
+		} else {
+			return bundleContext.registerService(names, serviceFactory, serviceProperties);
+		}
 	}
 
 	private boolean isBeanBundleScoped() {
