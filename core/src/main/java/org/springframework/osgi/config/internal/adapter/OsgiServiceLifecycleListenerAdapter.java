@@ -34,6 +34,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.SecurityContextProvider;
+import org.springframework.osgi.context.internal.security.SecurityUtils;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.internal.ReflectionUtils;
@@ -234,13 +235,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 		AccessControlContext acc = null;
 
 		if (isSecurityEnabled) {
-			if (beanFactory != null) {
-				if (beanFactory instanceof AbstractBeanFactory) {
-					SecurityContextProvider provider = ((AbstractBeanFactory) beanFactory).getSecurityContextProvider();
-					if (provider != null)
-						acc = provider.getAccessControlContext();
-				}
-			}
+			acc = SecurityUtils.getAccFrom(beanFactory);
 		}
 
 		// first call interface method (if it exists)
