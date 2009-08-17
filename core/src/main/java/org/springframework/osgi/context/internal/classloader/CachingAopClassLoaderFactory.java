@@ -17,15 +17,16 @@
 package org.springframework.osgi.context.internal.classloader;
 
 import java.lang.ref.WeakReference;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.springframework.aop.framework.ProxyFactory;
 
 /**
- * Default implementation for {@link InternalAopClassLoaderFactory}. Uses an
- * internal {@link WeakHashMap} to cache aop class loaders to prevent duplicated
- * copies.
+ * Default implementation for {@link InternalAopClassLoaderFactory}. Uses an internal {@link WeakHashMap} to cache aop
+ * class loaders to prevent duplicated copies.
  * 
  * @author Costin Leau
  */
@@ -36,8 +37,8 @@ class CachingAopClassLoaderFactory implements InternalAopClassLoaderFactory {
 	private final Class<?> cglibClass;
 
 	/** class loader -> aop class loader cache */
-	private final Map<ClassLoader, WeakReference<ChainedClassLoader>> cache = new WeakHashMap<ClassLoader, WeakReference<ChainedClassLoader>>();
-
+	private final Map<ClassLoader, WeakReference<ChainedClassLoader>> cache =
+			new WeakHashMap<ClassLoader, WeakReference<ChainedClassLoader>>();
 
 	CachingAopClassLoaderFactory() {
 		// load CGLIB through Spring-AOP
@@ -45,15 +46,15 @@ class CachingAopClassLoaderFactory implements InternalAopClassLoaderFactory {
 		Class<?> clazz = null;
 		try {
 			clazz = springAopClassLoader.loadClass(CGLIB_CLASS);
-		}
-		catch (ClassNotFoundException cnfe) {
+		} catch (ClassNotFoundException cnfe) {
 			// assume cglib is not present
 		}
 		cglibClass = clazz;
 	}
 
-	public ChainedClassLoader createClassLoader(ClassLoader classLoader) {
-		// search key (should be fast as the default classloader (BundleDelegatingClassLoader) has identity equality/hashcode)
+	public ChainedClassLoader createClassLoader(final ClassLoader classLoader) {
+		// search key (should be fast as the default classloader (BundleDelegatingClassLoader) has identity
+		// equality/hashcode)
 		synchronized (cache) {
 			ChainedClassLoader aopClassLoader = null;
 			WeakReference<ChainedClassLoader> loaderReference = cache.get(classLoader);
@@ -64,21 +65,31 @@ class CachingAopClassLoaderFactory implements InternalAopClassLoaderFactory {
 
 			// no associated class loader found, create one and put it in the cache
 			if (aopClassLoader == null) {
-				// use the given class loader, spring-aop, cglib (if available) and then spring-dm core class loader (for its infrastructure interfaces)
-				if (cglibClass != null) {
-					aopClassLoader = new ChainedClassLoader(new ClassLoader[] { classLoader,
-						ProxyFactory.class.getClassLoader(), cglibClass.getClassLoader(),
-						CachingAopClassLoaderFactory.class.getClassLoader() });
+				if (System.getSecurityManager() != null) {
+					aopClassLoader = AccessController.doPrivileged(new PrivilegedAction<ChainedClassLoader>() {
+						public ChainedClassLoader run() {
+							return doCreateClassLoader(classLoader);
+						}
+					});
+				} else {
+					aopClassLoader = doCreateClassLoader(classLoader);
 				}
-				else {
-					aopClassLoader = new ChainedClassLoader(new ClassLoader[] { classLoader,
-						ProxyFactory.class.getClassLoader(), CachingAopClassLoaderFactory.class.getClassLoader() });
-				}
-
 				// save the class loader as a weak reference (since it refers to the given class loader)
 				cache.put(classLoader, new WeakReference<ChainedClassLoader>(aopClassLoader));
 			}
 			return aopClassLoader;
+		}
+	}
+
+	private ChainedClassLoader doCreateClassLoader(ClassLoader classLoader) {
+		// use the given class loader, spring-aop, cglib (if available) and then spring-dm core class loader (for its
+		// infrastructure interfaces)
+		if (cglibClass != null) {
+			return new ChainedClassLoader(new ClassLoader[] { classLoader, ProxyFactory.class.getClassLoader(),
+					cglibClass.getClassLoader(), CachingAopClassLoaderFactory.class.getClassLoader() });
+		} else {
+			return new ChainedClassLoader(new ClassLoader[] { classLoader, ProxyFactory.class.getClassLoader(),
+					CachingAopClassLoaderFactory.class.getClassLoader() });
 		}
 	}
 }

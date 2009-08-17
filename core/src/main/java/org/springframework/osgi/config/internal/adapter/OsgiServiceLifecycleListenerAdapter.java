@@ -17,6 +17,11 @@
 package org.springframework.osgi.config.internal.adapter;
 
 import java.lang.reflect.Method;
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +32,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.support.AbstractBeanFactory;
+import org.springframework.beans.factory.support.SecurityContextProvider;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.internal.ReflectionUtils;
@@ -109,15 +116,22 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 
 		bindMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, bindMethod, isBlueprintCompliant);
 
-		if (StringUtils.hasText(bindMethod)) {
-			// determine methods using ServiceReference signature
-			bindReference =
-					org.springframework.util.ReflectionUtils.findMethod(clazz, bindMethod,
-							new Class[] { ServiceReference.class });
+		boolean isSecurityEnabled = System.getSecurityManager() != null;
+		final Class<?> clz = clazz;
 
-			if (bindReference != null) {
-				org.springframework.util.ReflectionUtils.makeAccessible(bindReference);
-			} else if (bindMethods.isEmpty()) {
+		// determine methods using ServiceReference signature
+		if (StringUtils.hasText(bindMethod)) {
+			if (isSecurityEnabled) {
+				bindReference = AccessController.doPrivileged(new PrivilegedAction<Method>() {
+					public Method run() {
+						return findServiceReferenceMethod(clz, bindMethod);
+					}
+				});
+			} else {
+				bindReference = findServiceReferenceMethod(clz, bindMethod);
+			}
+
+			if (bindMethods.isEmpty()) {
 				String beanName = (target == null ? "" : " bean [" + targetBeanName + "] ;");
 				throw new IllegalArgumentException("Custom bind method [" + bindMethod + "] not found on " + beanName
 						+ "class " + clazz);
@@ -127,13 +141,17 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 		unbindMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, unbindMethod, isBlueprintCompliant);
 
 		if (StringUtils.hasText(unbindMethod)) {
-			unbindReference =
-					org.springframework.util.ReflectionUtils.findMethod(clazz, unbindMethod,
-							new Class[] { ServiceReference.class });
+			if (isSecurityEnabled) {
+				unbindReference = AccessController.doPrivileged(new PrivilegedAction<Method>() {
+					public Method run() {
+						return findServiceReferenceMethod(clz, unbindMethod);
+					}
+				});
+			} else {
+				unbindReference = findServiceReferenceMethod(clz, unbindMethod);
+			}
 
-			if (unbindReference != null) {
-				org.springframework.util.ReflectionUtils.makeAccessible(unbindReference);
-			} else if (unbindMethods.isEmpty()) {
+			if (unbindMethods.isEmpty()) {
 				String beanName = (target == null ? "" : " bean [" + targetBeanName + "] ;");
 				throw new IllegalArgumentException("Custom unbind method [" + unbindMethod + "] not found on "
 						+ beanName + "class " + clazz);
@@ -160,6 +178,17 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 		}
 	}
 
+	private Method findServiceReferenceMethod(Class<?> clazz, String methodName) {
+		Method method =
+				org.springframework.util.ReflectionUtils.findMethod(clazz, bindMethod,
+						new Class[] { ServiceReference.class });
+		if (method != null) {
+			org.springframework.util.ReflectionUtils.makeAccessible(method);
+		}
+
+		return method;
+	}
+
 	/**
 	 * Invoke method with signature <code>bla(ServiceReference ref)</code>.
 	 * 
@@ -183,8 +212,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 				ReflectionUtils.invokeMethod(method, target, new Object[] { ref });
 			}
 			// make sure to log exceptions and continue with the
-			// rest of
-			// the listeners
+			// rest of the listeners
 			catch (Exception ex) {
 				Exception cause = ReflectionUtils.getInvocationException(ex);
 				log.warn("custom method [" + method + "] threw exception when passing service ["
@@ -193,7 +221,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 		}
 	}
 
-	public void bind(Object service, Map properties) throws Exception {
+	public void bind(final Object service, final Map properties) throws Exception {
 		boolean trace = log.isTraceEnabled();
 		if (trace)
 			log.trace("invoking bind method for service " + ObjectUtils.identityToString(service) + " with props="
@@ -202,20 +230,55 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 		if (!initialized)
 			retrieveTarget();
 
+		boolean isSecurityEnabled = (System.getSecurityManager() != null);
+		AccessControlContext acc = null;
+
+		if (isSecurityEnabled) {
+			if (beanFactory != null) {
+				if (beanFactory instanceof AbstractBeanFactory) {
+					SecurityContextProvider provider = ((AbstractBeanFactory) beanFactory).getSecurityContextProvider();
+					if (provider != null)
+						acc = provider.getAccessControlContext();
+				}
+			}
+		}
+
 		// first call interface method (if it exists)
 		if (isLifecycleListener) {
 			if (trace)
 				log.trace("invoking listener interface methods");
 
 			try {
-				((OsgiServiceLifecycleListener) target).bind(service, properties);
+				if (isSecurityEnabled) {
+					AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+						public Object run() throws Exception {
+							((OsgiServiceLifecycleListener) target).bind(service, properties);
+							return null;
+						}
+					}, acc);
+				} else {
+					((OsgiServiceLifecycleListener) target).bind(service, properties);
+				}
 			} catch (Exception ex) {
-				log.warn("standard bind method on [" + target.getClass().getName() + "] threw exception", ex);
+				if (ex instanceof PrivilegedActionException) {
+					ex = ((PrivilegedActionException) ex).getException();
+					log.warn("standard bind method on [" + target.getClass().getName() + "] threw exception", ex);
+				}
 			}
 		}
 
-		CustomListenerAdapterUtils.invokeCustomMethods(target, bindMethods, service, properties);
-		invokeCustomServiceReferenceMethod(target, bindReference, service);
+		if (isSecurityEnabled) {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
+				public Object run() {
+					CustomListenerAdapterUtils.invokeCustomMethods(target, bindMethods, service, properties);
+					invokeCustomServiceReferenceMethod(target, bindReference, service);
+					return null;
+				}
+			}, acc);
+		} else {
+			CustomListenerAdapterUtils.invokeCustomMethods(target, bindMethods, service, properties);
+			invokeCustomServiceReferenceMethod(target, bindReference, service);
+		}
 	}
 
 	public void unbind(Object service, Map properties) throws Exception {
