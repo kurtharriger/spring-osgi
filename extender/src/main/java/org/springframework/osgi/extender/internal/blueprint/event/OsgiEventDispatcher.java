@@ -192,7 +192,6 @@ class OsgiEventDispatcher implements EventDispatcher, BlueprintConstants {
 					}
 					sb.append("}");
 
-					System.out.println("Broadcasting OSGi event " + osgiEvent + " w/ props " + sb.toString());
 					log.trace("Broadcasting OSGi event " + osgiEvent + " w/ props " + sb.toString());
 				}
 				publisher.publish(eventAdmin, osgiEvent);
