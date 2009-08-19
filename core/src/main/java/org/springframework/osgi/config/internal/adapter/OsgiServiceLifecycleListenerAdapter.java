@@ -225,7 +225,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 	public void bind(final Object service, final Map properties) throws Exception {
 		boolean trace = log.isTraceEnabled();
 		if (trace)
-			log.trace("invoking bind method for service " + ObjectUtils.identityToString(service) + " with props="
+			log.trace("Invoking bind method for service " + ObjectUtils.identityToString(service) + " with props="
 					+ properties);
 
 		if (!initialized)
@@ -241,7 +241,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 		// first call interface method (if it exists)
 		if (isLifecycleListener) {
 			if (trace)
-				log.trace("invoking listener interface methods");
+				log.trace("Invoking listener interface methods");
 
 			try {
 				if (isSecurityEnabled) {
@@ -257,8 +257,8 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 			} catch (Exception ex) {
 				if (ex instanceof PrivilegedActionException) {
 					ex = ((PrivilegedActionException) ex).getException();
-					log.warn("standard bind method on [" + target.getClass().getName() + "] threw exception", ex);
 				}
+				log.warn("standard bind method on [" + target.getClass().getName() + "] threw exception", ex);
 			}
 		}
 
@@ -276,28 +276,54 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 		}
 	}
 
-	public void unbind(Object service, Map properties) throws Exception {
+	public void unbind(final Object service, final Map properties) throws Exception {
 		boolean trace = log.isTraceEnabled();
 		if (!initialized)
 			retrieveTarget();
 
 		if (trace)
-			log.trace("invoking unbind method for service " + ObjectUtils.identityToString(service) + " with props="
+			log.trace("Invoking unbind method for service " + ObjectUtils.identityToString(service) + " with props="
 					+ properties);
+
+		boolean isSecurityEnabled = (System.getSecurityManager() != null);
+		AccessControlContext acc = null;
+
+		if (isSecurityEnabled) {
+			acc = SecurityUtils.getAccFrom(beanFactory);
+		}
 
 		// first call interface method (if it exists)
 		if (isLifecycleListener) {
 			if (trace)
-				log.trace("invoking listener interface methods");
+				log.trace("Invoking listener interface methods");
 			try {
-				((OsgiServiceLifecycleListener) target).unbind(service, properties);
+				if (isSecurityEnabled) {
+					AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+						public Object run() throws Exception {
+							((OsgiServiceLifecycleListener) target).unbind(service, properties);
+							return null;
+						}
+					}, acc);
+				} else {
+					((OsgiServiceLifecycleListener) target).unbind(service, properties);
+				}
 			} catch (Exception ex) {
 				log.warn("Standard unbind method on [" + target.getClass().getName() + "] threw exception", ex);
 			}
 		}
 
-		CustomListenerAdapterUtils.invokeCustomMethods(target, unbindMethods, service, properties);
-		invokeCustomServiceReferenceMethod(target, unbindReference, service);
+		if (isSecurityEnabled) {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
+				public Object run() {
+					CustomListenerAdapterUtils.invokeCustomMethods(target, unbindMethods, service, properties);
+					invokeCustomServiceReferenceMethod(target, unbindReference, service);
+					return null;
+				}
+			}, acc);
+		} else {
+			CustomListenerAdapterUtils.invokeCustomMethods(target, unbindMethods, service, properties);
+			invokeCustomServiceReferenceMethod(target, unbindReference, service);
+		}
 	}
 
 	/**

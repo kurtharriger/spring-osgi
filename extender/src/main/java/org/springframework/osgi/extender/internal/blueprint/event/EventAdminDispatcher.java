@@ -16,6 +16,9 @@
 
 package org.springframework.osgi.extender.internal.blueprint.event;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
@@ -77,70 +80,133 @@ public class EventAdminDispatcher {
 		}
 	}
 
-	public void beforeClose(BlueprintEvent event) {
+	public void beforeClose(final BlueprintEvent event) {
 		if (dispatcher != null) {
 			try {
-				dispatcher.beforeClose(event);
+				if (System.getSecurityManager() != null) {
+					AccessController.doPrivileged(new PrivilegedAction<Object>() {
+						public Object run() {
+							dispatcher.beforeClose(event);
+							return null;
+						}
+					});
+				} else {
+					dispatcher.beforeClose(event);
+				}
 			} catch (Throwable th) {
 				log.warn("Cannot dispatch event " + event, th);
 			}
 		}
 	}
 
-	public void beforeRefresh(BlueprintEvent event) {
+	public void beforeRefresh(final BlueprintEvent event) {
 		if (dispatcher != null) {
 			try {
-				dispatcher.beforeRefresh(event);
+				if (System.getSecurityManager() != null) {
+					AccessController.doPrivileged(new PrivilegedAction<Object>() {
+						public Object run() {
+							dispatcher.beforeRefresh(event);
+							return null;
+						}
+					});
+				} else {
+					dispatcher.beforeRefresh(event);
+				}
 			} catch (Throwable th) {
 				log.warn("Cannot dispatch event " + event, th);
 			}
 		}
 	}
 
-	public void afterClose(BlueprintEvent event) {
+	public void afterClose(final BlueprintEvent event) {
 		if (dispatcher != null) {
 			try {
-				dispatcher.afterClose(event);
+				if (System.getSecurityManager() != null) {
+					AccessController.doPrivileged(new PrivilegedAction<Object>() {
+						public Object run() {
+							dispatcher.afterClose(event);
+							return null;
+						}
+					});
+				} else {
+					dispatcher.afterClose(event);
+				}
 			} catch (Throwable th) {
 				log.warn("Cannot dispatch event " + event, th);
 			}
 		}
 	}
 
-	public void afterRefresh(BlueprintEvent event) {
+	public void afterRefresh(final BlueprintEvent event) {
 		if (dispatcher != null) {
 			try {
-				dispatcher.afterRefresh(event);
+				if (System.getSecurityManager() != null) {
+					AccessController.doPrivileged(new PrivilegedAction<Object>() {
+						public Object run() {
+							dispatcher.afterRefresh(event);
+							return null;
+						}
+					});
+				} else {
+					dispatcher.afterRefresh(event);
+				}
 			} catch (Throwable th) {
 				log.warn("Cannot dispatch event " + event, th);
 			}
 		}
 	}
 
-	public void refreshFailure(BlueprintEvent event) {
+	public void refreshFailure(final BlueprintEvent event) {
 		if (dispatcher != null) {
 			try {
-				dispatcher.refreshFailure(event);
+				if (System.getSecurityManager() != null) {
+					AccessController.doPrivileged(new PrivilegedAction<Object>() {
+						public Object run() {
+							dispatcher.refreshFailure(event);
+							return null;
+						}
+					});
+				} else {
+					dispatcher.refreshFailure(event);
+				}
 			} catch (Throwable th) {
 				log.warn("Cannot dispatch event " + event, th);
 			}
 		}
 	}
 
-	public void grace(BlueprintEvent event) {
+	public void grace(final BlueprintEvent event) {
 		if (dispatcher != null) {
 			try {
-				dispatcher.grace(event);
+				if (System.getSecurityManager() != null) {
+					AccessController.doPrivileged(new PrivilegedAction<Object>() {
+						public Object run() {
+							dispatcher.grace(event);
+							return null;
+						}
+					});
+				} else {
+					dispatcher.grace(event);
+				}
 			} catch (Throwable th) {
 				log.warn("Cannot dispatch event " + event, th);
 			}
 		}
 	}
 
-	public void waiting(BlueprintEvent event) {
+	public void waiting(final BlueprintEvent event) {
 		if (dispatcher != null) {
 			try {
-				dispatcher.waiting(event);
+				if (System.getSecurityManager() != null) {
+					AccessController.doPrivileged(new PrivilegedAction<Object>() {
+						public Object run() {
+							dispatcher.waiting(event);
+							return null;
+						}
+					});
+				} else {
+					dispatcher.waiting(event);
+				}
 			} catch (Throwable th) {
 				log.warn("Cannot dispatch event " + event, th);
 			}

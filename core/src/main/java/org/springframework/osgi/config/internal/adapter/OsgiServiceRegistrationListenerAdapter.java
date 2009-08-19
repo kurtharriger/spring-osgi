@@ -17,6 +17,11 @@
 package org.springframework.osgi.config.internal.adapter;
 
 import java.lang.reflect.Method;
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +31,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
+import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -114,7 +120,7 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 		}
 	}
 
-	public void registered(Object service, Map serviceProperties) {
+	public void registered(final Object service, final Map serviceProperties) {
 		boolean trace = log.isTraceEnabled();
 
 		if (trace)
@@ -123,22 +129,47 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 		if (!initialized)
 			retrieveTarget();
 
+		boolean isSecurityEnabled = System.getSecurityManager() != null;
+		AccessControlContext acc = null;
+
 		// first call interface method (if it exists)
 		if (isListener) {
 			if (trace)
 				log.trace("Invoking listener interface methods");
 
 			try {
-				((OsgiServiceRegistrationListener) target).registered(service, serviceProperties);
+				if (isSecurityEnabled) {
+					AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+						public Object run() throws Exception {
+							((OsgiServiceRegistrationListener) target).registered(service, serviceProperties);
+							return null;
+						}
+					}, acc);
+				} else {
+					((OsgiServiceRegistrationListener) target).registered(service, serviceProperties);
+				}
 			} catch (Exception ex) {
+				if (ex instanceof PrivilegedActionException) {
+					ex = ((PrivilegedActionException) ex).getException();
+				}
 				log.warn("Standard registered method on [" + target.getClass().getName() + "] threw exception", ex);
 			}
 		}
 
-		CustomListenerAdapterUtils.invokeCustomMethods(target, registrationMethods, service, serviceProperties);
+		if (isSecurityEnabled) {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
+				public Object run() {
+					CustomListenerAdapterUtils.invokeCustomMethods(target, registrationMethods, service,
+							serviceProperties);
+					return null;
+				}
+			}, acc);
+		} else {
+			CustomListenerAdapterUtils.invokeCustomMethods(target, registrationMethods, service, serviceProperties);
+		}
 	}
 
-	public void unregistered(Object service, Map serviceProperties) {
+	public void unregistered(final Object service, final Map serviceProperties) {
 
 		boolean trace = log.isTraceEnabled();
 
@@ -148,18 +179,41 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 		if (!initialized)
 			retrieveTarget();
 
+		boolean isSecurityEnabled = System.getSecurityManager() != null;
+		AccessControlContext acc = null;
+
 		// first call interface method (if it exists)
 		if (isListener) {
 			if (trace)
 				log.trace("Invoking listener interface methods");
 
 			try {
-				((OsgiServiceRegistrationListener) target).unregistered(service, serviceProperties);
+				if (isSecurityEnabled) {
+					AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+						public Object run() throws Exception {
+							((OsgiServiceRegistrationListener) target).unregistered(service, serviceProperties);
+							return null;
+						}
+					}, acc);
+				} else {
+					((OsgiServiceRegistrationListener) target).unregistered(service, serviceProperties);
+				}
 			} catch (Exception ex) {
 				log.warn("Standard unregistered method on [" + target.getClass().getName() + "] threw exception", ex);
 			}
 		}
-		CustomListenerAdapterUtils.invokeCustomMethods(target, unregistrationMethods, service, serviceProperties);
+
+		if (isSecurityEnabled) {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
+				public Object run() {
+					CustomListenerAdapterUtils.invokeCustomMethods(target, unregistrationMethods, service,
+							serviceProperties);
+					return null;
+				}
+			}, acc);
+		} else {
+			CustomListenerAdapterUtils.invokeCustomMethods(target, unregistrationMethods, service, serviceProperties);
+		}
 	}
 
 	/**
