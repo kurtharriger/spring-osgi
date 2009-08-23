@@ -1,7 +1,10 @@
 package org.springframework.osgi.extender.internal.dependencies.startup;
 
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -21,6 +24,7 @@ import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
+import org.springframework.osgi.context.internal.security.SecurityUtils;
 import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
 import org.springframework.osgi.extender.event.BootstrappingDependenciesEvent;
 import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
@@ -237,10 +241,17 @@ public class DependencyServiceManager {
 	protected void findServiceDependencies() throws Exception {
 		try {
 			if (System.getSecurityManager() != null) {
+				final AccessControlContext acc = SecurityUtils.getAccFrom(context);
+
 				PrivilegedUtils.executeWithCustomTCCL(context.getClassLoader(),
 						new PrivilegedUtils.UnprivilegedThrowableExecution<Object>() {
 							public Object run() throws Throwable {
-								doFindDependencies();
+								AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+									public Object run() throws Exception {
+										doFindDependencies();
+										return null;
+									}
+								}, acc);
 								return null;
 							}
 						});
@@ -331,7 +342,7 @@ public class DependencyServiceManager {
 	}
 
 	protected void register() {
-		String filter = createDependencyFilter();
+		final String filter = createDependencyFilter();
 		if (log.isDebugEnabled()) {
 			log.debug(context.getDisplayName() + " has registered service dependency dependencyDetector with filter: "
 					+ filter);
@@ -339,7 +350,18 @@ public class DependencyServiceManager {
 
 		// send dependency event before registering the filter
 		sendInitialBootstrappingEvents(unsatisfiedDependencies.keySet());
-		OsgiListenerUtils.addServiceListener(bundleContext, listener, filter);
+
+		if (System.getSecurityManager() != null) {
+			AccessControlContext acc = SecurityUtils.getAccFrom(context);
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
+				public Object run() {
+					OsgiListenerUtils.addServiceListener(bundleContext, listener, filter);
+					return null;
+				}
+			}, acc);
+		} else {
+			OsgiListenerUtils.addServiceListener(bundleContext, listener, filter);
+		}
 	}
 
 	/**

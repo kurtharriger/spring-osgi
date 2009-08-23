@@ -30,8 +30,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.osgi.context.internal.security.SecurityUtils;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
-import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -131,6 +131,9 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 
 		boolean isSecurityEnabled = System.getSecurityManager() != null;
 		AccessControlContext acc = null;
+		if (isSecurityEnabled) {
+			acc = SecurityUtils.getAccFrom(beanFactory);
+		}
 
 		// first call interface method (if it exists)
 		if (isListener) {
@@ -181,6 +184,10 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 
 		boolean isSecurityEnabled = System.getSecurityManager() != null;
 		AccessControlContext acc = null;
+
+		if (isSecurityEnabled) {
+			acc = SecurityUtils.getAccFrom(beanFactory);
+		}
 
 		// first call interface method (if it exists)
 		if (isListener) {
