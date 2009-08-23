@@ -16,13 +16,20 @@
 
 package org.springframework.osgi.extender.internal.dependencies.startup;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
+import org.springframework.osgi.service.importer.DefaultOsgiServiceDependency;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Holder/helper class representing an OSGi service dependency
@@ -32,81 +39,66 @@ import org.springframework.osgi.util.OsgiServiceReferenceUtils;
  * @author Andy Piper
  */
 class MandatoryServiceDependency implements OsgiServiceDependency {
-
-	protected final Filter filter;
-
-	protected final String filterAsString;
-
-	protected final boolean isMandatory;
+	// match the class inside object class (and use a non backing reference group)
+	private static final Pattern PATTERN = Pattern.compile("objectClass=(?:[^\\)]+)");
 
 	protected final BundleContext bundleContext;
 
-	private final String beanName;
-
 	private OsgiServiceDependency serviceDependency;
-
 	private final AtomicInteger matchingServices = new AtomicInteger(0);
+	protected final String filterAsString;
+	private final String[] classes;
 
 	MandatoryServiceDependency(BundleContext bc, Filter serviceFilter, boolean isMandatory, String beanName) {
-		filter = serviceFilter;
-		this.filterAsString = filter.toString();
-		this.isMandatory = isMandatory;
-		bundleContext = bc;
-		this.beanName = beanName;
-		serviceDependency = new OsgiServiceDependency() {
-
-			public String getBeanName() {
-				return MandatoryServiceDependency.this.beanName;
-			}
-
-			public Filter getServiceFilter() {
-				return MandatoryServiceDependency.this.filter;
-			}
-
-			public boolean isMandatory() {
-				return MandatoryServiceDependency.this.isMandatory;
-			}
-
-		};
+		this(bc, new DefaultOsgiServiceDependency(beanName, serviceFilter, isMandatory));
 	}
 
 	MandatoryServiceDependency(BundleContext bc, OsgiServiceDependency dependency) {
-		this(bc, dependency.getServiceFilter(), dependency.isMandatory(), dependency.getBeanName());
+		bundleContext = bc;
+		serviceDependency = dependency;
+		this.filterAsString = dependency.getServiceFilter().toString();
+		this.classes = extractObjectClassFromFilter(filterAsString);
 	}
 
 	boolean matches(ServiceEvent event) {
-		return filter.match(event.getServiceReference());
+		return serviceDependency.getServiceFilter().match(event.getServiceReference());
 	}
 
-	/**
-	 * @return
-	 */
 	boolean isServicePresent() {
-		return (!isMandatory || OsgiServiceReferenceUtils.isServicePresent(bundleContext, filterAsString));
+		if (serviceDependency.isMandatory()) {
+			// check the service presence but use the classes (if discovered) to
+			// trigger security checks (if the sm is enabled)
+			if (!ObjectUtils.isEmpty(classes) && System.getSecurityManager() != null) {
+				try {
+					for (String className : classes) {
+						if (ObjectUtils.isEmpty(bundleContext.getServiceReferences(className, filterAsString))) {
+							return false;
+						}
+					}
+					return true;
+				} catch (InvalidSyntaxException ise) {
+				}
+			} else {
+				return OsgiServiceReferenceUtils.isServicePresent(bundleContext, filterAsString);
+			}
+		}
+		return true;
 	}
 
 	public String toString() {
-		return "Dependency on [" + filterAsString + "] (from bean [" + beanName + "])";
+		return "Dependency on [" + filterAsString + "] (from bean [" + serviceDependency.getBeanName() + "])";
 	}
 
-	/**
-	 * @return Returns the filter.
-	 */
 	public Filter getServiceFilter() {
-		return filter;
+		return serviceDependency.getServiceFilter();
 	}
 
-	/**
-	 * Returns the beanName.
-	 * 
-	 * @return Returns the beanName
-	 */
 	public String getBeanName() {
-		return beanName;
+		return serviceDependency.getBeanName();
 	}
 
 	public boolean isMandatory() {
-		return isMandatory;
+		return serviceDependency.isMandatory();
 	}
 
 	public boolean equals(Object o) {
@@ -117,18 +109,12 @@ class MandatoryServiceDependency implements OsgiServiceDependency {
 
 		final MandatoryServiceDependency that = (MandatoryServiceDependency) o;
 
-		if (isMandatory != that.isMandatory)
-			return false;
-		if (filterAsString != null ? !filterAsString.equals(that.filterAsString) : that.filterAsString != null)
-			return false;
-
-		return true;
+		return (serviceDependency.equals(that.serviceDependency));
 	}
 
 	public int hashCode() {
-		int result;
-		result = (filterAsString != null ? filterAsString.hashCode() : 0);
-		result = 29 * result + (isMandatory ? 1 : 0);
+		int result = MandatoryServiceDependency.class.hashCode();
+		result = 29 * result + serviceDependency.hashCode();
 		return result;
 	}
 
@@ -152,5 +138,19 @@ class MandatoryServiceDependency implements OsgiServiceDependency {
 	 */
 	int decrement() {
 		return matchingServices.decrementAndGet();
+	}
+
+	private static String[] extractObjectClassFromFilter(String filterString) {
+		List<String> matches = null;
+		Matcher matcher = PATTERN.matcher(filterString);
+		while (matcher.find()) {
+			if (matches == null) {
+				matches = new ArrayList<String>(4);
+			}
+
+			matches.add(matcher.group());
+		}
+
+		return (matches == null ? new String[0] : matches.toArray(new String[matches.size()]));
 	}
 }

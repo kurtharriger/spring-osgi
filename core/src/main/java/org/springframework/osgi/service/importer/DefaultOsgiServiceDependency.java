@@ -17,7 +17,6 @@
 package org.springframework.osgi.service.importer;
 
 import org.osgi.framework.Filter;
-import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**

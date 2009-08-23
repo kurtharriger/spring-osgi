@@ -134,7 +134,11 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			}
 
 			// Continue with the refresh process...
-			delegateContext.completeRefresh();
+			try {
+				delegateContext.completeRefresh();
+			} catch (Throwable th) {
+				fail(th, true);
+			}
 
 			// Once we are done, tell the world
 			synchronized (monitor) {
@@ -421,13 +425,17 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 		final StringBuilder message = new StringBuilder();
 		message.append("Unable to create application context for [");
-		AccessController.doPrivileged(new PrivilegedAction<Object>() {
+		if (System.getSecurityManager() != null) {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
+				public Object run() {
+					message.append(OsgiStringUtils.nullSafeSymbolicName(getBundle()));
+					return null;
+				}
+			});
+		} else {
+			message.append(OsgiStringUtils.nullSafeSymbolicName(getBundle()));
+		}
 
-			public Object run() {
-				message.append(OsgiStringUtils.nullSafeSymbolicName(getBundle()));
-				return null;
-			}
-		});
 		message.append("], unsatisfied dependencies: ");
 		message.append(buf.toString());
 
@@ -463,14 +471,21 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 		log.warn("Timeout occurred before finding service dependencies for [" + delegateContext.getDisplayName() + "]");
 
+		String bundleName = null;
+		if (System.getSecurityManager() != null) {
+			bundleName = AccessController.doPrivileged(new PrivilegedAction<String>() {
+				public String run() {
+					return OsgiStringUtils.nullSafeSymbolicName(getBundle());
+				}
+			});
+		} else {
+			bundleName = OsgiStringUtils.nullSafeSymbolicName(getBundle());
+		}
+
 		// generate exception
 		e =
-				new ApplicationContextException("Application context initialization for '"
-						+ AccessController.doPrivileged(new PrivilegedAction<String>() {
-							public String run() {
-								return OsgiStringUtils.nullSafeSymbolicName(getBundle());
-							}
-						}) + "' has timed out waiting for " + filterAsString);
+				new ApplicationContextException("Application context " + "initialization for '" + bundleName
+						+ "' has timed out waiting for " + filterAsString);
 		e.fillInStackTrace();
 
 		// send notification

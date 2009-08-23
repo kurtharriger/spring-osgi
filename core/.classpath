@@ -22,7 +22,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.test/3.0.0.BUILD-SNAPSHOT/org.springframework.test-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="M2_REPO/org/springframework/org.springframework.test/3.0.0.BUILD-SNAPSHOT/org.springframework.test-3.0.0.BUILD-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
-	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.0.v20090513/org.eclipse.osgi-3.5.0.v20090513.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.0.v20090513/org.eclipse.osgi-3.5.0.v20090513.jar" sourcepath="/M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.0.v20090513/org.eclipse.osgi.source_3.5.0.v20090520.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.asm/3.0.0.BUILD-SNAPSHOT/org.springframework.asm-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="M2_REPO/org/springframework/org.springframework.asm/3.0.0.BUILD-SNAPSHOT/org.springframework.asm-3.0.0.BUILD-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.expression/3.0.0.BUILD-SNAPSHOT/org.springframework.expression-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="M2_REPO/org/springframework/org.springframework.expression/3.0.0.BUILD-SNAPSHOT/org.springframework.expression-3.0.0.BUILD-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/antlr/com.springsource.org.antlr/3.0.1/com.springsource.org.antlr-3.0.1.jar"/>
