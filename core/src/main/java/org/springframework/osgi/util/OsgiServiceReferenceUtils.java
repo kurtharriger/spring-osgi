@@ -16,17 +16,10 @@
 
 package org.springframework.osgi.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,7 +48,6 @@ import org.springframework.util.ObjectUtils;
 public abstract class OsgiServiceReferenceUtils {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceReferenceUtils.class);
-	private static final Pattern PATTERN = Pattern.compile("objectClass=(?:[^\\)]+)");
 
 	/**
 	 * Returns a reference to the <em>best matching</em> service for the given class names.
@@ -163,30 +155,6 @@ public abstract class OsgiServiceReferenceUtils {
 
 		try {
 			ServiceReference[] refs = bundleContext.getServiceReferences(clazz, filter);
-
-			// when running with a security manager
-			// do additional filtering to returning references
-			// unaccessible to the given bundle context
-			if (!ObjectUtils.isEmpty(refs)) {
-				boolean hasSM = (System.getSecurityManager() != null);
-				if (hasSM) {
-					String[] names = extractObjectClassFromFilter(filter);
-					Set<ServiceReference> filteredReferences = new LinkedHashSet<ServiceReference>(refs.length);
-					for (String className : names) {
-						ServiceReference[] filteredRef = bundleContext.getServiceReferences(className, filter);
-						if (ObjectUtils.isEmpty(filteredRef)) {
-							return new ServiceReference[0];
-						}
-						Set<ServiceReference> filtered = new LinkedHashSet<ServiceReference>(filteredRef.length);
-						Collections.addAll(filtered, filteredRef);
-						filteredReferences.retainAll(filtered);
-						if (filteredReferences.isEmpty()) {
-							return new ServiceReference[0];
-						}
-					}
-				}
-			}
-
 			return (refs == null ? new ServiceReference[0] : refs);
 		} catch (InvalidSyntaxException ise) {
 			throw (RuntimeException) new IllegalArgumentException("invalid filter: " + ise.getFilter()).initCause(ise);
@@ -336,19 +304,5 @@ public abstract class OsgiServiceReferenceUtils {
 	 */
 	public static boolean isServicePresent(BundleContext bundleContext, String filter) {
 		return !ObjectUtils.isEmpty(getServiceReferences(bundleContext, filter));
-	}
-
-	private static String[] extractObjectClassFromFilter(String filterString) {
-		List<String> matches = null;
-		Matcher matcher = PATTERN.matcher(filterString);
-		while (matcher.find()) {
-			if (matches == null) {
-				matches = new ArrayList<String>(matcher.groupCount());
-			}
-
-			matches.add(matcher.group());
-		}
-
-		return (matches == null ? new String[0] : matches.toArray(new String[matches.size()]));
 	}
 }

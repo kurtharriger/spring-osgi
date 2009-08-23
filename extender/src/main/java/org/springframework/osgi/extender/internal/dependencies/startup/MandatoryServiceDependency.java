@@ -65,24 +65,8 @@ class MandatoryServiceDependency implements OsgiServiceDependency {
 	}
 
 	boolean isServicePresent() {
-		if (serviceDependency.isMandatory()) {
-			// check the service presence but use the classes (if discovered) to
-			// trigger security checks (if the sm is enabled)
-			if (!ObjectUtils.isEmpty(classes) && System.getSecurityManager() != null) {
-				try {
-					for (String className : classes) {
-						if (ObjectUtils.isEmpty(bundleContext.getServiceReferences(className, filterAsString))) {
-							return false;
-						}
-					}
-					return true;
-				} catch (InvalidSyntaxException ise) {
-				}
-			} else {
-				return OsgiServiceReferenceUtils.isServicePresent(bundleContext, filterAsString);
-			}
-		}
-		return true;
+		return (!serviceDependency.isMandatory() || OsgiServiceReferenceUtils.isServicePresent(bundleContext,
+				filterAsString));
 	}
 
 	public String toString() {
