@@ -50,21 +50,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * OSGi-specific application context that delegates the execution of its life
- * cycle methods to a different class. The main reason behind this is to
- * <em>break</em> the startup of the application context in steps that can be
- * executed asynchronously.
- * <p/>
- * <p/>
- * <p/>
- * The {@link #refresh()} and {@link #close()} methods delegate their execution
- * to an {@link OsgiBundleApplicationContextExecutor} class that chooses how to
- * call the lifecycle methods.
- * <p/>
- * <p/>
- * <p/>
- * One can still call the 'traditional' lifecycle methods through
- * {@link #normalRefresh()} and {@link #normalClose()}.
+ * OSGi-specific application context that delegates the execution of its life cycle methods to a different class. The
+ * main reason behind this is to <em>break</em> the startup of the application context in steps that can be executed
+ * asynchronously. <p/> <p/> <p/> The {@link #refresh()} and {@link #close()} methods delegate their execution to an
+ * {@link OsgiBundleApplicationContextExecutor} class that chooses how to call the lifecycle methods. <p/> <p/> <p/> One
+ * can still call the 'traditional' lifecycle methods through {@link #normalRefresh()} and {@link #normalClose()}.
  * 
  * @author Costin Leau
  * @see DelegatedExecutionOsgiBundleApplicationContext
@@ -73,16 +63,14 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		implements DelegatedExecutionOsgiBundleApplicationContext {
 
 	/**
-	 * Executor that offers the traditional way of <code>refreshing</code>/
-	 * <code>closing</code> of an ApplicationContext (no conditions have to be
-	 * met and the refresh happens in only one step).
+	 * Executor that offers the traditional way of <code>refreshing</code>/ <code>closing</code> of an
+	 * ApplicationContext (no conditions have to be met and the refresh happens in only one step).
 	 * 
 	 * @author Costin Leau
 	 */
 	private static class NoDependenciesWaitRefreshExecutor implements OsgiBundleApplicationContextExecutor {
 
 		private final DelegatedExecutionOsgiBundleApplicationContext context;
-
 
 		private NoDependenciesWaitRefreshExecutor(DelegatedExecutionOsgiBundleApplicationContext ctx) {
 			context = ctx;
@@ -98,16 +86,14 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	}
 
 	/**
-	 * BeanPostProcessor that logs an info message when a bean is created during
-	 * BeanPostProcessor instantiation, i.e. when a bean is not eligible for
-	 * getting processed by all BeanPostProcessors.
+	 * BeanPostProcessor that logs an info message when a bean is created during BeanPostProcessor instantiation, i.e.
+	 * when a bean is not eligible for getting processed by all BeanPostProcessors.
 	 */
 	private class BeanPostProcessorChecker implements BeanPostProcessor {
 
 		private final ConfigurableListableBeanFactory beanFactory;
 
 		private final int beanPostProcessorTargetCount;
-
 
 		public BeanPostProcessorChecker(ConfigurableListableBeanFactory beanFactory, int beanPostProcessorTargetCount) {
 			this.beanFactory = beanFactory;
@@ -130,7 +116,6 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		}
 	}
 
-
 	/**
 	 * Default executor
 	 */
@@ -148,18 +133,15 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 	private ContextClassLoaderProvider cclProvider;
 
-
 	/**
-	 * Constructs a new
-	 * <code>AbstractDelegatedExecutionApplicationContext</code> instance.
+	 * Constructs a new <code>AbstractDelegatedExecutionApplicationContext</code> instance.
 	 */
 	public AbstractDelegatedExecutionApplicationContext() {
 		super();
 	}
 
 	/**
-	 * Constructs a new
-	 * <code>AbstractDelegatedExecutionApplicationContext</code> instance.
+	 * Constructs a new <code>AbstractDelegatedExecutionApplicationContext</code> instance.
 	 * 
 	 * @param parent parent application context
 	 */
@@ -168,14 +150,9 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	}
 
 	/**
-	 * Delegate execution of refresh method to a third party. This allows
-	 * breaking the refresh process into several small pieces providing
-	 * continuation-like behaviour or completion of the refresh method on several
-	 * threads, in a asynch manner.
-	 * <p/>
-	 * By default, the refresh method in executed in <em>one go</em> (normal
-	 * behaviour).
-	 * <p/>
+	 * Delegate execution of refresh method to a third party. This allows breaking the refresh process into several
+	 * small pieces providing continuation-like behaviour or completion of the refresh method on several threads, in a
+	 * asynch manner. <p/> By default, the refresh method in executed in <em>one go</em> (normal behaviour). <p/>
 	 * {@inheritDoc}
 	 */
 	public void refresh() throws BeansException, IllegalStateException {
@@ -187,16 +164,15 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 		try {
 			PrivilegedUtils.executeWithCustomTCCL(contextClassLoaderProvider().getContextClassLoader(),
-				new PrivilegedUtils.UnprivilegedExecution() {
+					new PrivilegedUtils.UnprivilegedExecution() {
 
-					public Object run() {
-						AbstractDelegatedExecutionApplicationContext.super.refresh();
-						sendRefreshedEvent();
-						return null;
-					}
-				});
-		}
-		catch (Throwable th) {
+						public Object run() {
+							AbstractDelegatedExecutionApplicationContext.super.refresh();
+							sendRefreshedEvent();
+							return null;
+						}
+					});
+		} catch (Throwable th) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Refresh error", th);
 			}
@@ -205,8 +181,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 			// rethrow the problem w/o rewrapping
 			if (th instanceof RuntimeException) {
 				throw (RuntimeException) th;
-			}
-			else {
+			} else {
 				throw (Error) th;
 			}
 		}
@@ -215,23 +190,21 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	public void normalClose() {
 		try {
 			PrivilegedUtils.executeWithCustomTCCL(contextClassLoaderProvider().getContextClassLoader(),
-				new PrivilegedUtils.UnprivilegedExecution() {
+					new PrivilegedUtils.UnprivilegedExecution() {
 
-					public Object run() {
-						AbstractDelegatedExecutionApplicationContext.super.doClose();
-						sendClosedEvent();
-						return null;
-					}
-				});
-		}
-		catch (Throwable th) {
+						public Object run() {
+							AbstractDelegatedExecutionApplicationContext.super.doClose();
+							sendClosedEvent();
+							return null;
+						}
+					});
+		} catch (Throwable th) {
 			// send failure event
 			sendClosedEvent(th);
 			// rethrow the problem w/o rewrapping
 			if (th instanceof RuntimeException) {
 				throw (RuntimeException) th;
-			}
-			else {
+			} else {
 				throw (Error) th;
 			}
 		}
@@ -247,62 +220,59 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 		try {
 			PrivilegedUtils.executeWithCustomTCCL(contextClassLoaderProvider().getContextClassLoader(),
-				new PrivilegedUtils.UnprivilegedExecution() {
+					new PrivilegedUtils.UnprivilegedExecution<Object>() {
 
-					public Object run() {
+						public Object run() {
+							synchronized (startupShutdownMonitor) {
 
-						synchronized (startupShutdownMonitor) {
+								if (ObjectUtils.isEmpty(getConfigLocations())) {
+									setConfigLocations(getDefaultConfigLocations());
+								}
+								if (!OsgiBundleUtils.isBundleActive(getBundle())
+										&& !OsgiBundleUtils.isBundleLazyActivated(getBundle())) {
+									throw new ApplicationContextException(
+											"Unable to refresh application context: bundle is neither active nor lazy-activated but "
+													+ OsgiStringUtils.bundleStateAsString(getBundle()));
+								}
 
-							if (ObjectUtils.isEmpty(getConfigLocations())) {
-								setConfigLocations(getDefaultConfigLocations());
-							}
-							if (!OsgiBundleUtils.isBundleActive(getBundle())
-									&& !OsgiBundleUtils.isBundleLazyActivated(getBundle())) {
-								throw new ApplicationContextException(
-									"Unable to refresh application context: bundle is neither active nor lazy-activated but "
-											+ OsgiStringUtils.bundleStateAsString(getBundle()));
-							}
+								ConfigurableListableBeanFactory beanFactory = null;
+								// Prepare this context for refreshing.
+								prepareRefresh();
 
-							ConfigurableListableBeanFactory beanFactory = null;
-							// Prepare this context for refreshing.
-							prepareRefresh();
+								// Tell the subclass to refresh the internal bean
+								// factory.
+								beanFactory = obtainFreshBeanFactory();
 
-							// Tell the subclass to refresh the internal bean
-							// factory.
-							beanFactory = obtainFreshBeanFactory();
+								// Prepare the bean factory for use in this context.
+								prepareBeanFactory(beanFactory);
 
-							// Prepare the bean factory for use in this context.
-							prepareBeanFactory(beanFactory);
+								try {
+									// Allows post-processing of the bean factory in
+									// context subclasses.
+									postProcessBeanFactory(beanFactory);
 
-							try {
-								// Allows post-processing of the bean factory in
-								// context subclasses.
-								postProcessBeanFactory(beanFactory);
+									// Invoke factory processors registered as beans
+									// in the context.
+									invokeBeanFactoryPostProcessors(beanFactory);
 
-								// Invoke factory processors registered as beans
-								// in the context.
-								invokeBeanFactoryPostProcessors(beanFactory);
+									// Register bean processors that intercept bean
+									// creation.
+									registerBeanPostProcessors(beanFactory,
+											DependencyInitializationAwareBeanPostProcessor.class, null, false);
 
-								// Register bean processors that intercept bean
-								// creation.
-								registerBeanPostProcessors(beanFactory,
-									DependencyInitializationAwareBeanPostProcessor.class, null, false);
-
-								return null;
-							}
-							catch (BeansException ex) {
-								// Destroy already created singletons to avoid
-								// dangling resources.
-								beanFactory.destroySingletons();
-								cancelRefresh(ex);
-								// propagate exception to the caller
-								throw ex;
+									return null;
+								} catch (BeansException ex) {
+									// Destroy already created singletons to avoid
+									// dangling resources.
+									beanFactory.destroySingletons();
+									cancelRefresh(ex);
+									// propagate exception to the caller
+									throw ex;
+								}
 							}
 						}
-					}
-				});
-		}
-		catch (Throwable th) {
+					});
+		} catch (Throwable th) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Pre refresh error", th);
 			}
@@ -311,8 +281,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 			// rethrow the problem w/o rewrapping
 			if (th instanceof RuntimeException) {
 				throw (RuntimeException) th;
-			}
-			else {
+			} else {
 				throw (Error) th;
 			}
 		}
@@ -321,63 +290,61 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	public void completeRefresh() {
 		try {
 			PrivilegedUtils.executeWithCustomTCCL(contextClassLoaderProvider().getContextClassLoader(),
-				new PrivilegedUtils.UnprivilegedExecution() {
+					new PrivilegedUtils.UnprivilegedExecution<Object>() {
 
-					public Object run() {
+						public Object run() {
 
-						synchronized (startupShutdownMonitor) {
-							try {
-								ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+							synchronized (startupShutdownMonitor) {
+								try {
+									ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 
-								// Invoke factory processors registered as beans
-								// in the context.
-								invokeBeanFactoryPostProcessors(beanFactory,
-									DependencyAwareBeanFactoryPostProcessor.class, null);
+									// Invoke factory processors registered as beans
+									// in the context.
+									invokeBeanFactoryPostProcessors(beanFactory,
+											DependencyAwareBeanFactoryPostProcessor.class, null);
 
-								// Register bean processors that intercept bean
-								// creation.
-								registerBeanPostProcessors(beanFactory);
+									// Register bean processors that intercept bean
+									// creation.
+									registerBeanPostProcessors(beanFactory);
 
-								// Initialize message source for this context.
-								initMessageSource();
+									// Initialize message source for this context.
+									initMessageSource();
 
-								// Initialize event multicaster for this
-								// context.
-								initApplicationEventMulticaster();
+									// Initialize event multicaster for this
+									// context.
+									initApplicationEventMulticaster();
 
-								// Initialize other special beans in specific
-								// context
-								// subclasses.
-								onRefresh();
+									// Initialize other special beans in specific
+									// context
+									// subclasses.
+									onRefresh();
 
-								// Check for listener beans and register them.
-								registerListeners();
+									// Check for listener beans and register them.
+									registerListeners();
 
-								// Instantiate all remaining (non-lazy-init)
-								// singletons.
-								finishBeanFactoryInitialization(beanFactory);
+									// Instantiate all remaining (non-lazy-init)
+									// singletons.
+									finishBeanFactoryInitialization(beanFactory);
 
-								// Last step: publish corresponding event.
-								finishRefresh();
+									// Last step: publish corresponding event.
+									finishRefresh();
 
-								// everything went okay, post notification
-								sendRefreshedEvent();
-								return null;
-							}
-							catch (BeansException ex) {
-								// Destroy already created singletons to avoid
-								// dangling
-								// resources.
-								getBeanFactory().destroySingletons();
-								cancelRefresh(ex);
-								// propagate exception to the caller
-								throw ex;
+									// everything went okay, post notification
+									sendRefreshedEvent();
+									return null;
+								} catch (BeansException ex) {
+									// Destroy already created singletons to avoid
+									// dangling
+									// resources.
+									getBeanFactory().destroySingletons();
+									cancelRefresh(ex);
+									// propagate exception to the caller
+									throw ex;
+								}
 							}
 						}
-					}
-				});
-		}
-		catch (Throwable th) {
+					});
+		} catch (Throwable th) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Post refresh error", th);
 			}
@@ -386,8 +353,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 			// rethrow the problem w/o rewrapping
 			if (th instanceof RuntimeException) {
 				throw (RuntimeException) th;
-			}
-			else {
+			} else {
 				throw (Error) th;
 			}
 		}
@@ -396,16 +362,13 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	// customized to handle DependencyAwareBeanFactoryPostProcessor classes
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
 		invokeBeanFactoryPostProcessors(beanFactory, BeanFactoryPostProcessor.class,
-			DependencyAwareBeanFactoryPostProcessor.class);
+				DependencyAwareBeanFactoryPostProcessor.class);
 	}
 
 	/**
-	 * Instantiate and invoke all registered BeanFactoryPostProcessor beans,
-	 * respecting explicit order if given.
-	 * <p/>
+	 * Instantiate and invoke all registered BeanFactoryPostProcessor beans, respecting explicit order if given. <p/>
 	 * Must be called before singleton instantiation. Very similar to
-	 * {@link AbstractApplicationContext#invokeBeanFactoryPostProcessors} but
-	 * allowing exclusion of a certain type.
+	 * {@link AbstractApplicationContext#invokeBeanFactoryPostProcessors} but allowing exclusion of a certain type.
 	 * 
 	 * @param beanFactory
 	 * @param type
@@ -438,12 +401,10 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 			if (exclude == null || !isTypeMatch(postProcessorNames[i], exclude)) {
 				if (isTypeMatch(postProcessorNames[i], PriorityOrdered.class)) {
 					priorityOrderedPostProcessors.add(beanFactory.getBean(postProcessorNames[i],
-						BeanFactoryPostProcessor.class));
-				}
-				else if (isTypeMatch(postProcessorNames[i], Ordered.class)) {
+							BeanFactoryPostProcessor.class));
+				} else if (isTypeMatch(postProcessorNames[i], Ordered.class)) {
 					orderedPostProcessorNames.add(postProcessorNames[i]);
-				}
-				else {
+				} else {
 					nonOrderedPostProcessorNames.add(postProcessorNames[i]);
 				}
 			}
@@ -490,17 +451,13 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	// classes
 	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
 		registerBeanPostProcessors(beanFactory, BeanPostProcessor.class,
-			DependencyInitializationAwareBeanPostProcessor.class, true);
+				DependencyInitializationAwareBeanPostProcessor.class, true);
 	}
 
 	/**
-	 * Instantiate and invoke all registered BeanPostProcessor beans, respecting
-	 * explicit order if given.
-	 * <p/>
-	 * Must be called before any instantiation of application beans. Very
-	 * similar to
-	 * {@link AbstractApplicationContext#invokeBeanFactoryPostProcessors} but
-	 * allowing exclusion of a certain type.
+	 * Instantiate and invoke all registered BeanPostProcessor beans, respecting explicit order if given. <p/> Must be
+	 * called before any instantiation of application beans. Very similar to
+	 * {@link AbstractApplicationContext#invokeBeanFactoryPostProcessors} but allowing exclusion of a certain type.
 	 */
 	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, Class<?> type,
 			Class<?> exclude, boolean check) {
@@ -526,12 +483,10 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 			if (exclude == null || !isTypeMatch(postProcessorNames[i], exclude)) {
 				if (isTypeMatch(postProcessorNames[i], PriorityOrdered.class)) {
 					priorityOrderedPostProcessors.add(beanFactory.getBean(postProcessorNames[i],
-						BeanPostProcessor.class));
-				}
-				else if (isTypeMatch(postProcessorNames[i], Ordered.class)) {
+							BeanPostProcessor.class));
+				} else if (isTypeMatch(postProcessorNames[i], Ordered.class)) {
 					orderedPostProcessorNames.add(postProcessorNames[i]);
-				}
-				else {
+				} else {
 					nonOrderedPostProcessorNames.add(postProcessorNames[i]);
 				}
 			}
@@ -583,12 +538,10 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	}
 
 	/**
-	 * Sets the OSGi multicaster by using a Spring
-	 * {@link ApplicationEventMulticaster}. This method is added as a
+	 * Sets the OSGi multicaster by using a Spring {@link ApplicationEventMulticaster}. This method is added as a
 	 * covenience.
 	 * 
-	 * @param multicaster Spring multi-caster used for propagating OSGi specific
-	 *        events
+	 * @param multicaster Spring multi-caster used for propagating OSGi specific events
 	 * @see OsgiBundleApplicationContextEventMulticasterAdapter
 	 */
 	public void setDelegatedEventMulticaster(ApplicationEventMulticaster multicaster) {
@@ -632,9 +585,8 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	}
 
 	/**
-	 * Sets the {@link ContextClassLoaderProvider} used by this OSGi application
-	 * context instance. By default, {@link DefaultContextClassLoaderProvider}
-	 * is used.
+	 * Sets the {@link ContextClassLoaderProvider} used by this OSGi application context instance. By default,
+	 * {@link DefaultContextClassLoaderProvider} is used.
 	 * 
 	 * @param contextClassLoaderProvider context class loader provider to use
 	 * @see ContextClassLoaderProvider

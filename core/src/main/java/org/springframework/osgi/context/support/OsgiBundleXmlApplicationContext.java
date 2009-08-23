@@ -115,14 +115,18 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 
 		final Object[] resolvers = new Object[2];
 
-		AccessController.doPrivileged(new PrivilegedAction<Object>() {
-
-			public Object run() {
-				resolvers[0] = createNamespaceHandlerResolver(getBundleContext(), getClassLoader());
-				resolvers[1] = createEntityResolver(getBundleContext(), getClassLoader());
-				return null;
-			}
-		});
+		if (System.getSecurityManager() != null) {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
+				public Object run() {
+					resolvers[0] = createNamespaceHandlerResolver(getBundleContext(), getClassLoader());
+					resolvers[1] = createEntityResolver(getBundleContext(), getClassLoader());
+					return null;
+				}
+			});
+		} else {
+			resolvers[0] = createNamespaceHandlerResolver(getBundleContext(), getClassLoader());
+			resolvers[1] = createEntityResolver(getBundleContext(), getClassLoader());
+		}
 
 		beanDefinitionReader.setNamespaceHandlerResolver((NamespaceHandlerResolver) resolvers[0]);
 		beanDefinitionReader.setEntityResolver((EntityResolver) resolvers[1]);

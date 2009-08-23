@@ -86,7 +86,6 @@ abstract class TrackingUtil {
 				try {
 					if (securityOn) {
 						target = AccessController.doPrivileged(new PrivilegedAction<Object>() {
-
 							public Object run() {
 								return getTarget(context, filter);
 							}

@@ -49,21 +49,17 @@ public abstract class PrivilegedUtils {
 		public T run();
 	}
 
-
 	private static final GetTCCLAction getTCCLAction = new GetTCCLAction();
-
 
 	public static ClassLoader getTCCL() {
 		return getTCCLAction.getTCCL();
 	}
 
 	/**
-	 * Temporarily changes the TCCL to the given one for the duration of the
-	 * given execution. All actions except the execution are executed with
-	 * privileged access.
+	 * Temporarily changes the TCCL to the given one for the duration of the given execution. All actions except the
+	 * execution are executed with privileged access.
 	 * 
-	 * Consider checking if there is a security manager in place before calling
-	 * this method.
+	 * Consider checking if there is a security manager in place before calling this method.
 	 * 
 	 * @param customClassLoader
 	 * @param execution
@@ -74,34 +70,40 @@ public abstract class PrivilegedUtils {
 		final Thread currentThread = Thread.currentThread();
 		final ClassLoader oldTCCL = getTCCLAction.getTCCL();
 
+		boolean hasSecurity = System.getSecurityManager() != null;
+
 		try {
-			AccessController.doPrivileged(new PrivilegedAction<Object>() {
+			if (hasSecurity) {
+				AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
-				public Object run() {
-					currentThread.setContextClassLoader(customClassLoader);
-					return null;
-				}
-			});
+					public Object run() {
+						currentThread.setContextClassLoader(customClassLoader);
+						return null;
+					}
+				});
+			} else {
+				currentThread.setContextClassLoader(customClassLoader);
+			}
 			return execution.run();
-		}
-		finally {
-			AccessController.doPrivileged(new PrivilegedAction<Object>() {
-
-				public Object run() {
-					currentThread.setContextClassLoader(oldTCCL);
-					return null;
-				}
-			});
+		} finally {
+			if (hasSecurity) {
+				AccessController.doPrivileged(new PrivilegedAction<Object>() {
+					public Object run() {
+						currentThread.setContextClassLoader(oldTCCL);
+						return null;
+					}
+				});
+			} else {
+				currentThread.setContextClassLoader(oldTCCL);
+			}
 		}
 	}
 
 	/**
-	 * Temporarily changes the TCCL to the given one for the duration of the
-	 * given execution. All actions except the execution are executed with
-	 * privileged access.
+	 * Temporarily changes the TCCL to the given one for the duration of the given execution. All actions except the
+	 * execution are executed with privileged access.
 	 * 
-	 * Consider checking if there is a security manager in place before calling
-	 * this method.
+	 * Consider checking if there is a security manager in place before calling this method.
 	 * 
 	 * @param customClassLoader
 	 * @param execution
@@ -113,27 +115,34 @@ public abstract class PrivilegedUtils {
 		final Thread currentThread = Thread.currentThread();
 		final ClassLoader oldTCCL = getTCCLAction.getTCCL();
 
+		boolean hasSecurity = System.getSecurityManager() != null;
+
 		try {
-			AccessController.doPrivileged(new PrivilegedAction<Object>() {
+			if (hasSecurity) {
+				AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
-				public Object run() {
-					currentThread.setContextClassLoader(customClassLoader);
-					return null;
-				}
-			});
+					public Object run() {
+						currentThread.setContextClassLoader(customClassLoader);
+						return null;
+					}
+				});
+			} else {
+				currentThread.setContextClassLoader(customClassLoader);
+			}
 			return execution.run();
-		}
-		catch (PrivilegedActionException pae) {
+		} catch (PrivilegedActionException pae) {
 			throw pae.getCause();
-		}
-		finally {
-			AccessController.doPrivileged(new PrivilegedAction<Object>() {
-
-				public Object run() {
-					currentThread.setContextClassLoader(oldTCCL);
-					return null;
-				}
-			});
+		} finally {
+			if (hasSecurity) {
+				AccessController.doPrivileged(new PrivilegedAction<Object>() {
+					public Object run() {
+						currentThread.setContextClassLoader(oldTCCL);
+						return null;
+					}
+				});
+			} else {
+				currentThread.setContextClassLoader(oldTCCL);
+			}
 		}
 	}
 }

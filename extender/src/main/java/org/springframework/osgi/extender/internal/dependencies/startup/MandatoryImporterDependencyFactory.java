@@ -17,9 +17,12 @@
 package org.springframework.osgi.extender.internal.dependencies.startup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Filter;
@@ -54,6 +57,9 @@ import org.springframework.util.StringUtils;
  */
 public class MandatoryImporterDependencyFactory implements OsgiServiceDependencyFactory {
 
+	/** logger */
+	private static final Log log = LogFactory.getLog(MandatoryImporterDependencyFactory.class);
+
 	private static final String AVAILABILITY_PROP = "availability";
 	private static final String INTERFACES_PROP = "interfaces";
 	private static final String SERVICE_BEAN_NAME_PROP = "serviceBeanName";
@@ -62,13 +68,22 @@ public class MandatoryImporterDependencyFactory implements OsgiServiceDependency
 	public Collection<OsgiServiceDependency> getServiceDependencies(BundleContext bundleContext,
 			ConfigurableListableBeanFactory beanFactory) throws BeansException, InvalidSyntaxException, BundleException {
 
+		boolean trace = log.isTraceEnabled();
+
 		String[] singleBeans =
 				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory, OsgiServiceProxyFactoryBean.class,
 						true, false);
 
+		if (trace) {
+			log.trace("Discovered single proxy importers " + Arrays.toString(singleBeans));
+		}
 		String[] collectionBeans =
 				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
 						OsgiServiceCollectionProxyFactoryBean.class, true, false);
+
+		if (trace) {
+			log.trace("Discovered collection proxy importers " + Arrays.toString(collectionBeans));
+		}
 
 		String[] beans = StringUtils.concatenateStringArrays(singleBeans, collectionBeans);
 
@@ -76,7 +91,6 @@ public class MandatoryImporterDependencyFactory implements OsgiServiceDependency
 
 		for (int i = 0; i < beans.length; i++) {
 			if (!isLazy(beanFactory, beans[i])) {
-
 				String beanName =
 						(beans[i].startsWith(BeanFactory.FACTORY_BEAN_PREFIX) ? beans[i]
 								: BeanFactory.FACTORY_BEAN_PREFIX + beans[i]);
@@ -98,6 +112,9 @@ public class MandatoryImporterDependencyFactory implements OsgiServiceDependency
 									Availability.MANDATORY.equals(importer.getAvailability()));
 				}
 
+				if (trace)
+					log.trace("Eager importer " + beanName + " implies dependecy " + dependency);
+
 				beansCollections.add(dependency);
 			} else {
 				String name = (beans[i].startsWith(BeanFactory.FACTORY_BEAN_PREFIX) ? beans[i].substring(1) : beans[i]);
@@ -116,8 +133,15 @@ public class MandatoryImporterDependencyFactory implements OsgiServiceDependency
 						OsgiServiceDependency dependency;
 						dependency = new DefaultOsgiServiceDependency(name, filter, true);
 
+						if (trace)
+							log.trace("Lazy importer " + beanName + " implies dependecy " + dependency);
+
 						beansCollections.add(dependency);
 					}
+				} else {
+					if (trace)
+						log.trace("Bean " + name
+								+ " is marked as lazy but does not provide a bean definition; ignoring...");
 				}
 			}
 		}

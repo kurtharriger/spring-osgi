@@ -1,11 +1,11 @@
 package org.springframework.osgi.extender.internal.dependencies.startup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -236,16 +236,17 @@ public class DependencyServiceManager {
 
 	protected void findServiceDependencies() throws Exception {
 		try {
-
-			PrivilegedUtils.executeWithCustomTCCL(context.getClassLoader(),
-					new PrivilegedUtils.UnprivilegedThrowableExecution() {
-
-						public Object run() throws Throwable {
-							doFindDependencies();
-							return null;
-						}
-
-					});
+			if (System.getSecurityManager() != null) {
+				PrivilegedUtils.executeWithCustomTCCL(context.getClassLoader(),
+						new PrivilegedUtils.UnprivilegedThrowableExecution<Object>() {
+							public Object run() throws Throwable {
+								doFindDependencies();
+								return null;
+							}
+						});
+			} else {
+				doFindDependencies();
+			}
 		} catch (Throwable th) {
 			if (th instanceof Exception)
 				throw ((Exception) th);
@@ -280,8 +281,8 @@ public class DependencyServiceManager {
 				BeanFactoryUtils.beansOfTypeIncludingAncestors(beanFactory, OsgiServiceDependencyFactory.class, true,
 						false);
 
-		if (debug)
-			log.debug("Discovered local dependency factories: " + localFactories.keySet());
+		if (trace)
+			log.trace("Discovered local dependency factories: " + localFactories.keySet());
 
 		dependencyFactories.addAll(localFactories.values());
 
@@ -289,6 +290,9 @@ public class DependencyServiceManager {
 			OsgiServiceDependencyFactory dependencyFactory = iterator.next();
 			Collection<OsgiServiceDependency> discoveredDependencies = null;
 
+			if (trace) {
+				log.trace("Interogating dependency factory " + dependencyFactory);
+			}
 			try {
 				discoveredDependencies = dependencyFactory.getServiceDependencies(bundleContext, beanFactory);
 			} catch (Exception ex) {
@@ -308,6 +312,10 @@ public class DependencyServiceManager {
 							log.info("Adding OSGi service dependency for importer [" + msd.getBeanName()
 									+ "] matching OSGi filter [" + msd.filterAsString + "]");
 							unsatisfiedDependencies.put(msd, dependency.getBeanName());
+						} else {
+							if (debug)
+								log.debug("OSGi service dependency for importer [" + msd.getBeanName()
+										+ "] is already satisfied");
 						}
 					}
 				}

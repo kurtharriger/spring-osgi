@@ -49,8 +49,6 @@ class OsgiEventDispatcher implements EventDispatcher, BlueprintConstants {
 	/** logger */
 	private static final Log log = LogFactory.getLog(OsgiEventDispatcher.class);
 
-	// match the class inside object class (and use a non backing reference group)
-	private static final Pattern PATTERN = Pattern.compile("objectClass=(?:[^\\)]+)");
 	private static final String EVENT_ADMIN = "org.osgi.service.event.EventAdmin";
 
 	private final BundleContext bundleContext;
@@ -115,20 +113,6 @@ class OsgiEventDispatcher implements EventDispatcher, BlueprintConstants {
 			// props.put(SERVICE_OBJECTCLASS, extractObjectClassFromFilter(deps[0]));
 			props.put(ALL_DEPENDENCIES, deps);
 		}
-	}
-
-	private String[] extractObjectClassFromFilter(String filterString) {
-		List<String> matches = null;
-		Matcher matcher = PATTERN.matcher(filterString);
-		while (matcher.find()) {
-			if (matches == null) {
-				matches = new ArrayList<String>(8);
-			}
-
-			matches.add(matcher.group());
-		}
-
-		return (matches == null ? new String[0] : matches.toArray(new String[matches.size()]));
 	}
 
 	private Dictionary<String, Object> init(BlueprintEvent event) {
