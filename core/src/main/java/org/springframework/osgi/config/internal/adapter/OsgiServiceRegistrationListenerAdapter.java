@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.osgi.context.internal.security.SecurityUtils;
+import org.springframework.osgi.context.support.internal.security.SecurityUtils;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;

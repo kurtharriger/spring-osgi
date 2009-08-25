@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.osgi.context.support.internal.OsgiBundleScope;
+import org.springframework.osgi.context.support.internal.scope.OsgiBundleScope;
 
 /**
  * Tests for OsgiBundleScope.

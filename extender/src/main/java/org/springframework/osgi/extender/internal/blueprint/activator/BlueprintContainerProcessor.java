@@ -24,6 +24,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.container.BlueprintEvent;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -40,6 +41,7 @@ import org.springframework.osgi.blueprint.container.SpringBlueprintConverter;
 import org.springframework.osgi.blueprint.container.support.BlueprintContainerServicePublisher;
 import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.blueprint.reflect.EnvironmentManagerFactoryBean;
+import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
@@ -50,6 +52,7 @@ import org.springframework.osgi.extender.event.BootstrappingDependenciesFailedEv
 import org.springframework.osgi.extender.internal.activator.OsgiContextProcessor;
 import org.springframework.osgi.extender.internal.blueprint.event.EventAdminDispatcher;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitStartingEvent;
+import org.springframework.util.ClassUtils;
 
 /**
  * Blueprint specific context processor.
@@ -65,6 +68,7 @@ public class BlueprintContainerProcessor implements
 	private final EventAdminDispatcher dispatcher;
 	private final BlueprintListenerManager listenerManager;
 	private final Bundle extenderBundle;
+	private final BeanFactoryPostProcessor cycleBreaker;
 
 	class BlueprintWaitingEventDispatcher implements ApplicationListener<ApplicationEvent> {
 		private final BundleContext bundleContext;
@@ -108,6 +112,13 @@ public class BlueprintContainerProcessor implements
 		this.dispatcher = dispatcher;
 		this.listenerManager = listenerManager;
 		this.extenderBundle = extenderBundle;
+
+		Class<?> processorClass =
+				ClassUtils.resolveClassName(
+						"org.springframework.osgi.blueprint.container.support.internal.config.CycleOrderingProcessor",
+						BundleContextAware.class.getClassLoader());
+
+		cycleBreaker = (BeanFactoryPostProcessor) BeanUtils.instantiate(processorClass);
 	}
 
 	public void postProcessClose(ConfigurableOsgiBundleApplicationContext context) {
@@ -176,7 +187,8 @@ public class BlueprintContainerProcessor implements
 				addPredefinedBlueprintBean(beanFactory, BLUEPRINT_BUNDLE_CONTEXT, bundleContext, logger);
 				addPredefinedBlueprintBean(beanFactory, BLUEPRINT_CONTAINER, blueprintContainer, logger);
 				// addPredefinedBlueprintBean(beanFactory, BLUEPRINT_EXTENDER, extenderBundle, logger);
-				addPredefinedBlueprintBean(beanFactory, BLUEPRINT_CONVERTER, new SpringBlueprintConverter(beanFactory), logger);
+				addPredefinedBlueprintBean(beanFactory, BLUEPRINT_CONVERTER, new SpringBlueprintConverter(beanFactory),
+						logger);
 
 				// add Blueprint built-in converters
 				beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
@@ -208,6 +220,9 @@ public class BlueprintContainerProcessor implements
 				}
 			}
 		});
+
+		// 3. add cycle breaker
+		context.addBeanFactoryPostProcessor(cycleBreaker);
 
 		BlueprintEvent creatingEvent = new BlueprintEvent(BlueprintEvent.CREATING, context.getBundle(), extenderBundle);
 		listenerManager.blueprintEvent(creatingEvent);

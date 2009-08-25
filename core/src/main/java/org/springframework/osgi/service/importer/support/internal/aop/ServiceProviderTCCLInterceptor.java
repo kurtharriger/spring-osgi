@@ -21,7 +21,7 @@ import java.util.Map;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.Bundle;
-import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
+import org.springframework.osgi.context.support.internal.classloader.ClassLoaderFactory;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.internal.PrivilegedUtils;

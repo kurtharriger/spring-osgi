@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
+import org.springframework.osgi.context.support.internal.classloader.ClassLoaderFactory;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceInvoker;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceStaticInterceptor;
 import org.springframework.osgi.service.util.internal.aop.ServiceTCCLInterceptor;
