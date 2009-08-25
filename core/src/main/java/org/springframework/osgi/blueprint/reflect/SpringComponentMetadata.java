@@ -17,12 +17,14 @@
 package org.springframework.osgi.blueprint.reflect;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.osgi.blueprint.container.support.internal.config.CycleOrderingProcessor;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -40,7 +42,6 @@ public class SpringComponentMetadata implements ComponentMetadata {
 	private final List<String> dependsOn;
 	private final int activation;
 
-	// FIXME: allow rare-non abstract bean definition as well
 	public SpringComponentMetadata(String name, BeanDefinition definition) {
 		if (!(definition instanceof AbstractBeanDefinition)) {
 			throw new IllegalArgumentException("Unknown bean definition passed in" + definition);
@@ -49,11 +50,19 @@ public class SpringComponentMetadata implements ComponentMetadata {
 		this.beanDefinition = (AbstractBeanDefinition) definition;
 
 		String[] dpdOn = beanDefinition.getDependsOn();
+
 		if (ObjectUtils.isEmpty(dpdOn)) {
 			dependsOn = Collections.<String> emptyList();
 		} else {
 			List<String> dependencies = new ArrayList<String>(dpdOn.length);
 			CollectionUtils.mergeArrayIntoCollection(dpdOn, dependencies);
+			Collection<String> syntheticDependsOn =
+					(Collection<String>) beanDefinition.getAttribute(CycleOrderingProcessor.SYNTHETIC_DEPENDS_ON);
+
+			if (syntheticDependsOn != null) {
+				dependencies.removeAll(syntheticDependsOn);
+			}
+
 			dependsOn = Collections.unmodifiableList(dependencies);
 		}
 

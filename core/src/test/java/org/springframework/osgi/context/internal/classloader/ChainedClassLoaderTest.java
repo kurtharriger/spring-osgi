@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.TestUtils;
+import org.springframework.osgi.context.support.internal.classloader.ChainedClassLoader;
 
 /**
  * @author Costin Leau

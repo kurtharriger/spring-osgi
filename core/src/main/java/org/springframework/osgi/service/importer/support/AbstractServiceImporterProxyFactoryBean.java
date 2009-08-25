@@ -22,8 +22,8 @@ import java.security.PrivilegedAction;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.SmartFactoryBean;
-import org.springframework.osgi.context.internal.classloader.ChainedClassLoader;
-import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
+import org.springframework.osgi.context.support.internal.classloader.ChainedClassLoader;
+import org.springframework.osgi.context.support.internal.classloader.ClassLoaderFactory;
 
 /**
  * Package protected class that provides the common aop infrastructure functionality for OSGi service importers.

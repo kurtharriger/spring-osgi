@@ -44,6 +44,7 @@ public class ParsingUtils {
 	/** Reserved blueprint constants */
 	private static final String[] RESERVED_NAMES =
 			new String[] { "blueprintContainer", "blueprintBundle", "blueprintBundleContext", "blueprintConverter" };
+	public static final String BLUEPRINT_MARKER_NAME = "org.springframework.osgi.blueprint.config.internal.marker";
 
 	public static BeanDefinitionHolder decorateAndRegister(Element ele, BeanDefinitionHolder bdHolder,
 			ParserContext parserContext) {
@@ -67,6 +68,7 @@ public class ParsingUtils {
 					abd.setLenientConstructorResolution(false);
 					abd.setNonPublicAccessAllowed(false);
 				}
+				bdHolder.getBeanDefinition().setAttribute(BLUEPRINT_MARKER_NAME, Boolean.TRUE);
 
 				// Register the final decorated instance.
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, parserContext.getRegistry());

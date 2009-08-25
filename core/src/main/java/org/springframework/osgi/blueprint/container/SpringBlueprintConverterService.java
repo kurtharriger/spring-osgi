@@ -31,7 +31,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.osgi.context.internal.security.SecurityUtils;
+import org.springframework.osgi.context.support.internal.security.SecurityUtils;
 
 /**
  * Blueprint converter adapter for Spring 3.0 ConverterService.
