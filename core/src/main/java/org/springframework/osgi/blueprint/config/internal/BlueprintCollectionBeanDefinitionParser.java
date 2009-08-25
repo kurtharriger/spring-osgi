@@ -78,18 +78,13 @@ public abstract class BlueprintCollectionBeanDefinitionParser extends Collection
 	}
 
 	@Override
-	protected String generateBeanName(String id, BeanDefinition def, ParserContext parserContext) {
-		String name = super.generateBeanName(ParsingUtils.BLUEPRINT_GENERATED_NAME_PREFIX + id, def, parserContext);
-		if (parserContext.isNested()) {
-			name = name.concat("#generated");
-		}
-
-		return name;
+	protected CollectionType collectionType() {
+		return null;
 	}
 
 	@Override
-	protected CollectionType collectionType() {
-		return null;
+	protected String generateBeanName(String id, BeanDefinition def, ParserContext parserContext) {
+		return super.generateBeanName(ParsingUtils.BLUEPRINT_GENERATED_NAME_PREFIX + id, def, parserContext);
 	}
 
 	@Override

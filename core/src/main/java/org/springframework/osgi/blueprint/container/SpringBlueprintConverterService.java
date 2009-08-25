@@ -15,6 +15,9 @@
  */
 package org.springframework.osgi.blueprint.container;
 
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,6 +31,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.osgi.context.internal.security.SecurityUtils;
 
 /**
  * Blueprint converter adapter for Spring 3.0 ConverterService.
@@ -40,6 +44,7 @@ public class SpringBlueprintConverterService implements ConversionService {
 	private final ConversionService delegate;
 	private final List<Converter> converters = new ArrayList<Converter>();
 	private final TypeConverter typeConverter;
+	private final ConfigurableBeanFactory cbf;
 
 	public SpringBlueprintConverterService() {
 		this(null, null);
@@ -51,6 +56,7 @@ public class SpringBlueprintConverterService implements ConversionService {
 		if (cbf != null) {
 			cbf.copyRegisteredEditorsTo(simpleTC);
 		}
+		this.cbf = cbf;
 		this.typeConverter = simpleTC;
 	}
 
@@ -86,18 +92,24 @@ public class SpringBlueprintConverterService implements ConversionService {
 		return (T) convert(source, TypeDescriptor.valueOf(targetType));
 	}
 
-	public Object convert(Object source, TypeDescriptor targetType) {
-		ReifiedType type = TypeFactory.getType(targetType);
-		synchronized (converters) {
-			for (Converter converter : converters) {
-				try {
-					if (converter.canConvert(source, type)) {
-						return converter.convert(source, type);
-					}
-				} catch (Exception ex) {
-					throw new ConversionFailedException(source, source.getClass(), targetType.getType(), ex);
+	public Object convert(final Object source, TypeDescriptor targetType) {
+		final ReifiedType type = TypeFactory.getType(targetType);
+		boolean hasSecurity = (System.getSecurityManager() != null);
+		AccessControlContext acc = (hasSecurity ? SecurityUtils.getAccFrom(cbf) : null);
+		Object result = null;
+
+		if (hasSecurity) {
+			result = AccessController.doPrivileged(new PrivilegedAction<Object>() {
+				public Object run() {
+					return doConvert(source, type);
 				}
-			}
+			}, acc);
+		} else {
+			result = doConvert(source, type);
+		}
+
+		if (result != null) {
+			return result;
 		}
 
 		if (delegate != null) {
@@ -105,5 +117,20 @@ public class SpringBlueprintConverterService implements ConversionService {
 		}
 
 		return typeConverter.convertIfNecessary(source, targetType.getType(), targetType.getMethodParameter());
+	}
+
+	private Object doConvert(Object source, ReifiedType type) {
+		synchronized (converters) {
+			for (Converter converter : converters) {
+				try {
+					if (converter.canConvert(source, type)) {
+						return converter.convert(source, type);
+					}
+				} catch (Exception ex) {
+					throw new ConversionFailedException(source, source.getClass(), type.getRawClass(), ex);
+				}
+			}
+		}
+		return null;
 	}
 }

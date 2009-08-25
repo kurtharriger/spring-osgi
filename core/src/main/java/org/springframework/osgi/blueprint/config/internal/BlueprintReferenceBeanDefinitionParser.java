@@ -79,13 +79,9 @@ public class BlueprintReferenceBeanDefinitionParser extends ReferenceBeanDefinit
 
 	@Override
 	protected String generateBeanName(String id, BeanDefinition def, ParserContext parserContext) {
-		String name = super.generateBeanName(ParsingUtils.BLUEPRINT_GENERATED_NAME_PREFIX + id, def, parserContext);
-		if (parserContext.isNested()) {
-			name = name.concat("#generated");
-		}
-		return name;
+		return super.generateBeanName(ParsingUtils.BLUEPRINT_GENERATED_NAME_PREFIX + id, def, parserContext);
 	}
-
+	
 	@Override
 	protected void postProcessListenerDefinition(BeanDefinition wrapperDef) {
 		wrapperDef.getPropertyValues().addPropertyValue("blueprintCompliant", true);

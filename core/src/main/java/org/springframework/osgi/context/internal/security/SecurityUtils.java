@@ -18,8 +18,7 @@ package org.springframework.osgi.context.internal.security;
 import java.security.AccessControlContext;
 
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.support.AbstractBeanFactory;
-import org.springframework.beans.factory.support.SecurityContextProvider;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -30,10 +29,8 @@ public abstract class SecurityUtils {
 	public static AccessControlContext getAccFrom(BeanFactory beanFactory) {
 		AccessControlContext acc = null;
 		if (beanFactory != null) {
-			if (beanFactory instanceof AbstractBeanFactory) {
-				SecurityContextProvider provider = ((AbstractBeanFactory) beanFactory).getSecurityContextProvider();
-				if (provider != null)
-					acc = provider.getAccessControlContext();
+			if (beanFactory instanceof ConfigurableBeanFactory) {
+				return ((ConfigurableBeanFactory) beanFactory).getAccessControlContext();
 			}
 		}
 		return acc;
