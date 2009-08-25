@@ -56,8 +56,8 @@ public class BlueprintLoaderListener extends ContextLoaderListener {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		listenerManager.destroy();
 		super.stop(context);
+		listenerManager.destroy();
 	}
 
 	@Override

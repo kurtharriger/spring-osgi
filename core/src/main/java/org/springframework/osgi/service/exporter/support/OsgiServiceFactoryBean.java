@@ -375,9 +375,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		if (isBeanBundleScoped())
 			serviceFactory = new OsgiBundleScope.BundleScopeServiceFactory(serviceFactory);
 
-		AccessControlContext acc = SecurityUtils.getAccFrom(beanFactory);
-
 		if (System.getSecurityManager() != null) {
+			AccessControlContext acc = SecurityUtils.getAccFrom(beanFactory);
 			final ServiceFactory serviceFactoryFinal = serviceFactory;
 			return AccessController.doPrivileged(new PrivilegedAction<ServiceRegistration>() {
 				public ServiceRegistration run() {

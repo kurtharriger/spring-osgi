@@ -449,6 +449,9 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 
 		while (registry.containsBeanDefinition(generated)) {
 			generated = name + BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR + counter;
+			if (parserContext.isNested()) {
+				generated = generated.concat("#generated");
+			}
 			counter++;
 		}
 
