@@ -16,6 +16,7 @@
 package org.springframework.osgi.blueprint.container;
 
 import java.util.Collection;
+import java.util.Dictionary;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.blueprint.CollectionTestComponent;
+import org.springframework.osgi.blueprint.MyCustomList;
 import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.context.support.PublicBlueprintDocumentLoader;
@@ -50,6 +52,7 @@ public class TestBlueprintBuiltinConvertersTest extends TestCase {
 
 		context = new GenericApplicationContext();
 		context.setClassLoader(getClass().getClassLoader());
+		context.getBeanFactory().setConversionService(new SpringBlueprintConverterService());
 		context.getBeanFactory().addBeanPostProcessor(new BundleContextAwareProcessor(bundleContext));
 		context.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
 
@@ -91,5 +94,17 @@ public class TestBlueprintBuiltinConvertersTest extends TestCase {
 		System.out.println(value.getClass());
 		Collection col = (Collection) value;
 		assertEquals(2, col.size());
+	}
+
+	public void tstCustomCollection() throws Exception {
+		CollectionTestComponent cpn = context.getBean("customCollection", CollectionTestComponent.class);
+		Object value = cpn.getPropertyValue();
+		assertTrue(value instanceof MyCustomList);
+		System.out.println(value.getClass());
+		Collection col = (Collection) value;
+		assertEquals(2, col.size());
+		cpn = context.getBean("customDictionary", CollectionTestComponent.class);
+		assertTrue(cpn.getPropertyValue() instanceof Dictionary);
+		System.out.println(cpn.getPropertyValue());
 	}
 }

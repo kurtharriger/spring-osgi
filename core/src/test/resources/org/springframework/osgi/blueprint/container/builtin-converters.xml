@@ -7,6 +7,36 @@
         conversions (no type converters)
     </description>
 
+   <bean id="IntegerOne" class="java.lang.Integer">
+        <argument type="int" value="1"/>
+    </bean>
+<!--     
+	<bean id="customCollection" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+		<property name="customCollection">
+			<array>
+				<value>1</value>
+				<value>2</value>
+			</array>
+		</property>
+	</bean>
+	
+	<bean id="customMap" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="customMap">
+            <map>
+                <entry key="abc" value="123" />
+                <entry key="def" value="456" />
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="customDictionary" class="org.springframework.osgi.blueprint.CollectionTestComponent">
+        <property name="customDictionary">
+            <map>
+                <entry key="abc" value="123" />
+                <entry key="def" value="456" />
+            </map>
+        </property>
+    </bean>-->
 	
     <bean id="setToCollection" class="org.springframework.osgi.blueprint.CollectionTestComponent">
         <property name="collection">

@@ -169,4 +169,15 @@ public class CollectionTestComponent {
 		return this.value;
 	}
 
+	public void setCustomCollection(MyCustomList value) {
+		setPropertyValue("customCollection", value, MyCustomList.class);
+	}
+
+	public void setCustomMap(MyCustomMap value) {
+		setPropertyValue("customMap", value, MyCustomMap.class);
+	}
+	
+	public void setCustomDictionary(MyCustomDictionary value) {
+		setPropertyValue("customDictionary", value, MyCustomDictionary.class);
+	}
 }
