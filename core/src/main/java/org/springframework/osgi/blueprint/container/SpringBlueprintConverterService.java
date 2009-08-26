@@ -20,6 +20,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 
@@ -73,16 +74,14 @@ public class SpringBlueprintConverterService implements ConversionService {
 	}
 
 	public boolean canConvert(Class<?> sourceType, Class<?> targetType) {
-		if (targetType.isArray() || Collection.class.isAssignableFrom(targetType)
-				|| Map.class.isAssignableFrom(targetType)) {
-			return false;
-		}
-		return true;
+		return canConvert(sourceType, TypeDescriptor.valueOf(targetType));
 	}
 
 	public boolean canConvert(Class<?> sourceType, TypeDescriptor targetType) {
 		Class<?> target = targetType.getType();
-		if (targetType.isArray() || Collection.class.isAssignableFrom(target) || Map.class.isAssignableFrom(target)) {
+		if (target != null
+				&& (target.isArray() || Collection.class.isAssignableFrom(target) || Map.class.isAssignableFrom(target) || Dictionary.class
+						.isAssignableFrom(target))) {
 			return false;
 		}
 		return true;
@@ -116,7 +115,13 @@ public class SpringBlueprintConverterService implements ConversionService {
 			delegate.convert(source, targetType);
 		}
 
-		return typeConverter.convertIfNecessary(source, targetType.getType(), targetType.getMethodParameter());
+		Class<?> tType = targetType.getType();
+//		if (Collection.class.isAssignableFrom(tType) || Map.class.isAssignableFrom(tType)
+//				|| Dictionary.class.isAssignableFrom(tType)) {
+//			tType = null;
+//		}
+
+		return typeConverter.convertIfNecessary(source, tType, targetType.getMethodParameter());
 	}
 
 	private Object doConvert(Object source, ReifiedType type) {
