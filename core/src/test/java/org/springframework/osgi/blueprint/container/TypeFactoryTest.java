@@ -15,11 +15,18 @@
  */
 package org.springframework.osgi.blueprint.container;
 
-import java.util.ArrayList;
+import java.awt.Point;
+import java.awt.Shape;
+import java.lang.reflect.Method;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeMap;
 
 import junit.framework.TestCase;
 
 import org.osgi.service.blueprint.container.ReifiedType;
+import org.springframework.beans.BeanUtils;
+import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.TypeDescriptor;
 
 /**
@@ -27,10 +34,73 @@ import org.springframework.core.convert.TypeDescriptor;
  */
 public class TypeFactoryTest extends TestCase {
 
+	private static class TestSet {
+
+		public void rawList(List arg) {
+		}
+
+		public void typedList(LinkedList<Point> arg) {
+		};
+
+		public void extendsList(LinkedList<? extends Shape> arg) {
+		};
+
+		public void superList(LinkedList<? super Shape> arg) {
+		};
+
+		public void typedMap(TreeMap<Integer, Double> arg) {
+		};
+
+		public void pointMap(TreeMap<String, Point> arg) {
+		}
+	}
+
 	public void testJdk4Classes() throws Exception {
-		TypeDescriptor desc = TypeDescriptor.forObject(new ArrayList());
-		ReifiedType tp = TypeFactory.getType(desc);
-		assertEquals(0, tp.size());
-		assertEquals(ArrayList.class, tp.getRawClass());
+		ReifiedType tp = getReifiedTypeFor("rawList");
+		assertEquals(1, tp.size());
+		assertEquals(List.class, tp.getRawClass());
+	}
+
+	public void testTypedObjectList() throws Exception {
+		ReifiedType tp = getReifiedTypeFor("typedList");
+		assertEquals(1, tp.size());
+		assertEquals(LinkedList.class, tp.getRawClass());
+		assertEquals(Point.class, tp.getActualTypeArgument(0).getRawClass());
+	}
+
+	public void testExtendsList() throws Exception {
+		ReifiedType tp = getReifiedTypeFor("extendsList");
+		assertEquals(1, tp.size());
+		assertEquals(LinkedList.class, tp.getRawClass());
+		assertEquals(Shape.class, tp.getActualTypeArgument(0).getRawClass());
+	}
+
+	public void testSuperList() throws Exception {
+		ReifiedType tp = getReifiedTypeFor("superList");
+		assertEquals(1, tp.size());
+		assertEquals(LinkedList.class, tp.getRawClass());
+		assertEquals(Shape.class, tp.getActualTypeArgument(0).getRawClass());
+	}
+
+	public void testTypedMap() throws Exception {
+		ReifiedType tp = getReifiedTypeFor("typedMap");
+		assertEquals(2, tp.size());
+		assertEquals(TreeMap.class, tp.getRawClass());
+		assertEquals(Integer.class, tp.getActualTypeArgument(0).getRawClass());
+		assertEquals(Double.class, tp.getActualTypeArgument(1).getRawClass());
+	}
+
+	
+	public void testPointMap() throws Exception {
+		ReifiedType tp = getReifiedTypeFor("pointMap");
+		assertEquals(2, tp.size());
+		assertEquals(TreeMap.class, tp.getRawClass());
+		assertEquals(String.class, tp.getActualTypeArgument(0).getRawClass());
+		assertEquals(Point.class, tp.getActualTypeArgument(1).getRawClass());
+	}
+	private ReifiedType getReifiedTypeFor(String methodName) {
+		Method mt = BeanUtils.findDeclaredMethodWithMinimalParameters(TestSet.class, methodName);
+		TypeDescriptor td = new TypeDescriptor(new MethodParameter(mt, 0));
+		return TypeFactory.getType(td);
 	}
 }
