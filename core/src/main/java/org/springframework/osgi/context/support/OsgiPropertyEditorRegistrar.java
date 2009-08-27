@@ -18,6 +18,7 @@ package org.springframework.osgi.context.support;
 
 import java.beans.PropertyEditor;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
@@ -58,11 +59,20 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 
 		// load properties
 		Properties editorsConfig = new Properties();
+		InputStream stream = null;
 		try {
-			editorsConfig.load(getClass().getResourceAsStream(PROPERTIES_FILE));
+			stream = getClass().getResourceAsStream(PROPERTIES_FILE);
+			editorsConfig.load(stream);
 		} catch (IOException ex) {
-			throw (RuntimeException) new IllegalStateException("cannot load default property editors configuration")
-					.initCause(ex);
+			throw (RuntimeException) new IllegalStateException(
+					"cannot load default propertiy editorsConfig configuration").initCause(ex);
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (IOException ex) {
+				}
+			}
 		}
 
 		if (log.isTraceEnabled())
