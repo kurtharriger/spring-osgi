@@ -27,6 +27,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/catalina.osgi/5.5.23-SNAPSHOT/catalina.osgi-5.5.23-SNAPSHOT.jar" sourcepath="/CATALINA_5.5.X"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-test-support"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/servlet-api.osgi/2.5-SNAPSHOT/servlet-api.osgi-2.5-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/servlet/com.springsource.javax.servlet/2.4.0/com.springsource.javax.servlet-2.4.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

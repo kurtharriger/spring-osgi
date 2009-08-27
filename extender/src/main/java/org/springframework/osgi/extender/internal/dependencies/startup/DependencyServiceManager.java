@@ -21,10 +21,11 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
-import org.springframework.osgi.context.support.internal.security.SecurityUtils;
 import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
 import org.springframework.osgi.extender.event.BootstrappingDependenciesEvent;
 import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
@@ -241,7 +242,7 @@ public class DependencyServiceManager {
 	protected void findServiceDependencies() throws Exception {
 		try {
 			if (System.getSecurityManager() != null) {
-				final AccessControlContext acc = SecurityUtils.getAccFrom(context);
+				final AccessControlContext acc = getAcc();
 
 				PrivilegedUtils.executeWithCustomTCCL(context.getClassLoader(),
 						new PrivilegedUtils.UnprivilegedThrowableExecution<Object>() {
@@ -352,7 +353,7 @@ public class DependencyServiceManager {
 		sendInitialBootstrappingEvents(unsatisfiedDependencies.keySet());
 
 		if (System.getSecurityManager() != null) {
-			AccessControlContext acc = SecurityUtils.getAccFrom(context);
+			AccessControlContext acc = getAcc();
 			AccessController.doPrivileged(new PrivilegedAction<Object>() {
 				public Object run() {
 					OsgiListenerUtils.addServiceListener(bundleContext, listener, filter);
@@ -473,5 +474,13 @@ public class DependencyServiceManager {
 
 	private void publishEvent(OsgiBundleApplicationContextEvent dependencyEvent) {
 		this.contextStateAccessor.getEventMulticaster().multicastEvent(dependencyEvent);
+	}
+
+	private AccessControlContext getAcc() {
+		AutowireCapableBeanFactory beanFactory = context.getAutowireCapableBeanFactory();
+		if (beanFactory instanceof ConfigurableBeanFactory) {
+			return ((ConfigurableBeanFactory) beanFactory).getAccessControlContext();
+		}
+		return null;
 	}
 }
