@@ -319,7 +319,8 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		boolean debug = log.isDebugEnabled();
 
 		boolean normalShutdown = false;
-
+        stopWatchDog();
+        
 		synchronized (monitor) {
 
 			// no need for cleanup
