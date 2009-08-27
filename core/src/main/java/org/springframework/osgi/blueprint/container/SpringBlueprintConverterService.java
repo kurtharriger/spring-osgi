@@ -20,18 +20,18 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Dictionary;
 import java.util.List;
-import java.util.Map;
 
 import org.osgi.service.blueprint.container.Converter;
 import org.osgi.service.blueprint.container.ReifiedType;
 import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.beans.TypeConverter;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.context.support.internal.security.SecurityUtils;
 
 /**
@@ -44,8 +44,10 @@ public class SpringBlueprintConverterService implements ConversionService {
 	/** fallback delegate */
 	private final ConversionService delegate;
 	private final List<Converter> converters = new ArrayList<Converter>();
-	private final TypeConverter typeConverter;
+	private final SimpleTypeConverter typeConverter;
+	// used for grabbing the security context
 	private final ConfigurableBeanFactory cbf;
+	private volatile boolean converterInitialized = false;
 
 	public SpringBlueprintConverterService() {
 		this(null, null);
@@ -53,12 +55,8 @@ public class SpringBlueprintConverterService implements ConversionService {
 
 	public SpringBlueprintConverterService(ConversionService delegate, ConfigurableBeanFactory cbf) {
 		this.delegate = delegate;
-		SimpleTypeConverter simpleTC = new SimpleTypeConverter();
-		if (cbf != null) {
-			cbf.copyRegisteredEditorsTo(simpleTC);
-		}
 		this.cbf = cbf;
-		this.typeConverter = simpleTC;
+		this.typeConverter = new SimpleTypeConverter();
 	}
 
 	public void add(Converter blueprintConverter) {
@@ -74,16 +72,10 @@ public class SpringBlueprintConverterService implements ConversionService {
 	}
 
 	public boolean canConvert(Class<?> sourceType, Class<?> targetType) {
-		return canConvert(sourceType, TypeDescriptor.valueOf(targetType));
+		return true;
 	}
 
 	public boolean canConvert(Class<?> sourceType, TypeDescriptor targetType) {
-		Class<?> target = targetType.getType();
-//		if (target != null
-//				&& (target.isArray() || Collection.class.isAssignableFrom(target) || Map.class.isAssignableFrom(target) || Dictionary.class
-//						.isAssignableFrom(target))) {
-//			return false;
-//		}
 		return true;
 	}
 
@@ -115,13 +107,25 @@ public class SpringBlueprintConverterService implements ConversionService {
 			delegate.convert(source, targetType);
 		}
 
-		Class<?> tType = targetType.getType();
-		if (Collection.class.isAssignableFrom(tType) || Map.class.isAssignableFrom(tType)
-				|| Dictionary.class.isAssignableFrom(tType)) {
-			tType = null;
-		}
+		MethodParameter mp = targetType.getMethodParameter();
+		Class<?> tType = (mp != null && mp.getNestingLevel() > 1 ? null : targetType.getType());
 
+		lazyInitConverter();
 		return typeConverter.convertIfNecessary(source, tType, targetType.getMethodParameter());
+	}
+
+	private void lazyInitConverter() {
+		if (!converterInitialized) {
+			synchronized (typeConverter) {
+				if (!converterInitialized) {
+					converterInitialized = true;
+					if (cbf != null) {
+						cbf.copyRegisteredEditorsTo(typeConverter);
+						new BlueprintEditorRegistrar().registerCustomEditors(typeConverter);
+					}
+				}
+			}
+		}
 	}
 
 	private Object doConvert(Object source, ReifiedType type) {

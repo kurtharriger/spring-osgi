@@ -26,11 +26,11 @@ public class GenericHolder<T> {
 		this.target = target;
 	}
 
-	public T getType() {
+	public T getTarget() {
 		return target;
 	}
 
-	public void setType(T type) {
+	public void setTarget(T type) {
 		this.target = type;
 	}
 }

@@ -18,13 +18,9 @@ package org.springframework.osgi.blueprint.container;
 import junit.framework.TestCase;
 
 import org.osgi.service.blueprint.container.BlueprintContainer;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.context.support.PublicBlueprintDocumentLoader;
 import org.springframework.osgi.mock.MockBundleContext;
@@ -47,12 +43,10 @@ public class GenericsTest extends TestCase {
 		context = new GenericApplicationContext();
 		context.setClassLoader(getClass().getClassLoader());
 		context.getBeanFactory().addBeanPostProcessor(new BundleContextAwareProcessor(bundleContext));
-		context.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
-
-			public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-				beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
-			}
-		});
+		SpringBlueprintConverterService converterService =
+				new SpringBlueprintConverterService(null, context.getBeanFactory());
+		converterService.add(new GenericConverter());
+		context.getBeanFactory().setConversionService(converterService);
 
 		reader = new XmlBeanDefinitionReader(context);
 		reader.setDocumentLoader(new PublicBlueprintDocumentLoader());

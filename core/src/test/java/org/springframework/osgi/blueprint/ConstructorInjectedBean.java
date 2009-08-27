@@ -13,37 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.blueprint.container;
+package org.springframework.osgi.blueprint;
 
-import java.awt.Point;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Properties;
 
 /**
  * @author Costin Leau
  */
-public class GenerifiedBean {
+public class ConstructorInjectedBean {
 
-	private GenericHolder holder;
+	private Object target;
 
-	public GenericHolder getHolder() {
-		return holder;
+	public ConstructorInjectedBean(String arg1) {
+		this.target = arg1;
 	}
 
-	public void setStringHolder(GenericHolder<String> stringHolder) {
-		this.holder = stringHolder;
+	public ConstructorInjectedBean(Properties arg1) {
+		this.target = arg1;
 	}
 
-	public void setBooleanHolder(GenericHolder<Boolean> booleanHolder) {
-		this.holder = booleanHolder;
+	public ConstructorInjectedBean(Properties[] arg1) {
+		this.target = arg1;
 	}
 
-	public void setPointMap(TreeMap<String, Point> pointMap) {
-		System.out.println("created " + pointMap);
+	public Object getTarget() {
+		return target;
 	}
-	
-	public void setConcurrentMap(ConcurrentMap map) {
-		System.out.println("created " + map.getClass());
-	}
-	
 }
