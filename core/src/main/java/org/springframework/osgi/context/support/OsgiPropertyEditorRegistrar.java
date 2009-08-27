@@ -18,6 +18,7 @@ package org.springframework.osgi.context.support;
 
 import java.beans.PropertyEditor;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,12 +33,10 @@ import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.util.Assert;
 
 /**
- * Class that registers {@link PropertyEditor}s, useful inside an OSGi
- * application context.
+ * Class that registers {@link PropertyEditor}s, useful inside an OSGi application context.
  * 
- * As this class is used for bootstrapping and is likely to draw classes from
- * various packages that already depend on {@link BundleContextAware}, the
- * configuration has been externalized to avoid package cycles.
+ * As this class is used for bootstrapping and is likely to draw classes from various packages that already depend on
+ * {@link BundleContextAware}, the configuration has been externalized to avoid package cycles.
  * 
  * @author Costin Leau
  */
@@ -49,7 +48,6 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 
 	private final Map editors;
 
-
 	OsgiPropertyEditorRegistrar() {
 		this(OsgiPropertyEditorRegistrar.class.getClassLoader());
 	}
@@ -57,12 +55,21 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 	OsgiPropertyEditorRegistrar(ClassLoader classLoader) {
 		// load properties
 		Properties editorsConfig = new Properties();
+		InputStream stream = null;
+
 		try {
-			editorsConfig.load(getClass().getResourceAsStream(PROPERTIES_FILE));
-		}
-		catch (IOException ex) {
+			stream = getClass().getResourceAsStream(PROPERTIES_FILE);
+			editorsConfig.load(stream);
+		} catch (IOException ex) {
 			throw (RuntimeException) new IllegalStateException(
-				"cannot load default propertiy editorsConfig configuration").initCause(ex);
+					"cannot load default propertiy editorsConfig configuration").initCause(ex);
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (IOException ex) {
+				}
+			}
 		}
 
 		if (log.isTraceEnabled())
@@ -85,8 +92,7 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 			try {
 				key = classLoader.loadClass((String) entry.getKey());
 				editorClass = classLoader.loadClass((String) entry.getValue());
-			}
-			catch (ClassNotFoundException ex) {
+			} catch (ClassNotFoundException ex) {
 				throw (RuntimeException) new IllegalArgumentException("Cannot load class").initCause(ex);
 			}
 
