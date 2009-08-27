@@ -24,6 +24,7 @@ Package org.springframework.osgi.config
 Package org.springframework.osgi.context
 * improved serviceability by using NamedThreadLocal
 * added class loader aware default Class/Class[] property editors
+* fixed cleanup of an internal input stream used for loading property editors
 
 Package org.springframework.osgi.compendium
 * enhanced cm-properties to reflect Config Admin changes in the returned Properties object
