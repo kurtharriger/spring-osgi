@@ -222,7 +222,7 @@ public class BlueprintContainerProcessor implements
 		});
 
 		// 3. add cycle breaker
-		//context.addBeanFactoryPostProcessor(cycleBreaker);
+		context.addBeanFactoryPostProcessor(cycleBreaker);
 
 		BlueprintEvent creatingEvent = new BlueprintEvent(BlueprintEvent.CREATING, context.getBundle(), extenderBundle);
 		listenerManager.blueprintEvent(creatingEvent);

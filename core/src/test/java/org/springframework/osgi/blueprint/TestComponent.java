@@ -41,8 +41,21 @@ public class TestComponent implements java.io.Serializable {
 		propA = arg;
 	}
 
+	public TestComponent(int arg) {
+		propA = arg;
+	}
+	
 	public TestComponent(String str) {
 		this.propA = str;
+	}
+	
+	
+	public TestComponent(RegionCode str) {
+		this.propA = str;
+	}
+	
+	public TestComponent(Double dbl) {
+		this.propA = dbl;
 	}
 
 	public TestComponent(Object arg1, Object arg2) {

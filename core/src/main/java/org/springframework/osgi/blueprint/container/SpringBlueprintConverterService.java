@@ -79,11 +79,11 @@ public class SpringBlueprintConverterService implements ConversionService {
 
 	public boolean canConvert(Class<?> sourceType, TypeDescriptor targetType) {
 		Class<?> target = targetType.getType();
-		if (target != null
-				&& (target.isArray() || Collection.class.isAssignableFrom(target) || Map.class.isAssignableFrom(target) || Dictionary.class
-						.isAssignableFrom(target))) {
-			return false;
-		}
+//		if (target != null
+//				&& (target.isArray() || Collection.class.isAssignableFrom(target) || Map.class.isAssignableFrom(target) || Dictionary.class
+//						.isAssignableFrom(target))) {
+//			return false;
+//		}
 		return true;
 	}
 
@@ -116,10 +116,10 @@ public class SpringBlueprintConverterService implements ConversionService {
 		}
 
 		Class<?> tType = targetType.getType();
-//		if (Collection.class.isAssignableFrom(tType) || Map.class.isAssignableFrom(tType)
-//				|| Dictionary.class.isAssignableFrom(tType)) {
-//			tType = null;
-//		}
+		if (Collection.class.isAssignableFrom(tType) || Map.class.isAssignableFrom(tType)
+				|| Dictionary.class.isAssignableFrom(tType)) {
+			tType = null;
+		}
 
 		return typeConverter.convertIfNecessary(source, tType, targetType.getMethodParameter());
 	}

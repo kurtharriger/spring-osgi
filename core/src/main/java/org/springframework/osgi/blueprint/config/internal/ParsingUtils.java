@@ -68,7 +68,6 @@ public class ParsingUtils {
 					abd.setLenientConstructorResolution(false);
 					abd.setNonPublicAccessAllowed(false);
 				}
-				bdHolder.getBeanDefinition().setAttribute(BLUEPRINT_MARKER_NAME, Boolean.TRUE);
 
 				// Register the final decorated instance.
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, parserContext.getRegistry());

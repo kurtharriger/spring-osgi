@@ -34,6 +34,7 @@ Package org.springframework.osgi.extender
 * added JavaBean cache initialization for known types to reduce the number of class lookups during startup
 * improved importers detection by avoiding early initialization of lazy beans
 * align the bundles shutdown algorithm with the OSGi 4.2 Blueprint spec 
+* fixed delayed cancelation of bundles being stopped while waiting for mandatory services
 
 Package org.springframework.osgi.service
 * improved serviceability by using NamedInheritableThreadLocal
