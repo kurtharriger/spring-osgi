@@ -117,4 +117,9 @@
 		</argument>
 	</bean>
 	
+	<!--  more injection cases -->
+	
+	<bean id="compProperties" class="org.springframework.osgi.blueprint.ConstructorInjectedBean">
+		<argument value="Name=John" type="java.util.Properties"/>
+	</bean>
 </blueprint>

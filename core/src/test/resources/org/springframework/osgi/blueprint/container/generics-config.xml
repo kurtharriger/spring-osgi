@@ -10,6 +10,16 @@
 	<description>Generic component instantiation</description>
 
     <bean id="genericConversion" class="org.springframework.osgi.blueprint.container.GenerifiedBean">
+        <property name="pointMap">
+            <list>
+                <value>Start</value>
+                <value>123</value>
+                <value>456</value>
+                <value>Finish</value>
+                <value>0</value>
+                <value>0</value>
+            </list>
+        </property>        
         <property name="stringHolder">
             <bean class="org.springframework.osgi.blueprint.container.GenericHolder">
                 <argument>
@@ -17,5 +27,21 @@
                 </argument>
             </bean>
         </property>
-    </bean>	
+        <property name="concurrentMap">
+            <map>
+                <entry key="abc" value="1"/>
+                <entry key="def" value="2"/>
+            </map>
+        </property>        
+    </bean>
+    
+    <bean id="concurrentMap" class="org.springframework.osgi.blueprint.container.GenerifiedBean">
+        <property name="concurrentMap">
+            <map>
+                <entry key="abc" value="1"/>
+                <entry key="def" value="2"/>
+            </map>
+        </property>        
+    </bean>
+    	
 </blueprint>

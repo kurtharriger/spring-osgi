@@ -41,6 +41,9 @@ public class BlueprintConverterConfigurer implements BeanFactoryAware {
 		if (beanFactory instanceof AbstractBeanFactory) {
 			AbstractBeanFactory bf = ((AbstractBeanFactory) beanFactory);
 			ConversionService cs = bf.getConversionService();
+			if (cs instanceof SpringBlueprintConverterService) {
+				cs = null;
+			}
 			SpringBlueprintConverterService sbc = new SpringBlueprintConverterService(cs, bf);
 			sbc.add(converters);
 			bf.setConversionService(sbc);

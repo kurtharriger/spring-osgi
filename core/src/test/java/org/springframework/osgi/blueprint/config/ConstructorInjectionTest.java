@@ -52,12 +52,6 @@ public class ConstructorInjectionTest extends TestCase {
 		reader = new XmlBeanDefinitionReader(context);
 		reader.setDocumentLoader(new PublicBlueprintDocumentLoader());
 		reader.loadBeanDefinitions(new ClassPathResource(CONFIG, getClass()));
-		context.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
-
-			public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-				beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
-			}
-		});
 		context.getBeanFactory().setConversionService(new SpringBlueprintConverterService());
 		context.refresh();
 		container = new SpringBlueprintContainer(context, null);
@@ -150,5 +144,10 @@ public class ConstructorInjectionTest extends TestCase {
 		} catch (Exception ex) {
 			// expected
 		}
+	}
+	
+
+	public void testCompProperties() throws Exception {
+		Object component = context.getBean("compProperties");
 	}
 }

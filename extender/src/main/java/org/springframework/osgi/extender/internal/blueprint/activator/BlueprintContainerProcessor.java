@@ -36,6 +36,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.osgi.blueprint.container.BlueprintConverterConfigurer;
 import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
 import org.springframework.osgi.blueprint.container.SpringBlueprintConverter;
 import org.springframework.osgi.blueprint.container.support.BlueprintContainerServicePublisher;
@@ -53,6 +54,7 @@ import org.springframework.osgi.extender.internal.activator.OsgiContextProcessor
 import org.springframework.osgi.extender.internal.blueprint.event.EventAdminDispatcher;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitStartingEvent;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Blueprint specific context processor.
@@ -190,8 +192,11 @@ public class BlueprintContainerProcessor implements
 				addPredefinedBlueprintBean(beanFactory, BLUEPRINT_CONVERTER, new SpringBlueprintConverter(beanFactory),
 						logger);
 
-				// add Blueprint built-in converters
-				beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
+				// add Blueprint conversion service
+				String[] beans = beanFactory.getBeanNamesForType(BlueprintConverterConfigurer.class, false, false);
+				if (ObjectUtils.isEmpty(beans)) {
+					beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
+				}
 			}
 
 			private void addPredefinedBlueprintBean(ConfigurableListableBeanFactory beanFactory, String beanName,
