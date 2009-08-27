@@ -69,7 +69,7 @@ public class BlueprintContainerConfig extends ApplicationContextConfiguration {
 		buf.append(publishContext);
 		buf.append("|timeout=");
 		buf.append(timeout);
-		buf.append("s");
+		buf.append("ms");
 		toString = buf.toString();
 
 		if (log.isTraceEnabled()) {

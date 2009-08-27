@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -33,6 +35,9 @@ import org.osgi.service.blueprint.container.BlueprintListener;
  */
 class ReplayEventManager {
 
+	/** logger */
+	private static final Log log = LogFactory.getLog(ReplayEventManager.class);
+
 	private final Map<Bundle, BlueprintEvent> events =
 			Collections.synchronizedMap(new LinkedHashMap<Bundle, BlueprintEvent>());
 
@@ -40,8 +45,12 @@ class ReplayEventManager {
 	private final BundleListener listener = new BundleListener() {
 
 		public void bundleChanged(BundleEvent event) {
-			if (BundleEvent.STOPPED == event.getType()) {
-				events.remove(event.getBundle());
+			if (BundleEvent.STOPPED == event.getType() || BundleEvent.UNINSTALLED == event.getType()
+					|| BundleEvent.UNRESOLVED == event.getType()) {
+				BlueprintEvent removed = events.remove(event.getBundle());
+				if (log.isTraceEnabled())
+					log.trace("Removed  bundle " + event.getBundle() + " for sending replayes events; last one was "
+							+ removed);
 			}
 		}
 	};
@@ -54,7 +63,18 @@ class ReplayEventManager {
 	void addEvent(BlueprintEvent event) {
 		// copy event
 		BlueprintEvent replay = new BlueprintEvent(event, true);
-		events.put(replay.getBundle(), replay);
+		Bundle bnd = replay.getBundle();
+		if (bnd.getState() == Bundle.ACTIVE || bnd.getState() == Bundle.STARTING || bnd.getState() == Bundle.STOPPING) {
+			events.put(bnd, replay);
+			if (log.isTraceEnabled())
+				log.trace("Adding replay event  " + replay.getType() + " for bundle " + replay.getBundle());
+		} else {
+			if (log.isTraceEnabled()) {
+				log.trace("Replay event " + replay.getType() + " ignored; " + "owning bundle has been uninstalled "
+						+ bnd);
+				events.remove(bnd);
+			}
+		}
 	}
 
 	void destroy() {

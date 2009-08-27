@@ -17,24 +17,20 @@ package org.springframework.osgi.blueprint.config;
 
 import java.net.URL;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import junit.framework.TestCase;
 
 import org.osgi.service.blueprint.container.BlueprintContainer;
-import org.osgi.service.blueprint.reflect.BeanArgument;
-import org.osgi.service.blueprint.reflect.BeanMetadata;
-import org.osgi.service.blueprint.reflect.CollectionMetadata;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.osgi.blueprint.ArrayItem;
 import org.springframework.osgi.blueprint.TestComponent;
 import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
+import org.springframework.osgi.blueprint.container.SpringBlueprintConverterService;
 import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.context.support.PublicBlueprintDocumentLoader;
 
@@ -62,7 +58,7 @@ public class ConstructorInjectionTest extends TestCase {
 				beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
 			}
 		});
-
+		context.getBeanFactory().setConversionService(new SpringBlueprintConverterService());
 		context.refresh();
 		container = new SpringBlueprintContainer(context, null);
 	}
@@ -79,6 +75,10 @@ public class ConstructorInjectionTest extends TestCase {
 	private <T> T getPropA(String name) {
 		TestComponent tc = getComponent(name);
 		return (T) tc.getPropA();
+	}
+
+	public void tstCtrAssign() throws Exception {
+		Object propA = getPropA("constructorAssign");
 	}
 
 	public void testCharArray() throws Exception {
@@ -142,7 +142,7 @@ public class ConstructorInjectionTest extends TestCase {
 	public void testEmptyArray() throws Exception {
 		Object component = context.getBean("emptyArrayConstruct");
 	}
-	
+
 	public void testCollectionConversion() throws Exception {
 		try {
 			Object component = context.getBean("collectionConflict");

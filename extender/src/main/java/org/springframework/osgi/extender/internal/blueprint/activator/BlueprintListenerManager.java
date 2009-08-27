@@ -18,8 +18,6 @@ package org.springframework.osgi.extender.internal.blueprint.activator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

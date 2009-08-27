@@ -96,7 +96,7 @@ public class TestBlueprintBuiltinConvertersTest extends TestCase {
 		assertEquals(2, col.size());
 	}
 
-	public void tstCustomCollection() throws Exception {
+	public void testCustomCollection() throws Exception {
 		CollectionTestComponent cpn = context.getBean("customCollection", CollectionTestComponent.class);
 		Object value = cpn.getPropertyValue();
 		assertTrue(value instanceof MyCustomList);

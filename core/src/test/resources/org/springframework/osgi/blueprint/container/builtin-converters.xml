@@ -10,7 +10,7 @@
    <bean id="IntegerOne" class="java.lang.Integer">
         <argument type="int" value="1"/>
     </bean>
-<!--     
+    
 	<bean id="customCollection" class="org.springframework.osgi.blueprint.CollectionTestComponent">
 		<property name="customCollection">
 			<array>
@@ -36,7 +36,7 @@
                 <entry key="def" value="456" />
             </map>
         </property>
-    </bean>-->
+    </bean>
 	
     <bean id="setToCollection" class="org.springframework.osgi.blueprint.CollectionTestComponent">
         <property name="collection">
