@@ -103,7 +103,7 @@ public abstract class RunnableTimedExecution {
 			log.error(task + " did not finish in " + waitTime
 					+ "ms; consider taking a snapshot and then shutdown the VM in case the thread still hangs");
 
-			log.error("Current Thread dump***\n" + ThreadDump.dumpThreads());
+//			log.error("Current Thread dump***\n" + ThreadDump.dumpThreads());
 
 			if (internallyManaged) {
 				try {
