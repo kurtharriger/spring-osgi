@@ -18,6 +18,7 @@ package org.springframework.osgi.iandt.proxied.listener;
 import java.awt.Shape;
 import java.awt.geom.Area;
 
+import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.proxy.listener.Listener;
 
@@ -37,6 +38,7 @@ public class ProxiedListenerTest extends BaseIntegrationTest {
 	public void testListenerProxy() throws Exception {
 		System.out.println(Listener.class.getName());
 		Object obj = new Area();
-		bundleContext.registerService(Shape.class.getName(), obj, null);
+		ServiceRegistration reg = bundleContext.registerService(Shape.class.getName(), obj, null);
+		reg.unregister();
 	}
 }

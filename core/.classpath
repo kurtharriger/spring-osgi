@@ -19,7 +19,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.org.apache.commons.logging/1.5.6/com.springsource.slf4j.org.apache.commons.logging-1.5.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.api/1.5.6/com.springsource.slf4j.api-1.5.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.log4j/1.5.6/com.springsource.slf4j.log4j-1.5.6.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.test/3.0.0.BUILD-SNAPSHOT/org.springframework.test-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="M2_REPO/org/springframework/org.springframework.test/3.0.0.BUILD-SNAPSHOT/org.springframework.test-3.0.0.BUILD-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.0.v20090513/org.eclipse.osgi-3.5.0.v20090513.jar" sourcepath="/M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.0.v20090513/org.eclipse.osgi.source_3.5.0.v20090520.jar"/>
