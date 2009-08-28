@@ -20,7 +20,9 @@ import java.awt.Shape;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 import junit.framework.TestCase;
 
@@ -34,9 +36,15 @@ import org.springframework.core.convert.TypeDescriptor;
  */
 public class TypeFactoryTest extends TestCase {
 
-	private static class TestSet {
+	private static class TestSet<A> {
 
 		public void rawList(List arg) {
+		}
+
+		public void primitive(int arg) {
+		}
+
+		public void integer(Integer arg) {
 		}
 
 		public void typedList(LinkedList<Point> arg) {
@@ -53,12 +61,42 @@ public class TypeFactoryTest extends TestCase {
 
 		public void pointMap(TreeMap<String, Point> arg) {
 		}
+
+		public void typedReference(AtomicReference<Boolean> arg) {
+		}
+
+		public void objectTypedReference(AtomicReference<Object> arg) {
+		}
+
+		public void wildcardReference(AtomicReference<?> arg) {
+		}
+
+		public void superTypedReference(AtomicReference<? super Properties> arg) {
+		}
+
+		public void extendsTypedReference(AtomicReference<? extends Properties> arg) {
+		}
+
+		public void typeVariable(AtomicReference<A> arg) {
+		}
 	}
 
 	public void testJdk4Classes() throws Exception {
 		ReifiedType tp = getReifiedTypeFor("rawList");
 		assertEquals(1, tp.size());
 		assertEquals(List.class, tp.getRawClass());
+	}
+
+	public void testPrimitive() throws Exception {
+		ReifiedType tp = getReifiedTypeFor("primitive");
+		assertEquals(0, tp.size());
+		assertEquals(Integer.class, tp.getRawClass());
+	}
+
+	public void testInteger() throws Exception {
+		ReifiedType tp = getReifiedTypeFor("integer");
+		assertEquals(0, tp.size());
+		assertEquals(Integer.class, tp.getRawClass());
 	}
 
 	public void testTypedObjectList() throws Exception {
@@ -90,7 +128,6 @@ public class TypeFactoryTest extends TestCase {
 		assertEquals(Double.class, tp.getActualTypeArgument(1).getRawClass());
 	}
 
-	
 	public void testPointMap() throws Exception {
 		ReifiedType tp = getReifiedTypeFor("pointMap");
 		assertEquals(2, tp.size());
@@ -98,6 +135,49 @@ public class TypeFactoryTest extends TestCase {
 		assertEquals(String.class, tp.getActualTypeArgument(0).getRawClass());
 		assertEquals(Point.class, tp.getActualTypeArgument(1).getRawClass());
 	}
+
+	public void testTypedReference() throws Exception {
+		ReifiedType tp = getReifiedTypeFor("typedReference");
+		assertEquals(1, tp.size());
+		assertEquals(AtomicReference.class, tp.getRawClass());
+		assertEquals(Boolean.class, tp.getActualTypeArgument(0).getRawClass());
+	}
+
+	public void testObjectTypedReference() throws Exception {
+		ReifiedType tp = getReifiedTypeFor("objectTypedReference");
+		assertEquals(1, tp.size());
+		assertEquals(AtomicReference.class, tp.getRawClass());
+		assertEquals(Object.class, tp.getActualTypeArgument(0).getRawClass());
+	}
+
+	public void testWildcardReference() throws Exception {
+		ReifiedType tp = getReifiedTypeFor("wildcardReference");
+		assertEquals(1, tp.size());
+		assertEquals(AtomicReference.class, tp.getRawClass());
+		assertEquals(Object.class, tp.getActualTypeArgument(0).getRawClass());
+	}
+
+	public void testSuperReference() throws Exception {
+		ReifiedType tp = getReifiedTypeFor("superTypedReference");
+		assertEquals(1, tp.size());
+		assertEquals(AtomicReference.class, tp.getRawClass());
+		assertEquals(Properties.class, tp.getActualTypeArgument(0).getRawClass());
+	}
+
+	public void testExtendsReference() throws Exception {
+		ReifiedType tp = getReifiedTypeFor("extendsTypedReference");
+		assertEquals(1, tp.size());
+		assertEquals(AtomicReference.class, tp.getRawClass());
+		assertEquals(Properties.class, tp.getActualTypeArgument(0).getRawClass());
+	}
+
+	public void testTypeVariable() throws Exception {
+		ReifiedType tp = getReifiedTypeFor("typeVariable");
+		assertEquals(1, tp.size());
+		assertEquals(AtomicReference.class, tp.getRawClass());
+		assertEquals(Object.class, tp.getActualTypeArgument(0).getRawClass());
+	}
+
 	private ReifiedType getReifiedTypeFor(String methodName) {
 		Method mt = BeanUtils.findDeclaredMethodWithMinimalParameters(TestSet.class, methodName);
 		TypeDescriptor td = new TypeDescriptor(new MethodParameter(mt, 0));
