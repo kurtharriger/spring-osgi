@@ -30,12 +30,7 @@ import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.CachedIntrospectionResults;
-import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
-import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
-import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
-import org.springframework.osgi.context.event.OsgiBundleContextRefreshedEvent;
 import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
 import org.springframework.osgi.extender.internal.support.NamespaceManager;
 import org.springframework.osgi.extender.support.internal.ConfigUtils;
@@ -95,7 +90,7 @@ public class ContextLoaderListener implements BundleActivator {
 	private abstract class BaseListener implements SynchronousBundleListener {
 
 		static final int LAZY_ACTIVATION_EVENT_TYPE = 0x00000200;
-		
+
 		protected final Log log = LogFactory.getLog(getClass());
 
 		/**
@@ -338,9 +333,9 @@ public class ContextLoaderListener implements BundleActivator {
 
 		Bundle[] previousBundles = context.getBundles();
 
-		for (int i = 0; i < previousBundles.length; i++) {
-			Bundle bundle = previousBundles[i];
-			if (OsgiBundleUtils.isBundleActive(bundle)) {
+		for (Bundle bundle : previousBundles) {
+			// special handling for uber bundle being restarted
+			if (OsgiBundleUtils.isBundleActive(bundle) || bundleId == bundle.getBundleId()) {
 				maybeAddNamespaceHandlerFor(bundle, false);
 			} else if (OsgiBundleUtils.isBundleLazyActivated(bundle)) {
 				maybeAddNamespaceHandlerFor(bundle, true);

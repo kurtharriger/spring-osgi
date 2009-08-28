@@ -40,12 +40,11 @@ import org.xml.sax.SAXException;
 /**
  * Spring schema handler/resolver for OSGi environments.
  * 
- * Besides delegation this class also does type filtering to avoid wiring the
- * wrong bundle if multiple versions of the same library (which support the same
- * schema) are available.
+ * Besides delegation this class also does type filtering to avoid wiring the wrong bundle if multiple versions of the
+ * same library (which support the same schema) are available.
  * 
- * Additionally, lazy handlers are supported so that they are checked (and thus
- * loaded) only if no previous handler has been able to satisfy the request.
+ * Additionally, lazy handlers are supported so that they are checked (and thus loaded) only if no previous handler has
+ * been able to satisfy the request.
  * 
  * @author Hal Hildebrand
  * @author Costin Leau
@@ -54,11 +53,9 @@ import org.xml.sax.SAXException;
 public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolver, DisposableBean {
 
 	/**
-	 * Wrapper class which implements both {@link EntityResolver} and
-	 * {@link NamespaceHandlerResolver} interfaces.
+	 * Wrapper class which implements both {@link EntityResolver} and {@link NamespaceHandlerResolver} interfaces.
 	 * 
-	 * Simply delegates to the actual implementation discovered in a specific
-	 * bundle.
+	 * Simply delegates to the actual implementation discovered in a specific bundle.
 	 */
 	private static class Plugin implements NamespaceHandlerResolver, EntityResolver {
 
@@ -67,7 +64,6 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 		private final EntityResolver entity;
 
 		private final Bundle bundle;
-
 
 		private Plugin(Bundle bundle) {
 			this.bundle = bundle;
@@ -91,20 +87,17 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 		}
 	}
 
-
 	private static final Log log = LogFactory.getLog(NamespacePlugins.class);
 
 	final LazyBundleRegistry.Condition condition = new LazyBundleRegistry.Condition() {
 
 		private final String NS_HANDLER_RESOLVER_CLASS_NAME = NamespaceHandlerResolver.class.getName();
 
-
 		public boolean pass(Bundle bundle) {
 			try {
 				Class<?> type = bundle.loadClass(NS_HANDLER_RESOLVER_CLASS_NAME);
 				return NamespaceHandlerResolver.class.equals(type);
-			}
-			catch (Throwable th) {
+			} catch (Throwable th) {
 				// if the interface is not wired, ignore the bundle
 				log.warn("Bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " cannot see class ["
 						+ NS_HANDLER_RESOLVER_CLASS_NAME + "]; ignoring it as a namespace resolver");
@@ -121,8 +114,8 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 		}
 	};
 
-	private final LazyBundleRegistry<Plugin> pluginRegistry = new LazyBundleRegistry<Plugin>(condition, activation, log);
-
+	private final LazyBundleRegistry<Plugin> pluginRegistry =
+			new LazyBundleRegistry<Plugin>(condition, activation, log);
 
 	/**
 	 * Adds a bundle as a handler to plugin registry.
@@ -141,8 +134,8 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 	}
 
 	/**
-	 * Checks the type compatibility check between the namespace parser wired to
-	 * Spring DM and the discovered bundle class space.
+	 * Checks the type compatibility check between the namespace parser wired to Spring DM and the discovered bundle
+	 * class space.
 	 * 
 	 * @param bundle handler bundle
 	 * @return true if there is type compatibility, false otherwise
@@ -173,8 +166,7 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 				}
 			});
 
-		}
-		else {
+		} else {
 			return doResolve(namespaceUri);
 		}
 	}
@@ -188,17 +180,14 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 						return doResolveEntity(publicId, systemId);
 					}
 				});
-			}
-			catch (PrivilegedActionException pae) {
+			} catch (PrivilegedActionException pae) {
 				Exception cause = pae.getException();
 				handleInputSourceException(cause);
 			}
-		}
-		else {
+		} else {
 			try {
 				return doResolveEntity(publicId, systemId);
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				handleInputSourceException(ex);
 			}
 		}
@@ -225,9 +214,11 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 										+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()));
 
 							return handler;
-						}
-					}
-					catch (IllegalArgumentException ex) {
+						} else if (trace)
+							log.trace("Namespace handler for " + namespaceUri + " not found inside bundle "
+									+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()));
+
+					} catch (IllegalArgumentException ex) {
 						if (trace)
 							log.trace("Namespace handler for " + namespaceUri + " not found inside bundle "
 									+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()));
@@ -235,8 +226,7 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 					return null;
 				}
 			});
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			// the inner method doesn't declare any exceptions so the cast should be safe
 			throw (RuntimeException) ex;
 		}
@@ -264,8 +254,7 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 							return inputSource;
 						}
 
-					}
-					catch (FileNotFoundException ex) {
+					} catch (FileNotFoundException ex) {
 						if (trace)
 							log.trace("XML schema for " + publicId + "|" + systemId + " not found inside bundle "
 									+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()), ex);
