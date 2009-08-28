@@ -39,6 +39,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.osgi.blueprint.container.BlueprintConverterConfigurer;
 import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
 import org.springframework.osgi.blueprint.container.SpringBlueprintConverter;
+import org.springframework.osgi.blueprint.container.SpringBlueprintConverterService;
 import org.springframework.osgi.blueprint.container.support.BlueprintContainerServicePublisher;
 import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.blueprint.reflect.EnvironmentManagerFactoryBean;
@@ -193,10 +194,11 @@ public class BlueprintContainerProcessor implements
 						logger);
 
 				// add Blueprint conversion service
-				String[] beans = beanFactory.getBeanNamesForType(BlueprintConverterConfigurer.class, false, false);
-				if (ObjectUtils.isEmpty(beans)) {
-					beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
-				}
+//				String[] beans = beanFactory.getBeanNamesForType(BlueprintConverterConfigurer.class, false, false);
+//				if (ObjectUtils.isEmpty(beans)) {
+//					beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
+//				}
+				beanFactory.setConversionService(new SpringBlueprintConverterService(beanFactory.getConversionService(), beanFactory));
 			}
 
 			private void addPredefinedBlueprintBean(ConfigurableListableBeanFactory beanFactory, String beanName,

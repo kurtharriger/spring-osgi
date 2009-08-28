@@ -33,6 +33,7 @@ import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.propertyeditors.ClassArrayEditor;
 import org.springframework.beans.propertyeditors.ClassEditor;
 import org.springframework.beans.propertyeditors.CustomMapEditor;
+import org.springframework.beans.propertyeditors.PropertiesEditor;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.util.Assert;
 
@@ -119,6 +120,7 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 
 		// register non-externalized types
 		registry.registerCustomEditor(Dictionary.class, new CustomMapEditor(Hashtable.class));
+		registry.registerCustomEditor(Properties.class, new PropertiesEditor());
 		registry.registerCustomEditor(Class.class, new ClassEditor(userClassLoader));
 		registry.registerCustomEditor(Class[].class, new ClassArrayEditor(userClassLoader));
 	}

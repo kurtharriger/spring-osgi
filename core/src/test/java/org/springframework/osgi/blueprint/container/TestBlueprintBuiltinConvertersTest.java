@@ -52,14 +52,9 @@ public class TestBlueprintBuiltinConvertersTest extends TestCase {
 
 		context = new GenericApplicationContext();
 		context.setClassLoader(getClass().getClassLoader());
-		context.getBeanFactory().setConversionService(new SpringBlueprintConverterService());
+		context.getBeanFactory().setConversionService(
+				new SpringBlueprintConverterService(null, context.getBeanFactory()));
 		context.getBeanFactory().addBeanPostProcessor(new BundleContextAwareProcessor(bundleContext));
-		context.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
-
-			public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-				beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
-			}
-		});
 
 		reader = new XmlBeanDefinitionReader(context);
 		reader.setDocumentLoader(new PublicBlueprintDocumentLoader());
