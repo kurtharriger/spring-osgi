@@ -30,24 +30,18 @@ import org.osgi.framework.Bundle;
 import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
- * Map-like class with dedicated support for lazy bundles. Allows execution of
- * operations on active bundles, promoting the lazy ones, if necessary, as fall
- * back.
+ * Map-like class with dedicated support for lazy bundles. Allows execution of operations on active bundles, promoting
+ * the lazy ones, if necessary, as fall back.
  * 
  * The class is thread-safe.
  * 
  * @author Costin Leau
  * @param <T> the entity type associated with active bundles
  */
-/**
- * @author Costin Leau
- * @param <T>
- */
 class LazyBundleRegistry<T> {
 
 	/** logger */
 	private final Log log;
-
 
 	/**
 	 * A simple condition-like class.
@@ -84,8 +78,8 @@ class LazyBundleRegistry<T> {
 	}
 
 	/**
-	 * Operation performed all bundles - first active ones, followed by lazy
-	 * ones (if nothing is found (null is returned)) by 'activating' them.
+	 * Operation performed all bundles - first active ones, followed by lazy ones (if nothing is found (null is
+	 * returned)) by 'activating' them.
 	 * 
 	 * @author Costin Leau
 	 * @param <T>
@@ -102,16 +96,14 @@ class LazyBundleRegistry<T> {
 		V operate(T t) throws Exception;
 	}
 
-
 	/** active, valid bundles */
 	private final ConcurrentMap<Bundle, T> activeBundles = new ConcurrentHashMap<Bundle, T>(8);
 	/** lazy bundles (potentially invalid) */
 	private final ConcurrentMap<Bundle, Boolean> lazyBundles = new ConcurrentHashMap<Bundle, Boolean>(8);
 
 	/**
-	 * Queue of bundles that have been activated and validated and should be
-	 * removed from the lazy map. This is needed so that promoted bundles do not
-	 * go unseen by threads using the method at that point.
+	 * Queue of bundles that have been activated and validated and should be removed from the lazy map. This is needed
+	 * so that promoted bundles do not go unseen by threads using the method at that point.
 	 */
 	private final List<Bundle> promotionQueue = new ArrayList<Bundle>(4);
 
@@ -120,7 +112,6 @@ class LazyBundleRegistry<T> {
 
 	private final Condition condition;
 	private final Activator<T> activator;
-
 
 	LazyBundleRegistry(Condition promotionCondition, Activator<T> activator, Log log) {
 		this.condition = promotionCondition;
@@ -131,8 +122,7 @@ class LazyBundleRegistry<T> {
 	void add(Bundle bundle, boolean isLazy, boolean applyCondition) {
 		if (isLazy) {
 			lazyBundles.put(bundle, Boolean.valueOf(applyCondition));
-		}
-		else {
+		} else {
 			activeBundles.put(bundle, activator.activate(bundle));
 		}
 	}
@@ -151,10 +141,8 @@ class LazyBundleRegistry<T> {
 	}
 
 	/**
-	 * Applies an operation on all the bundles. To cope with concurrent
-	 * environment, the class uses several queues so that lazy bundles that get
-	 * activated, do not get ignored by threads hitting the method right at that
-	 * point.
+	 * Applies an operation on all the bundles. To cope with concurrent environment, the class uses several queues so
+	 * that lazy bundles that get activated, do not get ignored by threads hitting the method right at that point.
 	 * 
 	 * @param <V>
 	 * @param action
@@ -176,7 +164,7 @@ class LazyBundleRegistry<T> {
 				}
 			}
 
-			// nothing found, look into lazy bundles 
+			// nothing found, look into lazy bundles
 			for (Iterator<Map.Entry<Bundle, Boolean>> i = lazyBundles.entrySet().iterator(); i.hasNext();) {
 				Entry<Bundle, Boolean> entry = i.next();
 				Bundle bundle = entry.getKey();
@@ -192,16 +180,15 @@ class LazyBundleRegistry<T> {
 							promotionQueue.add(bundle);
 						}
 					}
-					
+
 					if (result != null) {
 						V value = action.operate(result);
 						if (value != null) {
 							return value;
 						}
 					}
-				}
-				else {
-					// the bundle is not compatible, remove it asap  
+				} else {
+					// the bundle is not compatible, remove it asap
 					lazyBundles.remove(bundle);
 					if (debug)
 						log.debug("Activated lazy bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle)

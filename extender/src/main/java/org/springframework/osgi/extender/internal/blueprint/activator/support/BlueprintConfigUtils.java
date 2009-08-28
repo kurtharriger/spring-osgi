@@ -117,7 +117,7 @@ public class BlueprintConfigUtils {
 	/**
 	 * Shortcut for finding the boolean value for {@link #BLUEPRINT_TIMEOUT} directive using the given headers.
 	 * 
-	 * Assumes the headers belong to a Spring powered bundle. Returns the timeout (in seconds) for which the application
+	 * Assumes the headers belong to a Spring powered bundle. Returns the timeout (in milliseconds) for which the application
 	 * context should wait to have its dependencies satisfied.
 	 * 
 	 * @param headers
@@ -133,7 +133,7 @@ public class BlueprintConfigUtils {
 			return Long.valueOf(value).longValue();
 		}
 
-		return ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT;
+		return ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT * 1000;
 	}
 
 	/**
