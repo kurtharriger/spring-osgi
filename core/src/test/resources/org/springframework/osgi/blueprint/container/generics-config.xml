@@ -9,6 +9,17 @@
 	
 	<description>Generic component instantiation</description>
 
+    <bean id="rawInjection" class="org.springframework.osgi.blueprint.container.GenerifiedBean">
+        <property name="booleanHolder">
+            <bean class="org.springframework.osgi.blueprint.container.GenericHolder">
+                <argument>
+                	<value type="java.lang.Boolean">true</value>
+                </argument>
+            </bean>
+        </property>        
+    </bean>
+    
+ 
     <bean id="genericConversion" class="org.springframework.osgi.blueprint.container.GenerifiedBean">
         <property name="pointMap">
             <list>
@@ -43,5 +54,5 @@
             </map>
         </property>        
     </bean>
-    	
+   	
 </blueprint>

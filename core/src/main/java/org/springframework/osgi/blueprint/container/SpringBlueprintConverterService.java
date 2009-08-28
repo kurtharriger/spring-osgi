@@ -25,11 +25,11 @@ import java.util.List;
 import org.osgi.service.blueprint.container.Converter;
 import org.osgi.service.blueprint.container.ReifiedType;
 import org.springframework.beans.SimpleTypeConverter;
-import org.springframework.beans.TypeConverter;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.ConverterNotFoundException;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.context.support.internal.security.SecurityUtils;
@@ -99,12 +99,24 @@ public class SpringBlueprintConverterService implements ConversionService {
 			return result;
 		}
 
+		MethodParameter mp = targetType.getMethodParameter();
+		Class<?> tType = (mp != null && mp.getNestingLevel() > 1 ? null : targetType.getType());
+
+		if (!targetType.isCollection() && !targetType.isArray() && !targetType.isMap()) {
+			if (type.size() > 0) {
+				for (int i = 0; i < type.size(); i++) {
+					ReifiedType arg = type.getActualTypeArgument(i);
+					if (!Object.class.equals(arg.getRawClass())) {
+						throw new ConverterNotFoundException(source.getClass(), tType,
+								"No conversion found for generic argument(s) for reified type " + arg.getRawClass());
+					}
+				}
+			}
+		}
+
 		if (delegate != null) {
 			delegate.convert(source, targetType);
 		}
-
-		MethodParameter mp = targetType.getMethodParameter();
-		Class<?> tType = (mp != null && mp.getNestingLevel() > 1 ? null : targetType.getType());
 
 		lazyInitConverter();
 		return typeConverter.convertIfNecessary(source, tType, targetType.getMethodParameter());
