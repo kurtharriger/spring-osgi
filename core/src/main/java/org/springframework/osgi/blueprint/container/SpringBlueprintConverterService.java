@@ -49,10 +49,6 @@ public class SpringBlueprintConverterService implements ConversionService {
 	private final ConfigurableBeanFactory cbf;
 	private volatile boolean converterInitialized = false;
 
-	public SpringBlueprintConverterService() {
-		this(null, null);
-	}
-
 	public SpringBlueprintConverterService(ConversionService delegate, ConfigurableBeanFactory cbf) {
 		this.delegate = delegate;
 		this.cbf = cbf;

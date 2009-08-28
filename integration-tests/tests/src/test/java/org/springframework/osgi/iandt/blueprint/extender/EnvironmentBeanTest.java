@@ -23,7 +23,7 @@ import org.springframework.osgi.iandt.blueprint.BaseBlueprintIntegrationTest;
 /**
  * @author Costin Leau
  */
-public class EnvironmentBeans extends BaseBlueprintIntegrationTest {
+public class EnvironmentBeanTest extends BaseBlueprintIntegrationTest {
 
 	private static final String SYM_NAME = "org.springframework.osgi.rfc124.iandt.simpleservice";
 
