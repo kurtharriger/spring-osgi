@@ -158,30 +158,33 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 		BundleContext bundleContext = getBundleContext();
 		ClassLoader classLoader = getAopClassLoader();
 		Filter filter = getUnifiedFilter();
+		boolean useServiceReferences = MemberType.SERVICE_REFERENCE.equals(memberType);
 
 		if (CollectionType.LIST.equals(collectionType)) {
 			collection =
 					(comparator == null ? new OsgiServiceList(filter, bundleContext, classLoader, proxyCreator,
-							memberType) : new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator,
-							proxyCreator, memberType));
+							useServiceReferences) : new OsgiServiceSortedList(filter, bundleContext, classLoader,
+							comparator, proxyCreator, useServiceReferences));
 			delegate = Collections.unmodifiableList((List) collection);
 		} else if (CollectionType.SET.equals(collectionType)) {
 			collection =
 					(comparator == null ? new OsgiServiceSet(filter, bundleContext, classLoader, proxyCreator,
-							memberType) : new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator,
-							proxyCreator, memberType));
+							useServiceReferences) : new OsgiServiceSortedSet(filter, bundleContext, classLoader,
+							comparator, proxyCreator, useServiceReferences));
 
 			delegate = Collections.unmodifiableSet((Set) collection);
 		} else if (CollectionType.SORTED_LIST.equals(collectionType)) {
 			collection =
-					new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator, proxyCreator, memberType);
+					new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator, proxyCreator,
+							useServiceReferences);
 
 			delegate = Collections.unmodifiableList((List) collection);
 		}
 
 		else if (CollectionType.SORTED_SET.equals(collectionType)) {
 			collection =
-					new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator, proxyCreator, memberType);
+					new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator, proxyCreator,
+							useServiceReferences);
 			delegate = Collections.unmodifiableSortedSet((SortedSet) collection);
 		}
 

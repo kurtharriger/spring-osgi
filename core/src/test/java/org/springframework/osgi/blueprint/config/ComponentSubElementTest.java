@@ -75,7 +75,7 @@ public class ComponentSubElementTest extends TestCase {
 		reader.loadBeanDefinitions(new ClassPathResource(CONFIG, getClass()));
 		context.refresh();
 
-		BlueprintContainer = new SpringBlueprintContainer(context, bundleContext);
+		BlueprintContainer = new SpringBlueprintContainer(context);
 	}
 
 	protected void tearDown() throws Exception {

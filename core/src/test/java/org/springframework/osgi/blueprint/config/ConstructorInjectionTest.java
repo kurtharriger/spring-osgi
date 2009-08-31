@@ -54,7 +54,7 @@ public class ConstructorInjectionTest extends TestCase {
 		reader.loadBeanDefinitions(new ClassPathResource(CONFIG, getClass()));
 		context.getBeanFactory().setConversionService(new SpringBlueprintConverterService(null, context.getBeanFactory()));
 		context.refresh();
-		container = new SpringBlueprintContainer(context, null);
+		container = new SpringBlueprintContainer(context);
 	}
 
 	protected void tearDown() throws Exception {

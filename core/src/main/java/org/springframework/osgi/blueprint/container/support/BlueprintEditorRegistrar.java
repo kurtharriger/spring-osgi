@@ -60,7 +60,7 @@ public class BlueprintEditorRegistrar implements PropertyEditorRegistrar {
 	 */
 	private static class BlueprintCustomCollectionEditor extends CustomCollectionEditor {
 
-		public BlueprintCustomCollectionEditor(Class collectionType) {
+		public BlueprintCustomCollectionEditor(Class<?> collectionType) {
 			super(collectionType);
 		}
 
@@ -73,6 +73,7 @@ public class BlueprintEditorRegistrar implements PropertyEditorRegistrar {
 			super.setValue(value);
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		protected Collection createCollection(Class collectionType, int initialCapacity) {
 			if (!collectionType.isInterface()) {

@@ -55,7 +55,7 @@ public class TestLazyBeansTest extends TestCase {
 			public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 				beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
 				beanFactory.registerSingleton("blueprintContainer",
-						new SpringBlueprintContainer(context, bundleContext));
+						new SpringBlueprintContainer(context));
 			}
 		});
 
@@ -64,7 +64,7 @@ public class TestLazyBeansTest extends TestCase {
 		reader.loadBeanDefinitions(new ClassPathResource(CONFIG, getClass()));
 		context.refresh();
 
-		blueprintContainer = new SpringBlueprintContainer(context, bundleContext);
+		blueprintContainer = new SpringBlueprintContainer(context);
 	}
 
 	protected void tearDown() throws Exception {

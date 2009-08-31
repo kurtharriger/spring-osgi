@@ -26,7 +26,7 @@ import org.osgi.service.blueprint.reflect.PropsMetadata;
  * 
  * @author Costin Leau
  */
-public class SimplePropsMetadata implements PropsMetadata {
+class SimplePropsMetadata implements PropsMetadata {
 
 	private final List<MapEntry> entries;
 

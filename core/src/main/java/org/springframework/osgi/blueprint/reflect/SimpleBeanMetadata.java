@@ -31,7 +31,7 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  */
-class SpringBeanMetadata extends SpringComponentMetadata implements BeanMetadata {
+class SimpleBeanMetadata extends SimpleComponentMetadata implements BeanMetadata {
 
 	private final List<BeanArgument> arguments;
 	private final List<BeanProperty> properties;
@@ -46,7 +46,7 @@ class SpringBeanMetadata extends SpringComponentMetadata implements BeanMetadata
 	 * @param name bean name
 	 * @param definition Spring bean definition
 	 */
-	public SpringBeanMetadata(String name, BeanDefinition definition) {
+	public SimpleBeanMetadata(String name, BeanDefinition definition) {
 		super(name, definition);
 
 		final String factoryMtd = definition.getFactoryMethodName();

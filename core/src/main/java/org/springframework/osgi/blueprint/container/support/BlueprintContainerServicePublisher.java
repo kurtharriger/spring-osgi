@@ -86,8 +86,6 @@ public class BlueprintContainerServicePublisher implements ApplicationListener<A
 		final Dictionary<String, Object> serviceProperties = new Hashtable<String, Object>();
 
 		Bundle bundle = bundleContext.getBundle();
-		// add RFC124 properties
-
 		String symName = bundle.getSymbolicName();
 		serviceProperties.put(Constants.BUNDLE_SYMBOLICNAME, symName);
 		serviceProperties.put(BLUEPRINT_SYMNAME, symName);

@@ -24,7 +24,7 @@ import org.springframework.osgi.service.importer.support.MemberType;
 /**
  * @author Costin Leau
  */
-class SpringReferenceListMetadata extends SpringServiceReferenceComponentMetadata implements ReferenceListMetadata {
+class SimpleReferenceListMetadata extends SimpleServiceReferenceComponentMetadata implements ReferenceListMetadata {
 
 	private final int memberType;
 	private static final String MEMBER_TYPE_PROP = "memberType";
@@ -35,7 +35,7 @@ class SpringReferenceListMetadata extends SpringServiceReferenceComponentMetadat
 	 * @param name
 	 * @param definition
 	 */
-	public SpringReferenceListMetadata(String name, BeanDefinition definition) {
+	public SimpleReferenceListMetadata(String name, BeanDefinition definition) {
 		super(name, definition);
 
 		MemberType type = MemberType.SERVICE_OBJECT;

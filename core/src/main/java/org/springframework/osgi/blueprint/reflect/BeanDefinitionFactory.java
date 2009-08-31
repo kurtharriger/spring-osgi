@@ -47,8 +47,8 @@ class BeanDefinitionFactory implements MetadataConstants {
 
 	BeanDefinition buildBeanDefinitionFor(ComponentMetadata metadata) {
 		// shortcut (to avoid re-rewrapping)
-		if (metadata instanceof SpringComponentMetadata) {
-			return ((SpringComponentMetadata) metadata).getBeanDefinition();
+		if (metadata instanceof SimpleComponentMetadata) {
+			return ((SimpleComponentMetadata) metadata).getBeanDefinition();
 		}
 
 		AbstractBeanDefinition definition = buildBeanDefinition(metadata);

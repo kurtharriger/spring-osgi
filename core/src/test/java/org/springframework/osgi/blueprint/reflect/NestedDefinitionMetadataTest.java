@@ -66,7 +66,7 @@ public class NestedDefinitionMetadataTest extends TestCase {
 		reader.loadBeanDefinitions(new ClassPathResource(CONFIG, getClass()));
 		context.refresh();
 
-		blueprintContainer = new SpringBlueprintContainer(context, bundleContext);
+		blueprintContainer = new SpringBlueprintContainer(context);
 	}
 
 	protected void tearDown() throws Exception {
@@ -77,42 +77,42 @@ public class NestedDefinitionMetadataTest extends TestCase {
 	public void testFirstLevel() throws Exception {
 		String name = "first-level";
 		BeanDefinition def = context.getBeanDefinition(name);
-		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(name, def);
+		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(def);
 		assertEquals(2, metadata.size());
 	}
 
 	public void testDeeplyNested() throws Exception {
 		String name = "deeply-nested";
 		BeanDefinition def = context.getBeanDefinition(name);
-		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(name, def);
+		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(def);
 		assertEquals(3, metadata.size());
 	}
 
 	public void testCollectionNested() throws Exception {
 		String name = "nested-collection";
 		BeanDefinition def = context.getBeanDefinition(name);
-		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(name, def);
+		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(def);
 		assertEquals(3, metadata.size());
 	}
 
 	public void testNestedBeans() throws Exception {
 		String name = "nested-beans";
 		BeanDefinition def = context.getBeanDefinition(name);
-		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(name, def);
+		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(def);
 		assertEquals(4, metadata.size());
 	}
 
 	public void testNestedServices() throws Exception {
 		String name = "nested-references";
 		BeanDefinition def = context.getBeanDefinition(name);
-		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(name, def);
+		Collection<ComponentMetadata> metadata = ComponentMetadataFactory.buildNestedMetadata(def);
 		assertEquals(2, metadata.size());
 	}
 
 	public void testOverallMetadata() throws Exception {
 
 		BeanDefinition def = new GenericBeanDefinition();
-		assertEquals(new SpringComponentMetadata(null, def), new SpringComponentMetadata("foo", def));
+		assertEquals(new SimpleComponentMetadata(null, def), new SimpleComponentMetadata("foo", def));
 
 		Collection<ComponentMetadata> metadata = blueprintContainer.getMetadata(ComponentMetadata.class);
 

@@ -303,7 +303,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	private volatile boolean useBlueprintExceptions = false;
 
 	public OsgiServiceCollection(Filter filter, BundleContext context, ClassLoader classLoader,
-			ServiceProxyCreator proxyCreator, MemberType memberType) {
+			ServiceProxyCreator proxyCreator, boolean useServiceReference) {
 		Assert.notNull(classLoader, "ClassLoader is required");
 		Assert.notNull(context, "context is required");
 
@@ -312,7 +312,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		this.classLoader = classLoader;
 
 		this.proxyCreator = proxyCreator;
-		this.useServiceReferences = MemberType.SERVICE_REFERENCE.equals(memberType);
+		this.useServiceReferences = useServiceReference;
 		listener = new ServiceInstanceListener();
 	}
 

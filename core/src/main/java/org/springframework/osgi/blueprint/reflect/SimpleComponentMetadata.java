@@ -35,14 +35,14 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
-public class SpringComponentMetadata implements ComponentMetadata {
+class SimpleComponentMetadata implements ComponentMetadata {
 
 	private final String name;
 	protected final AbstractBeanDefinition beanDefinition;
 	private final List<String> dependsOn;
 	private final int activation;
 
-	public SpringComponentMetadata(String name, BeanDefinition definition) {
+	public SimpleComponentMetadata(String name, BeanDefinition definition) {
 		if (!(definition instanceof AbstractBeanDefinition)) {
 			throw new IllegalArgumentException("Unknown bean definition passed in" + definition);
 		}
@@ -104,8 +104,8 @@ public class SpringComponentMetadata implements ComponentMetadata {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj instanceof SpringComponentMetadata) {
-			SpringComponentMetadata other = (SpringComponentMetadata) obj;
+		if (obj instanceof SimpleComponentMetadata) {
+			SimpleComponentMetadata other = (SimpleComponentMetadata) obj;
 			if (beanDefinition == null) {
 				if (other.beanDefinition != null)
 					return false;

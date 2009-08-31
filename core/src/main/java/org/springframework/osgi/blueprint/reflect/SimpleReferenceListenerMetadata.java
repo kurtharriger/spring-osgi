@@ -26,7 +26,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
  * 
  * @author Costin Leau
  */
-public class SimpleReferenceListenerMetadata implements ReferenceListener {
+class SimpleReferenceListenerMetadata implements ReferenceListener {
 
 	private static final String BIND_PROP = "bindMethod";
 	private static final String UNBIND_PROP = "unbindMethod";

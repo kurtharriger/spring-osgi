@@ -46,7 +46,7 @@ public class OsgiServiceSortedListTest extends AbstractOsgiCollectionTest {
 
 	OsgiServiceCollection createCollection() {
 		return new OsgiServiceSortedList(null, context, getClass().getClassLoader(), createProxyCreator(new Class<?>[] {
-				Wrapper.class, Comparable.class }), MemberType.SERVICE_OBJECT);
+				Wrapper.class, Comparable.class }), false);
 	}
 
 	public void testOrderingWhileAdding() {

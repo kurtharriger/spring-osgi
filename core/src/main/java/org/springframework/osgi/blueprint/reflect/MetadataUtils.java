@@ -18,7 +18,6 @@ package org.springframework.osgi.blueprint.reflect;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +40,7 @@ abstract class MetadataUtils {
 	static Object getValue(PropertyValues pvs, String name) {
 		if (pvs.contains(name)) {
 			PropertyValue pv = pvs.getPropertyValue(name);
-			//return (pv.isConverted() ? pv.getConvertedValue() : pv.getValue());
+			// return (pv.isConverted() ? pv.getConvertedValue() : pv.getValue());
 			return pv.getValue();
 		}
 
@@ -49,12 +48,12 @@ abstract class MetadataUtils {
 	}
 
 	static Object getValue(PropertyValue pv) {
-		//return (pv.isConverted() ? pv.getConvertedValue() : pv.getValue());
+		// return (pv.isConverted() ? pv.getConvertedValue() : pv.getValue());
 		return pv.getValue();
 	}
 
 	static Object getValue(ValueHolder valueHolder) {
-		//return (valueHolder.isConverted() ? valueHolder.getConvertedValue() : valueHolder.getValue());
+		// return (valueHolder.isConverted() ? valueHolder.getConvertedValue() : valueHolder.getValue());
 		return valueHolder.getValue();
 	}
 
@@ -70,9 +69,7 @@ abstract class MetadataUtils {
 		if (!indexedArguments.isEmpty()) {
 			temp = new ArrayList<BeanArgument>(indexedArguments.size());
 
-			for (Iterator<Map.Entry<Integer, ValueHolder>> iterator = indexedArguments.entrySet().iterator(); iterator
-					.hasNext();) {
-				Map.Entry<Integer, ValueHolder> entry = iterator.next();
+			for (Map.Entry<Integer, ValueHolder> entry : indexedArguments.entrySet()) {
 				temp.add(new SimpleBeanArgument(entry.getKey(), entry.getValue()));
 			}
 		} else {

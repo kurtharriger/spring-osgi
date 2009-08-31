@@ -20,7 +20,6 @@ import java.util.SortedSet;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
-import org.springframework.osgi.service.importer.support.MemberType;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 
 /**
@@ -43,13 +42,13 @@ public class OsgiServiceSortedSet extends OsgiServiceSet implements SortedSet {
 	private final Comparator comparator;
 
 	public OsgiServiceSortedSet(Filter filter, BundleContext context, ClassLoader classLoader,
-			ServiceProxyCreator proxyCreator, MemberType memberType) {
-		this(filter, context, classLoader, null, proxyCreator, memberType);
+			ServiceProxyCreator proxyCreator, boolean useServiceReferences) {
+		this(filter, context, classLoader, null, proxyCreator, useServiceReferences);
 	}
 
 	public OsgiServiceSortedSet(Filter filter, BundleContext context, ClassLoader classLoader, Comparator comparator,
-			ServiceProxyCreator proxyCreator, MemberType memberType) {
-		super(filter, context, classLoader, proxyCreator, memberType);
+			ServiceProxyCreator proxyCreator, boolean useServiceReferences) {
+		super(filter, context, classLoader, proxyCreator, useServiceReferences);
 		this.comparator = comparator;
 	}
 

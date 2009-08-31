@@ -39,7 +39,7 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.ManagedProperties;
 import org.springframework.beans.factory.support.ManagedSet;
-import org.springframework.osgi.blueprint.config.internal.temp.OrderedManagedProperties;
+import org.springframework.osgi.blueprint.reflect.internal.support.OrderedManagedProperties;
 
 /**
  * Adapter between OSGi's Blueprint {@link Value} and Spring {@link BeanMetadataElement}.
