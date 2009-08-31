@@ -194,7 +194,6 @@ limitations under the License.
   <!-- modules for Spring-OSGi -->
   <modules>   
     <module>mock</module>
-    <module>rfc-124/api</module>
     <module>io</module>
     <module>core</module>
     <module>extender</module>
@@ -203,7 +202,6 @@ limitations under the License.
     <module>web-extender</module>
     <module>bundle-archetype</module>
     <module>annotation</module>
-    <module>rfc-124/packaging</module>
     <!-- unused at the moment
     <module>release</module>
     -->
@@ -710,6 +708,10 @@ Ignored-Existing-Headers:
         <osgi.test.platform>org.springframework.osgi.test.platform.EquinoxPlatform</osgi.test.platform>
         <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
+      <modules>
+        <module>rfc-124/api</module>
+        <module>rfc-124/packaging</module>
+      </modules>
     </profile>
     
     <profile>
