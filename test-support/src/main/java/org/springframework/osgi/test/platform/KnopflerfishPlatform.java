@@ -17,25 +17,129 @@
 package org.springframework.osgi.test.platform;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Properties;
 
-import org.knopflerfish.framework.Framework;
 import org.osgi.framework.BundleContext;
+import org.springframework.beans.BeanUtils;
 import org.springframework.osgi.test.internal.util.IOUtils;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ReflectionUtils;
 
 /**
- * Knopflerfish 2.0.4+ Platform.
+ * Knopflerfish 2.0.4+ Platform. Handles the 3.x line through reflection.
  * 
  * @author Costin Leau
  */
 public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 
+	private static interface KFBootstrapper {
+		BundleContext start();
+
+		void stop();
+	}
+
+	private static class KF2Bootstrapper implements KFBootstrapper {
+		private static final Class<?> BOOT_CLASS;
+		private static final Constructor<?> CONSTRUCTOR;
+		private static final Method LAUNCH;
+		private static final Method GET_BUNDLE_CONTEXT;
+		private static final Method SHUTDOWN;
+
+		static {
+			BOOT_CLASS = ClassUtils.resolveClassName(KF_2X_BOOT_CLASS, KF2Bootstrapper.class.getClassLoader());
+
+			try {
+				CONSTRUCTOR = BOOT_CLASS.getDeclaredConstructor(Object.class);
+			} catch (NoSuchMethodException nsme) {
+				throw new IllegalArgumentException("Invalid framework class", nsme);
+			}
+
+			LAUNCH = BeanUtils.findDeclaredMethod(BOOT_CLASS, "launch", new Class[] { long.class });
+			GET_BUNDLE_CONTEXT =
+					org.springframework.util.ReflectionUtils.findMethod(BOOT_CLASS, "getSystemBundleContext");
+			SHUTDOWN = org.springframework.util.ReflectionUtils.findMethod(BOOT_CLASS, "shutdown");
+		}
+
+		private final Object monitor;
+		private Object framework;
+
+		KF2Bootstrapper(Object monitor) {
+			this.monitor = monitor;
+
+		}
+
+		public BundleContext start() {
+			framework = BeanUtils.instantiateClass(CONSTRUCTOR, monitor);
+			org.springframework.util.ReflectionUtils.invokeMethod(LAUNCH, framework, Integer.valueOf(0));
+			return (BundleContext) org.springframework.util.ReflectionUtils.invokeMethod(GET_BUNDLE_CONTEXT, framework);
+		}
+
+		public void stop() {
+			if (framework != null) {
+				org.springframework.util.ReflectionUtils.invokeMethod(SHUTDOWN, framework);
+				framework = null;
+			}
+		}
+	}
+
+	private static class KF3Bootstrapper implements KFBootstrapper {
+		private static final Class<?> BOOT_CLASS;
+		private static final Constructor<?> CONSTRUCTOR;
+		private static final Method INIT;
+		private static final Method LAUNCH;
+		private static final Method GET_BUNDLE_CONTEXT;
+		private static final Method SHUTDOWN;
+
+		private Object framework;
+		private Map properties;
+
+		static {
+			BOOT_CLASS = ClassUtils.resolveClassName(KF_3X_BOOT_CLASS, KF3Bootstrapper.class.getClassLoader());
+
+			try {
+				CONSTRUCTOR = BOOT_CLASS.getDeclaredConstructor(Map.class, BOOT_CLASS);
+			} catch (NoSuchMethodException nsme) {
+				throw new IllegalArgumentException("Invalid framework class", nsme);
+			}
+
+			INIT = BeanUtils.findDeclaredMethod(BOOT_CLASS, "init", null);
+			ReflectionUtils.makeAccessible(INIT);
+			LAUNCH = BeanUtils.findDeclaredMethod(BOOT_CLASS, "launch", null);
+			GET_BUNDLE_CONTEXT =
+					org.springframework.util.ReflectionUtils.findMethod(BOOT_CLASS, "getSystemBundleContext");
+			SHUTDOWN = org.springframework.util.ReflectionUtils.findMethod(BOOT_CLASS, "shutdown");
+		}
+
+		KF3Bootstrapper(Map properties) {
+			this.properties = properties;
+		}
+
+		public BundleContext start() {
+			framework = BeanUtils.instantiateClass(CONSTRUCTOR, properties, null);
+			ReflectionUtils.invokeMethod(INIT, framework);
+			ReflectionUtils.invokeMethod(LAUNCH, framework);
+			return (BundleContext) org.springframework.util.ReflectionUtils.invokeMethod(GET_BUNDLE_CONTEXT, framework);
+		}
+
+		public void stop() {
+			if (framework != null) {
+				org.springframework.util.ReflectionUtils.invokeMethod(SHUTDOWN, framework);
+				framework = null;
+			}
+		}
+	}
+
+	private static final String KF_2X_BOOT_CLASS = "org.knopflerfish.framework.Framework";
+	private static final String KF_3X_BOOT_CLASS = "org.knopflerfish.framework.FrameworkContext";
+	private static final boolean KF_2X =
+			ClassUtils.isPresent(KF_2X_BOOT_CLASS, KnopflerfishPlatform.class.getClassLoader());
+
 	private BundleContext context;
-
-	private Framework framework;
-
+	private KFBootstrapper framework;
 	private File kfStorageDir;
-
 
 	public KnopflerfishPlatform() {
 		toString = "Knopflerfish OSGi Platform";
@@ -76,10 +180,8 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 		if (framework == null) {
 			// copy configuration properties to sys properties
 			System.getProperties().putAll(getConfigurationProperties());
-
-			framework = new Framework(this);
-			framework.launch(0);
-			context = framework.getSystemBundleContext();
+			framework = (KF_2X ? new KF2Bootstrapper(this) : new KF3Bootstrapper(getPlatformProperties()));
+			context = framework.start();
 		}
 	}
 
@@ -87,9 +189,8 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 		if (framework != null) {
 			context = null;
 			try {
-				framework.shutdown();
-			}
-			finally {
+				framework.stop();
+			} finally {
 				framework = null;
 				IOUtils.delete(kfStorageDir);
 			}

@@ -8,8 +8,9 @@ Changes in version 2.0.0 M1 (2009-mm-dd)
 General
 * JDK 5.0 required for both building and running; for JDK 1.4 support use 1.2.x branch
 * upgraded to Spring Framework 3.0
-* upgraded to Equinox 3.4.3
+* upgraded to Equinox 3.5.0
 * upgraded to Knopflerfish 2.3.0
+* upgraded to Felix 1.8.0
 * generified classes (both public and internal)
 * updated archetype project to save locally the manifest generated during packaging
 * added new elements to spring-osgi schema
