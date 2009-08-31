@@ -39,8 +39,8 @@
    
    <!-- platform versions -->
    <equinox.ver>3.5.0.v20090513</equinox.ver>
-   <kf.ver>2.3.0</kf.ver>
-   <felix.ver>1.4.1</felix.ver>
+   <kf.ver>3.0.0.alpha1</kf.ver>
+   <felix.ver>1.8.0</felix.ver>
    
    <!-- javadoc configuration -->
    <javadoc.loc>${basedir}/docs/src/javadoc</javadoc.loc>
