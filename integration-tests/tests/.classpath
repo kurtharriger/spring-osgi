@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
+	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/3.0.0.alpha1/framework-3.0.0.alpha1.jar" sourcepath="/KF3_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.4.3/org.eclipse.osgi-3.4.3.jar" sourcepath="/M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.4.3/org.eclipse.osgi-3.4.3-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/2.3.0/framework-2.3.0.jar" sourcepath="/KF_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/3.0.0.BUILD-SNAPSHOT/org.springframework.context-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="/M2_REPO/org/springframework/org.springframework.context/3.0.0.BUILD-SNAPSHOT/org.springframework.context-3.0.0.BUILD-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.aop/3.0.0.BUILD-SNAPSHOT/org.springframework.aop-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/aopalliance/com.springsource.org.aopalliance/1.0.0/com.springsource.org.aopalliance-1.0.0.jar"/>
@@ -21,7 +21,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.apache.felix.main/1.4.1/org.apache.felix.main-1.4.1.jar" sourcepath="/FELIX_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/2.0.0-m1-SNAPSHOT/spring-osgi-core-2.0.0-m1-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/2.0.0-m1-SNAPSHOT/spring-osgi-test-2.0.0-m1-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/extender/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/2.0.0-m1-SNAPSHOT/spring-osgi-test-2.0.0-m1-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/test-support/src/main/java"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/2.0.0-m1-SNAPSHOT/spring-osgi-io-2.0.0-m1-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/io/src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="var" path="M2_REPO/org/objectweb/asm/com.springsource.org.objectweb.asm/2.2.3/com.springsource.org.objectweb.asm-2.2.3.jar"/>
