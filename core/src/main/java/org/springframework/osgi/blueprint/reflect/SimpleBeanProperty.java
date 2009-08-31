@@ -26,7 +26,7 @@ import org.springframework.beans.PropertyValue;
  * @author Costin Leau
  * 
  */
-public class SimpleBeanProperty implements BeanProperty {
+class SimpleBeanProperty implements BeanProperty {
 
 	private final String name;
 	private final Metadata value;

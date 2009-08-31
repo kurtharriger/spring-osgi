@@ -21,7 +21,6 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,7 +32,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Factory between Spring type descriptor and reified type.
+ * Adaptor factory between Spring type descriptor and OSGi 4.2 Reified type.
  * 
  * @author Costin Leau
  */
@@ -137,7 +136,7 @@ class TypeFactory {
 		}
 
 		if (targetType instanceof TypeVariable) {
-			Type[] bounds = ((TypeVariable) targetType).getBounds();
+			Type[] bounds = ((TypeVariable<?>) targetType).getBounds();
 			return getReifiedType(bounds[0]);
 		}
 

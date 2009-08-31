@@ -24,7 +24,7 @@ import org.osgi.service.blueprint.reflect.IdRefMetadata;
  * @author Costin Leau
  * 
  */
-public class SimpleIdRefMetadata implements IdRefMetadata {
+class SimpleIdRefMetadata implements IdRefMetadata {
 
 	private final String referenceName;
 

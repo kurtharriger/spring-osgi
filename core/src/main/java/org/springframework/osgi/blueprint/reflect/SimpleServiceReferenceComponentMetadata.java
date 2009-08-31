@@ -35,7 +35,7 @@ import org.springframework.osgi.service.importer.support.Availability;
  * @author Adrian Colyer
  * @author Costin Leau
  */
-abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMetadata implements
+abstract class SimpleServiceReferenceComponentMetadata extends SimpleComponentMetadata implements
 		ServiceReferenceMetadata {
 
 	private static final String FILTER_PROP = "filter";
@@ -56,7 +56,7 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 	 * @param name bean name
 	 * @param definition bean definition
 	 */
-	public SpringServiceReferenceComponentMetadata(String name, BeanDefinition definition) {
+	public SimpleServiceReferenceComponentMetadata(String name, BeanDefinition definition) {
 		super(name, definition);
 
 		MutablePropertyValues pvs = beanDefinition.getPropertyValues();

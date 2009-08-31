@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
-import org.springframework.osgi.service.importer.support.MemberType;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 
 /**
@@ -36,12 +35,11 @@ import org.springframework.osgi.service.importer.support.internal.aop.ServicePro
 public class OsgiServiceSet extends OsgiServiceCollection implements Set {
 
 	public OsgiServiceSet(Filter filter, BundleContext context, ClassLoader classLoader,
-			ServiceProxyCreator proxyCreator, MemberType memberType) {
-		super(filter, context, classLoader, proxyCreator, memberType);
+			ServiceProxyCreator proxyCreator, boolean useServiceReferences) {
+		super(filter, context, classLoader, proxyCreator, useServiceReferences);
 	}
 
 	protected DynamicCollection createInternalDynamicStorage() {
 		return new DynamicSet();
 	}
-
 }

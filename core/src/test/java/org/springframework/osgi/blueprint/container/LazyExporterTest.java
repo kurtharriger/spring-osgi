@@ -59,7 +59,7 @@ public class LazyExporterTest extends TestCase {
 		reader.loadBeanDefinitions(new ClassPathResource(CONFIG, getClass()));
 		context.refresh();
 
-		blueprintContainer = new SpringBlueprintContainer(context, bundleContext);
+		blueprintContainer = new SpringBlueprintContainer(context);
 	}
 
 	protected void tearDown() throws Exception {

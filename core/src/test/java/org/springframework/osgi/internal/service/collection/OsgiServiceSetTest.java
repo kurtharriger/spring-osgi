@@ -52,7 +52,7 @@ public class OsgiServiceSetTest extends AbstractOsgiCollectionTest {
 
 	OsgiServiceCollection createCollection() {
 		return new OsgiServiceSet(null, context, getClass().getClassLoader(), createProxyCreator(new Class<?>[] {
-				Wrapper.class, Comparable.class }), MemberType.SERVICE_OBJECT);
+				Wrapper.class, Comparable.class }), false);
 	}
 
 	public void testAddDuplicates() {

@@ -26,7 +26,7 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
-public class SimpleValueMetadata implements ValueMetadata {
+class SimpleValueMetadata implements ValueMetadata {
 
 	private final String typeName, value;
 

@@ -24,7 +24,7 @@ import org.springframework.beans.factory.config.TypedStringValue;
 /**
  * @author Costin Leau
  */
-class SpringReferenceMetadata extends SpringServiceReferenceComponentMetadata implements ReferenceMetadata {
+class SimpleReferenceMetadata extends SimpleServiceReferenceComponentMetadata implements ReferenceMetadata {
 
 	private static final String TIMEOUT_PROP = "timeout";
 	private static final long DEFAULT_TIMEOUT = 300000;
@@ -36,7 +36,7 @@ class SpringReferenceMetadata extends SpringServiceReferenceComponentMetadata im
 	 * @param name
 	 * @param definition
 	 */
-	public SpringReferenceMetadata(String name, BeanDefinition definition) {
+	public SimpleReferenceMetadata(String name, BeanDefinition definition) {
 		super(name, definition);
 
 		MutablePropertyValues pvs = beanDefinition.getPropertyValues();

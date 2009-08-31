@@ -17,7 +17,6 @@ package org.springframework.osgi.internal.service.collection;
 
 import java.util.Iterator;
 
-import org.springframework.osgi.service.importer.support.MemberType;
 import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceCollection;
 import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSortedSet;
 
@@ -44,7 +43,7 @@ public class OsgiServiceSortedSetTest extends AbstractOsgiCollectionTest {
 
 	OsgiServiceCollection createCollection() {
 		return new OsgiServiceSortedSet(null, context, getClass().getClassLoader(), createProxyCreator(new Class<?>[] {
-				Wrapper.class, Comparable.class }), MemberType.SERVICE_OBJECT);
+				Wrapper.class, Comparable.class }), false);
 	}
 
 	public void testOrderingWhileAdding() {

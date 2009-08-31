@@ -35,7 +35,7 @@ import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegis
 import org.springframework.osgi.context.support.internal.security.SecurityUtils;
 
 /**
- * Blueprint converter adapter for Spring 3.0 ConverterService.
+ * OSGi 4.2 Blueprint converter adapter as an Spring 3.0 ConverterService.
  * 
  * @author Costin Leau
  */
@@ -75,6 +75,7 @@ public class SpringBlueprintConverterService implements ConversionService {
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	public <T> T convert(Object source, Class<T> targetType) {
 		return (T) convert(source, TypeDescriptor.valueOf(targetType));
 	}

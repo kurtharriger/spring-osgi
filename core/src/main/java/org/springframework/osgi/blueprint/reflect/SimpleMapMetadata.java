@@ -28,7 +28,7 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
-public class SimpleMapMetadata implements MapMetadata {
+class SimpleMapMetadata implements MapMetadata {
 
 	private final List<MapEntry> entries;
 	private final String keyValueType, valueValueType;

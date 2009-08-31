@@ -39,7 +39,7 @@ public class OsgiServiceCollectionTest extends AbstractOsgiCollectionTest {
 
 	OsgiServiceCollection createCollection() {
 		return new OsgiServiceCollection(null, context, getClass().getClassLoader(), createProxyCreator(new Class<?>[] {
-				Wrapper.class, Comparable.class }), MemberType.SERVICE_OBJECT);
+				Wrapper.class, Comparable.class }), false);
 	}
 
 	protected void tearDown() throws Exception {

@@ -24,7 +24,7 @@ import org.osgi.service.blueprint.reflect.RefMetadata;
  * @author Costin Leau
  * 
  */
-public class SimpleRefMetadata implements RefMetadata {
+class SimpleRefMetadata implements RefMetadata {
 
 	private final String componentId;
 

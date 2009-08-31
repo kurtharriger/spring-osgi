@@ -19,7 +19,6 @@ import java.util.Comparator;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
-import org.springframework.osgi.service.importer.support.MemberType;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 
 /**
@@ -42,13 +41,13 @@ public class OsgiServiceSortedList extends OsgiServiceList {
 	 * @param classLoader
 	 */
 	public OsgiServiceSortedList(Filter filter, BundleContext context, ClassLoader classLoader,
-			ServiceProxyCreator proxyCreator, MemberType memberType) {
-		this(filter, context, classLoader, null, proxyCreator, memberType);
+			ServiceProxyCreator proxyCreator, boolean useServiceReference) {
+		this(filter, context, classLoader, null, proxyCreator, useServiceReference);
 	}
 
 	public OsgiServiceSortedList(Filter filter, BundleContext context, ClassLoader classLoader, Comparator comparator,
-			ServiceProxyCreator proxyCreator, MemberType memberType) {
-		super(filter, context, classLoader, proxyCreator, memberType);
+			ServiceProxyCreator proxyCreator, boolean useServiceReference) {
+		super(filter, context, classLoader, proxyCreator, useServiceReference);
 		this.comparator = comparator;
 	}
 
@@ -60,5 +59,4 @@ public class OsgiServiceSortedList extends OsgiServiceList {
 	public Comparator comparator() {
 		return comparator;
 	}
-
 }

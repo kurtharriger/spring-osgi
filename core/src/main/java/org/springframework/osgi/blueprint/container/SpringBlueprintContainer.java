@@ -21,10 +21,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
 import org.osgi.service.blueprint.container.NoSuchComponentException;
@@ -39,8 +37,8 @@ import org.springframework.util.CollectionUtils;
  * Default {@link ModuleContext} implementation. Wraps a Spring's {@link ConfigurableListableBeanFactory} to the
  * BlueprintContainer interface.
  * 
- * <b>Note</b>: This class does not fully implements the Blueprint contract: for example it does not trigger any of the
- * Blueprint events or does not perform exception handling - these concerned are left to the Blueprint extender.
+ * <b>Note</b>: This class does not fully implements the Blueprint contract: for example it does not fire any of the
+ * Blueprint events nor performs exception handling - these concerned are left to the Blueprint extender.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
@@ -49,18 +47,16 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 
 	// cannot use a ConfigurableBeanFactory since the context is not yet refreshed at construction time
 	private final ConfigurableApplicationContext applicationContext;
-	private final BundleContext bundleContext;
-	private transient ConfigurableListableBeanFactory beanFactory;
+	private volatile ConfigurableListableBeanFactory beanFactory;
 
-	public SpringBlueprintContainer(ConfigurableApplicationContext applicationContext, BundleContext bundleContext) {
+	public SpringBlueprintContainer(ConfigurableApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
-		this.bundleContext = bundleContext;
 	}
 
 	public Object getComponentInstance(String name) throws NoSuchComponentException {
-		if (applicationContext.containsBean(name)) {
+		if (getBeanFactory().containsBean(name)) {
 			try {
-				return applicationContext.getBean(name);
+				return getBeanFactory().getBean(name);
 			} catch (RuntimeException ex) {
 				throw new ComponentDefinitionException("Cannot get component instance " + name, ex);
 			}
@@ -70,7 +66,7 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 	}
 
 	public ComponentMetadata getComponentMetadata(String name) throws NoSuchComponentException {
-		if (applicationContext.containsBeanDefinition(name)) {
+		if (getBeanFactory().containsBeanDefinition(name)) {
 			BeanDefinition beanDefinition = getBeanFactory().getBeanDefinition(name);
 			return MetadataFactory.buildComponentMetadataFor(name, beanDefinition);
 		} else {
@@ -79,7 +75,7 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 	}
 
 	public Set<String> getComponentIds() {
-		String[] names = applicationContext.getBeanDefinitionNames();
+		String[] names = getBeanFactory().getBeanDefinitionNames();
 		Set<String> components = new LinkedHashSet<String>(names.length);
 		CollectionUtils.mergeArrayIntoCollection(names, components);
 		Set<String> filtered = MetadataFactory.filterIds(components);
@@ -93,7 +89,7 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 
 	@SuppressWarnings("unchecked")
 	private <T extends ComponentMetadata> Collection<T> getComponentMetadata(Class<T> clazz) {
-		List<ComponentMetadata> metadatas = getComponentMetadataForAllComponents();
+		Collection<ComponentMetadata> metadatas = getComponentMetadataForAllComponents();
 		Collection<T> filteredMetadata = new ArrayList<T>(metadatas.size());
 
 		for (ComponentMetadata metadata : metadatas) {
@@ -105,7 +101,7 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 		return Collections.unmodifiableCollection(filteredMetadata);
 	}
 
-	private List<ComponentMetadata> getComponentMetadataForAllComponents() {
+	private Collection<ComponentMetadata> getComponentMetadataForAllComponents() {
 		return MetadataFactory.buildComponentMetadataFor(getBeanFactory());
 	}
 
@@ -113,7 +109,6 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 		if (beanFactory == null) {
 			beanFactory = applicationContext.getBeanFactory();
 		}
-
 		return beanFactory;
 	}
 }

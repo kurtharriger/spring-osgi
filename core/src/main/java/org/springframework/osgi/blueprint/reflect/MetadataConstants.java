@@ -17,6 +17,7 @@
 package org.springframework.osgi.blueprint.reflect;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
+import org.springframework.osgi.blueprint.reflect.internal.metadata.EnvironmentManagerFactoryBean;
 import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
@@ -59,5 +60,4 @@ interface MetadataConstants {
 
 	// multi importer
 	static String IMPORTER_COLLECTION_PROP = "collectionType";
-
 }

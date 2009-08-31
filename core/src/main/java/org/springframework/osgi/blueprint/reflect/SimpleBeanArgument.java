@@ -25,7 +25,7 @@ import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueH
  * 
  * @author Costin Leau
  */
-public class SimpleBeanArgument implements BeanArgument {
+class SimpleBeanArgument implements BeanArgument {
 
 	private final int index;
 	private final String typeName;

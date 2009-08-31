@@ -42,7 +42,7 @@ import org.springframework.osgi.blueprint.container.SpringBlueprintConverter;
 import org.springframework.osgi.blueprint.container.SpringBlueprintConverterService;
 import org.springframework.osgi.blueprint.container.support.BlueprintContainerServicePublisher;
 import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
-import org.springframework.osgi.blueprint.reflect.EnvironmentManagerFactoryBean;
+import org.springframework.osgi.blueprint.reflect.internal.metadata.EnvironmentManagerFactoryBean;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
@@ -158,7 +158,7 @@ public class BlueprintContainerProcessor implements
 	public void preProcessRefresh(final ConfigurableOsgiBundleApplicationContext context) {
 		final BundleContext bundleContext = context.getBundleContext();
 		// create the ModuleContext adapter
-		final BlueprintContainer blueprintContainer = createBlueprintContainer(context, bundleContext);
+		final BlueprintContainer blueprintContainer = createBlueprintContainer(context);
 
 		// 1. add event listeners
 		// add service publisher
@@ -236,10 +236,9 @@ public class BlueprintContainerProcessor implements
 		dispatcher.beforeRefresh(creatingEvent);
 	}
 
-	private BlueprintContainer createBlueprintContainer(ConfigurableOsgiBundleApplicationContext context,
-			BundleContext bundleContext) {
+	private BlueprintContainer createBlueprintContainer(ConfigurableOsgiBundleApplicationContext context) {
 		// return new ExceptionHandlingBlueprintContainer(context, bundleContext);
-		return new SpringBlueprintContainer(context, bundleContext);
+		return new SpringBlueprintContainer(context);
 	}
 
 	public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent evt) {

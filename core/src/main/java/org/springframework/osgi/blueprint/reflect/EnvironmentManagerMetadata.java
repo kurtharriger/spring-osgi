@@ -25,7 +25,7 @@ import org.osgi.service.blueprint.reflect.ComponentMetadata;
  * 
  * @author Costin Leau
  */
-public class EnvironmentManagerMetadata implements ComponentMetadata {
+class EnvironmentManagerMetadata implements ComponentMetadata {
 
 	private final String id;
 

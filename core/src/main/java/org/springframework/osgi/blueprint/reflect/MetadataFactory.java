@@ -17,7 +17,6 @@
 package org.springframework.osgi.blueprint.reflect;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
@@ -52,13 +51,25 @@ public class MetadataFactory {
 		return blueprintFactory.buildMetadata(name, beanDefinition);
 	}
 
-	public static Collection<ComponentMetadata> buildNestedComponentMetadataFor(String beanName,
-			BeanDefinition beanDefinition) {
-		return blueprintFactory.buildNestedMetadata(beanName, beanDefinition);
+	/**
+	 * Inspects the given {@link ConfigurableListableBeanFactory factory} and returns the appropriate OSGi 4.2 Blueprint
+	 * {@link ComponentMetadata metadata}.
+	 * 
+	 * @param factory Spring bean factory
+	 * @return collection of blueprint metadata
+	 */
+	public static Collection<ComponentMetadata> buildComponentMetadataFor(ConfigurableListableBeanFactory factory) {
+		return blueprintFactory.buildComponentMetadataFor(factory);
 	}
 
-	public static List<ComponentMetadata> buildComponentMetadataFor(ConfigurableListableBeanFactory factory) {
-		return blueprintFactory.buildComponentMetadataFor(factory);
+	/**
+	 * Builds the Blueprint metadata based on the nested elements contained by the given bean definition.
+	 * 
+	 * @param beanDefinition
+	 * @return
+	 */
+	static Collection<ComponentMetadata> buildNestedComponentMetadataFor(BeanDefinition beanDefinition) {
+		return blueprintFactory.buildNestedMetadata(beanDefinition);
 	}
 
 	public static Set<String> filterIds(Set<String> components) {

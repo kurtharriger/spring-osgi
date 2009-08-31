@@ -22,7 +22,7 @@ import org.springframework.osgi.service.exporter.support.DefaultInterfaceDetecto
  * @author Adrian Colyer
  * @author Costin Leau
  */
-class SpringServiceExportComponentMetadata extends SpringComponentMetadata implements ServiceMetadata {
+class SimpleServiceExportComponentMetadata extends SimpleComponentMetadata implements ServiceMetadata {
 
 	private static final String AUTO_EXPORT_PROP = "interfaceDetector";
 	private static final String RANKING_PROP = "ranking";
@@ -48,7 +48,7 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 	 * @param definition bean definition
 	 */
 	@SuppressWarnings("unchecked")
-	public SpringServiceExportComponentMetadata(String name, BeanDefinition definition) {
+	public SimpleServiceExportComponentMetadata(String name, BeanDefinition definition) {
 		super(name, definition);
 
 		MutablePropertyValues pvs = definition.getPropertyValues();

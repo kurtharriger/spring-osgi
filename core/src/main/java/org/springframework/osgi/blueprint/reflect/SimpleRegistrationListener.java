@@ -26,7 +26,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
  * 
  * @author Costin Leau
  */
-public class SimpleRegistrationListener implements RegistrationListener {
+class SimpleRegistrationListener implements RegistrationListener {
 
 	private static final String REG_PROP = "registrationMethod";
 	private static final String UNREG_PROP = "unregistrationMethod";

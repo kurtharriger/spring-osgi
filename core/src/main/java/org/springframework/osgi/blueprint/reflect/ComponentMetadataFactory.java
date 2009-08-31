@@ -22,7 +22,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
@@ -77,14 +76,14 @@ class ComponentMetadataFactory implements MetadataConstants {
 		}
 
 		if (isServiceExporter(beanDefinition)) {
-			return new SpringServiceExportComponentMetadata(name, beanDefinition);
+			return new SimpleServiceExportComponentMetadata(name, beanDefinition);
 		}
 
 		if (isSingleServiceImporter(beanDefinition)) {
-			return new SpringReferenceMetadata(name, beanDefinition);
+			return new SimpleReferenceMetadata(name, beanDefinition);
 		}
 		if (isCollectionImporter(beanDefinition)) {
-			return new SpringReferenceListMetadata(name, beanDefinition);
+			return new SimpleReferenceListMetadata(name, beanDefinition);
 		}
 
 		BeanDefinition original = unwrapImporterReference(beanDefinition);
@@ -96,7 +95,7 @@ class ComponentMetadataFactory implements MetadataConstants {
 			return new EnvironmentManagerMetadata(name);
 		}
 
-		return new SpringBeanMetadata(name, beanDefinition);
+		return new SimpleBeanMetadata(name, beanDefinition);
 	}
 
 	private static boolean isServiceExporter(BeanDefinition beanDefinition) {
@@ -142,7 +141,7 @@ class ComponentMetadataFactory implements MetadataConstants {
 		return (clazz.getName().equals(definition.getBeanClassName()));
 	}
 
-	static Collection<ComponentMetadata> buildNestedMetadata(String beanName, BeanDefinition beanDefinition) {
+	static Collection<ComponentMetadata> buildNestedMetadata(BeanDefinition beanDefinition) {
 		List<ComponentMetadata> col = new ArrayList<ComponentMetadata>(4);
 		processBeanDefinition(beanDefinition, col);
 		// remove the first definition
@@ -205,7 +204,7 @@ class ComponentMetadataFactory implements MetadataConstants {
 		}
 	}
 
-	public List<ComponentMetadata> buildComponentMetadataFor(ConfigurableListableBeanFactory factory) {
+	public static List<ComponentMetadata> buildComponentMetadataFor(ConfigurableListableBeanFactory factory) {
 		List<ComponentMetadata> metadata = new ArrayList<ComponentMetadata>();
 		String[] components = factory.getBeanDefinitionNames();
 
@@ -217,7 +216,7 @@ class ComponentMetadataFactory implements MetadataConstants {
 				// add metadata for top-level definitions
 				metadata.add(MetadataFactory.buildComponentMetadataFor(beanName, definition));
 				// look for nested ones
-				metadata.addAll(MetadataFactory.buildNestedComponentMetadataFor(beanName, definition));
+				metadata.addAll(MetadataFactory.buildNestedComponentMetadataFor(definition));
 			}
 		}
 
@@ -225,7 +224,7 @@ class ComponentMetadataFactory implements MetadataConstants {
 	}
 
 	// eliminate the names of promoted importers
-	public Set<String> filterIds(Set<String> components) {
+	public static Set<String> filterIds(Set<String> components) {
 		// search for pattern "
 		// .org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean#N#N and
 		// .org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean#N#N
