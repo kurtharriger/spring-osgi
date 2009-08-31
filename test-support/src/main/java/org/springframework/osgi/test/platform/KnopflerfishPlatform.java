@@ -18,10 +18,12 @@ package org.springframework.osgi.test.platform;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Properties;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.osgi.test.internal.util.IOUtils;
@@ -118,9 +120,33 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 		}
 
 		public BundleContext start() {
+			// Main main = new Main();
+			// Method mt = ReflectionUtils.findMethod(Main.class, "handleArgs", String[].class);
+			// ReflectionUtils.makeAccessible(mt);
+			// ReflectionUtils.invokeMethod(mt, main, new Object[] { new String[] { "-launch", "-init" } });
+			// Field fl = ReflectionUtils.findField(main.getClass(), "framework");
+			// ReflectionUtils.makeAccessible(fl);
+			// return OsgiBundleUtils.getBundleContext((Bundle) ReflectionUtils.getField(fl, main));
+
 			framework = BeanUtils.instantiateClass(CONSTRUCTOR, properties, null);
+			
+			Field systemBundle = ReflectionUtils.findField(framework.getClass(), "systemBundle");
+			ReflectionUtils.makeAccessible(systemBundle);
+
+			Bundle bundle = (Bundle) ReflectionUtils.getField(systemBundle, framework);
+			Method mt = ReflectionUtils.findMethod(bundle.getClass(), "init");
+			ReflectionUtils.invokeMethod(mt, bundle);
+
+			
 			ReflectionUtils.invokeMethod(INIT, framework);
 			ReflectionUtils.invokeMethod(LAUNCH, framework);
+
+			try {
+				bundle.start();
+			} catch (Exception ex) {
+				throw new IllegalStateException("Cannot start framework", ex);
+			}
+
 			return (BundleContext) org.springframework.util.ReflectionUtils.invokeMethod(GET_BUNDLE_CONTEXT, framework);
 		}
 
