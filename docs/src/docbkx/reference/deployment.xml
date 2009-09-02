@@ -189,8 +189,8 @@ context ::= path ( ';' path ) * (';' directive) *
       immediately even if dependencies are not satisfied. This essentially
       means that mandatory service references are treated as though they were
       optional - clients will be injected with a service object that may not
-      be backed by an actual service in the registry initially. See section
-      5.2 for more details.</para>
+      be backed by an actual service in the registry initially. See 
+      <xref linkend="service-registry:refs:singular:dynamics"/> for more details.</para>
         </listitem>
         
         <listitem>
@@ -608,7 +608,7 @@ context ::= path ( ';' path ) * (';' directive) *
       resources on the bundle's classpath are accessible via the context class
       loader. Spring Dynamic Modules also allows you to control what is
       accessible through the context class loader when invoking external
-      services and when servicing requests on exported services. See section 5
+      services and when servicing requests on exported services. See <xref linkend="service-registry"/>
       for details on this.</para>
 
       <para>Work is underway in the OSGi R5 timeframe to provide standardized

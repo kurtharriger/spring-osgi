@@ -710,12 +710,15 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
           A cardinality value of <literal>1..1</literal> (the default)
           indicates that a matching service must always be available. A
           cardinality value of <literal>0..1</literal> indicates that a
-          matching service is not required at all times (see section 4.2.1.6
+          matching service is not required at all times (see 
+          <xref linkend="service-registry:refs:singular:dynamics"/>
           for more details). A <literal>reference</literal> with cardinality
           <literal>1..1</literal> is also known as a
           <emphasis>mandatory</emphasis> service reference and, by default,
           application context creation is deferred until the reference is
-          satisfied.</para>
+          satisfied. More information about context creation and mandatory
+          dependencies is available at <xref linkend="service-registry:refs:singular:dynamics"/>
+          </para>
 
           <note>It is an error to declare a mandatory reference to a
           service that is also exported by the same bundle, this behavior can
