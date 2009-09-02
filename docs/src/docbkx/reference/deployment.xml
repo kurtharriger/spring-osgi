@@ -283,7 +283,7 @@ context ::= path ( ';' path ) * (';' directive) *
               </row>
               
               <row>
-                <entry><literal>applicationEventMulticaster</literal></entry>
+                <entry><literal>osgiApplicationEventMulticaster</literal></entry>
                 <entry><interfacename>ApplicationEventMulticaster</interfacename>
                 <footnote>Part of <literal>org.springframework.context.event</literal> package</footnote>
                 </entry>
