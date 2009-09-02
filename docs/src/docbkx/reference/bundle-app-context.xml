@@ -120,7 +120,8 @@
 
         <para>It is possible to change the application context creation
         semantics so that application context creation fails if all mandatory
-        services are not immediately available upon startup (see section 4.1).
+        services are not immediately available upon startup (see the aformentioned 
+        section for more information).
         However, regardless of the configuration chosen, the failure of the
         application context will not change the bundle state.</para>
       </section>
