@@ -9,8 +9,8 @@ General
 * JDK 5.0 required for both building and running; for JDK 1.4 support use 1.2.x branch
 * upgraded to Spring Framework 3.0
 * upgraded to Equinox 3.5.0
-* upgraded to Knopflerfish 2.3.0
-* upgraded to Felix 1.8.0
+* upgraded to Knopflerfish 3.0.0.alfa1
+* upgraded to Felix 1.8.1
 * generified classes (both public and internal)
 * updated archetype project to save locally the manifest generated during packaging
 * added new elements to spring-osgi schema
@@ -51,7 +51,7 @@ Package org.springframework.osgi.service
 * service collection can now contain service references instead of just service proxies
 * service exporter returns a 'safe' service registration that forbids unregistration
 * added new custom callback signature to service importer and exporter listeners
-* framework defined property take precedence over the user defined ones
+* enforced precedence of framework defined properties over user defined ones
 * eliminated generated name property for inner/anonymous beans
 * fixed reference collection listener behaviour by invoking the callbacks before items are removed from the collection
 * fixed service registration listener behaviour by invoking the callbacks before the service gets unregistered
@@ -62,6 +62,7 @@ Package org.springframework.osgi.service
 * improved detection of transitive dependencies when traversing nested beans
 * added cleanup for services on destruction to avoid postponing bundle shutdown
 * improved static service importers by adding caching of the service to ease service cleanup
+* added 'cache target' option on service exporter for compatible behaviour with OSGi 4.2 Blueprint spec
 
 Package org.springframework.osgi.mock
 * added specific OSGi r4.2 methods

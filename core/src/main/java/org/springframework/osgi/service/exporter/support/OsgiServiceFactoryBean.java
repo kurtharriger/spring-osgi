@@ -169,7 +169,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	private ListenerNotifier notifier;
 	private final AtomicBoolean activated = new AtomicBoolean(false);
 	/** should the service be cached or not */
-	private boolean cacheService = false;
+	private boolean cacheTarget = false;
 
 	public OsgiServiceFactoryBean() {
 		controller = new ExporterController(new Executor());
@@ -249,7 +249,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		}
 
 		resolver =
-				new LazyTargetResolver(target, beanFactory, targetBeanName, cacheService, getNotifier(),
+				new LazyTargetResolver(target, beanFactory, targetBeanName, cacheTarget, getNotifier(),
 						getLazyListeners());
 
 		if (shouldRegisterAtStartup) {
@@ -681,13 +681,13 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	}
 
 	/**
-	 * Sets the caching of the exported service. When enabled, the exporter will ignore the scope of the target bean and
-	 * use only the first resolved instance for registration. When disabled (default), the scope of the target bean is
-	 * considered and each request for a service, will be directed to the container.
+	 * Sets the caching of the exported target object. When enabled, the exporter will ignore the scope of the
+	 * target bean and use only the first resolved instance for registration. When disabled (default), the scope of the
+	 * target bean is considered and each service request, will be directed to the container.
 	 * 
 	 * Set this option to 'true' to obtain OSGi 4.2 blueprint behaviour.
 	 */
-	public void setCacheService(boolean cacheService) {
-		this.cacheService = cacheService;
+	public void setCacheTarget(boolean cacheTarget) {
+		this.cacheTarget = cacheTarget;
 	}
 }
