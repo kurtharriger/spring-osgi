@@ -527,7 +527,16 @@
                 <xsd:attribute name="ranking" type="xsd:int" default="0">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[
-    Specify the service ranking to be used when advertising the service.
+    Specifies the service ranking to be used when advertising the service.
+                		]]></xsd:documentation>
+                	</xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="cache-target" type="xsd:boolean" default="false">
+                	<xsd:annotation>
+                		<xsd:documentation><![CDATA[
+    Specifies the caching of the exported target object. When enabled, the exporter will ignore the scope of the 
+    target bean and	use only the first resolved instance for registration. When disabled (default), the scope of 
+    the target bean is considered and each service request, will be directed to the container.
                 		]]></xsd:documentation>
                 	</xsd:annotation>
                 </xsd:attribute>
