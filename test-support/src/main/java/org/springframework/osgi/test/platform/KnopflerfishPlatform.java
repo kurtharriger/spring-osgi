@@ -25,6 +25,7 @@ import java.util.Properties;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.launch.Framework;
 import org.springframework.beans.BeanUtils;
 import org.springframework.osgi.test.internal.util.IOUtils;
 import org.springframework.util.ClassUtils;
@@ -91,11 +92,9 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 		private static final Class<?> BOOT_CLASS;
 		private static final Constructor<?> CONSTRUCTOR;
 		private static final Method INIT;
-		private static final Method LAUNCH;
 		private static final Method GET_BUNDLE_CONTEXT;
-		private static final Method SHUTDOWN;
 
-		private Object framework;
+		private Bundle framework;
 		private Map properties;
 
 		static {
@@ -109,10 +108,8 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 
 			INIT = BeanUtils.findDeclaredMethod(BOOT_CLASS, "init", null);
 			ReflectionUtils.makeAccessible(INIT);
-			LAUNCH = BeanUtils.findDeclaredMethod(BOOT_CLASS, "launch", null);
 			GET_BUNDLE_CONTEXT =
 					org.springframework.util.ReflectionUtils.findMethod(BOOT_CLASS, "getSystemBundleContext");
-			SHUTDOWN = org.springframework.util.ReflectionUtils.findMethod(BOOT_CLASS, "shutdown");
 		}
 
 		KF3Bootstrapper(Map properties) {
@@ -128,31 +125,34 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 			// ReflectionUtils.makeAccessible(fl);
 			// return OsgiBundleUtils.getBundleContext((Bundle) ReflectionUtils.getField(fl, main));
 
-			framework = BeanUtils.instantiateClass(CONSTRUCTOR, properties, null);
-			
-			Field systemBundle = ReflectionUtils.findField(framework.getClass(), "systemBundle");
+			Object fwkContext = BeanUtils.instantiateClass(CONSTRUCTOR, properties, null);
+
+			Field systemBundle = ReflectionUtils.findField(fwkContext.getClass(), "systemBundle");
 			ReflectionUtils.makeAccessible(systemBundle);
 
-			Bundle bundle = (Bundle) ReflectionUtils.getField(systemBundle, framework);
-			Method mt = ReflectionUtils.findMethod(bundle.getClass(), "init");
-			ReflectionUtils.invokeMethod(mt, bundle);
-
-			
-			ReflectionUtils.invokeMethod(INIT, framework);
-			ReflectionUtils.invokeMethod(LAUNCH, framework);
+			framework = (Bundle) ReflectionUtils.getField(systemBundle, fwkContext);
+			Method mt = ReflectionUtils.findMethod(framework.getClass(), "init");
+			ReflectionUtils.invokeMethod(mt, framework);
+			ReflectionUtils.invokeMethod(INIT, fwkContext);
 
 			try {
-				bundle.start();
+				framework.start();
 			} catch (Exception ex) {
 				throw new IllegalStateException("Cannot start framework", ex);
 			}
 
-			return (BundleContext) org.springframework.util.ReflectionUtils.invokeMethod(GET_BUNDLE_CONTEXT, framework);
+			return (BundleContext) org.springframework.util.ReflectionUtils
+					.invokeMethod(GET_BUNDLE_CONTEXT, fwkContext);
 		}
 
 		public void stop() {
 			if (framework != null) {
-				org.springframework.util.ReflectionUtils.invokeMethod(SHUTDOWN, framework);
+				Framework fwk = (Framework) framework;
+				try {
+					fwk.waitForStop(1000);
+				} catch (InterruptedException ex) {
+					System.err.println("Cannot properly shutdown framework" + ex);
+				}
 				framework = null;
 			}
 		}
@@ -194,6 +194,12 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 		props.setProperty("org.knopflerfish.framework.patch", "false");
 		// new in KF 2.0.4 - automatically exports system packages based on the JRE version
 		props.setProperty("org.knopflerfish.framework.system.export.all", "true");
+		//props.setProperty("org.knopflerfish.framework.system.export.all_15", "true");
+		// add strict bootpath delegation (introduced in KF 2.3.0)
+		// since otherwise classes will be loaded from the booth classpath
+		// when generating JDK proxies instead of the OSGi space
+		// since KF thinks that a non-OSGi class is making the call.
+		props.setProperty("org.knopflerfish.framework.strictbootclassloading", "true");
 
 		return props;
 	}
