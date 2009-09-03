@@ -20,12 +20,12 @@ import java.net.URL;
 import java.util.Enumeration;
 
 import org.springframework.osgi.iandt.io.BaseIoTest;
+import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Low level access API used for discovering the underlying platform
- * capabilities since there are subtle yet major differences between each
- * implementation.
+ * Low level access API used for discovering the underlying platform capabilities since there are subtle yet major
+ * differences between each implementation.
  * 
  * @author Costin Leau
  * 
@@ -41,8 +41,9 @@ public class IoTest extends BaseIoTest {
 		return null;
 	}
 
+	// using /META-INF fails on KF 3.0.0.x
 	public void testGetResourceOnMetaInf() throws Exception {
-		URL url = bundle.getResource("/META-INF");
+		URL url = bundle.getResource("/META-INF/");
 		System.out.println(url);
 		assertNotNull(url);
 	}
@@ -107,5 +108,10 @@ public class IoTest extends BaseIoTest {
 		assertNotNull(enm);
 		assertTrue(enm.hasMoreElements());
 		assertTrue(((URL) enm.nextElement()).getPath().endsWith("/"));
+	}
+
+	@Override
+	protected String getPlatformName() {
+		return Platforms.KNOPFLERFISH;
 	}
 }

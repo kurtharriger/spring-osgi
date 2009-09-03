@@ -28,12 +28,11 @@ import org.springframework.osgi.util.internal.PrivilegedUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Special Thread Context ClassLoading handling interceptor dealing with
- * "service-provided" case, in which the backing service reference can be
- * updated which requires update of the classloader used as TCCL.
+ * Special Thread Context ClassLoading handling interceptor dealing with "service-provided" case, in which the backing
+ * service reference can be updated which requires update of the classloader used as TCCL.
  * 
- * This interceptor requires registration of a dedicated
- * {@link OsgiServiceLifecycleListener} which updates the classloader used.
+ * This interceptor requires registration of a dedicated {@link OsgiServiceLifecycleListener} which updates the
+ * classloader used.
  * 
  * @author Costin Leau
  * 
@@ -57,7 +56,6 @@ public class ServiceProviderTCCLInterceptor implements MethodInterceptor {
 		}
 	}
 
-
 	private static final int hashCode = ServiceProviderTCCLInterceptor.class.hashCode() * 13;
 
 	/** internal lock used for synchronized access to the serviceBundle */
@@ -67,25 +65,23 @@ public class ServiceProviderTCCLInterceptor implements MethodInterceptor {
 
 	private ClassLoader serviceClassLoader;
 
-
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 
 		if (System.getSecurityManager() != null) {
 			return invokePrivileged(invocation);
-		}
-		else {
+		} else {
 			return invokeUnprivileged(invocation);
 		}
 	}
 
 	private Object invokePrivileged(final MethodInvocation invocation) throws Throwable {
 		return PrivilegedUtils.executeWithCustomTCCL(getServiceProvidedClassLoader(),
-			new PrivilegedUtils.UnprivilegedThrowableExecution() {
+				new PrivilegedUtils.UnprivilegedThrowableExecution() {
 
-				public Object run() throws Throwable {
-					return invocation.proceed();
-				}
-			});
+					public Object run() throws Throwable {
+						return invocation.proceed();
+					}
+				});
 	}
 
 	private Object invokeUnprivileged(MethodInvocation invocation) throws Throwable {
@@ -95,8 +91,7 @@ public class ServiceProviderTCCLInterceptor implements MethodInterceptor {
 		try {
 			Thread.currentThread().setContextClassLoader(current);
 			return invocation.proceed();
-		}
-		finally {
+		} finally {
 			Thread.currentThread().setContextClassLoader(previous);
 		}
 	}
@@ -112,8 +107,7 @@ public class ServiceProviderTCCLInterceptor implements MethodInterceptor {
 			this.serviceBundle = serviceBundle;
 			if (serviceBundle != null) {
 				serviceClassLoader = ClassLoaderFactory.getBundleClassLoaderFor(serviceBundle);
-			}
-			else
+			} else
 				serviceClassLoader = null;
 		}
 	}
@@ -131,5 +125,4 @@ public class ServiceProviderTCCLInterceptor implements MethodInterceptor {
 	public int hashCode() {
 		return hashCode;
 	}
-
 }

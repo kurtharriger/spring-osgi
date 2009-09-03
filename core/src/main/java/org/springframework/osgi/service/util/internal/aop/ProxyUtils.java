@@ -58,13 +58,18 @@ public abstract class ProxyUtils {
 		// factory.setOptimize(true);
 		factory.setFrozen(true);
 		factory.setOpaque(true);
+		boolean isSecurityOn = (System.getSecurityManager() != null);
 		try {
-			return AccessController.doPrivileged(new PrivilegedAction<Object>() {
+			if (isSecurityOn) {
+				return AccessController.doPrivileged(new PrivilegedAction<Object>() {
+					public Object run() {
+						return factory.getProxy(classLoader);
+					}
+				});
+			} else {
+				return factory.getProxy(classLoader);
+			}
 
-				public Object run() {
-					return factory.getProxy(classLoader);
-				}
-			});
 		} catch (NoClassDefFoundError ncdfe) {
 			DebugUtils.debugClassLoadingThrowable(ncdfe, bundleContext.getBundle(), classes);
 			throw ncdfe;
