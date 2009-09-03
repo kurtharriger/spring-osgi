@@ -19,6 +19,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.springframework.osgi.iandt.blueprint.BaseBlueprintIntegrationTest;
+import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * @author Costin Leau
@@ -33,7 +34,7 @@ public class EnvironmentBeanTest extends BaseBlueprintIntegrationTest {
 	}
 
 	public void testBlueprintContainer() throws Exception {
-		Thread.sleep(1000 * 3);
+		// Thread.sleep(1000 * 3);
 		ServiceReference reference = bundleContext.getServiceReference(BlueprintContainer.class.getName());
 		assertNotNull(reference);
 		BlueprintContainer container = (BlueprintContainer) bundleContext.getService(reference);

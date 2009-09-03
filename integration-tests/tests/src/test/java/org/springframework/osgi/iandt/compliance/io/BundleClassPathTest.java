@@ -34,6 +34,8 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.PackagePermission;
 import org.osgi.framework.ServicePermission;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
+import org.springframework.osgi.test.platform.OsgiPlatform;
+import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * IO compliance test for bundles containing Bundle ClassPath entries.
@@ -47,21 +49,20 @@ public class BundleClassPathTest extends BaseIntegrationTest {
 		Manifest mf = super.getManifest();
 		// add bundle classpath
 		mf.getMainAttributes().putValue(Constants.BUNDLE_CLASSPATH,
-			".,bundleclasspath/folder,bundleclasspath/simple.jar");
+				".,bundleclasspath/folder,bundleclasspath/simple.jar");
 		return mf;
 	}
 
 	protected String[] getBundleContentPattern() {
 		String pkg = getClass().getPackage().getName().replace('.', '/').concat("/");
-		String[] patterns = new String[] { BaseIntegrationTest.class.getName().replace('.', '/').concat(".class"),
-			pkg + "**/*", "bundleclasspath/**/*" };
+		String[] patterns =
+				new String[] { BaseIntegrationTest.class.getName().replace('.', '/').concat(".class"), pkg + "**/*",
+						"bundleclasspath/**/*" };
 		return patterns;
 	}
 
-
 	private Bundle bundle;
 	private String classLocation;
-
 
 	protected void onSetUp() throws Exception {
 		bundle = bundleContext.getBundle();
@@ -103,7 +104,8 @@ public class BundleClassPathTest extends BaseIntegrationTest {
 
 	public void testFindEntriesOnFileJustInsideFolderOnClassPath() throws Exception {
 		System.out.println("running test" + this.getName());
-		Enumeration enm = bundle.findEntries("org/springframework/osgi/iandt/compliance/io/", "folder-test.file", false);
+		Enumeration enm =
+				bundle.findEntries("org/springframework/osgi/iandt/compliance/io/", "folder-test.file", false);
 		assertNull("findEntries doesn't work on bundle classpath entries", enm);
 	}
 
@@ -170,4 +172,15 @@ public class BundleClassPathTest extends BaseIntegrationTest {
 		System.out.println(jis.available());
 		jis.close();
 	}
+
+	// @Override
+	// protected OsgiPlatform createPlatform() {
+	// OsgiPlatform platform = super.createPlatform();
+	// platform.getConfigurationProperties().setProperty("org.knopflerfish.framework.debug.framework", "true");
+	// platform.getConfigurationProperties().setProperty("org.knopflerfish.framework.debug.errors", "true");
+	// platform.getConfigurationProperties().setProperty("org.knopflerfish.framework.debug.classloader", "true");
+	// platform.getConfigurationProperties().setProperty("org.knopflerfish.framework.debug.packages", "true");
+	//		
+	// return platform;
+	// }
 }

@@ -21,9 +21,11 @@ import java.util.Properties;
 
 import org.osgi.framework.AdminPermission;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.packageadmin.PackageAdmin;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
+import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.scheduling.timer.TimerTaskExecutor;
 
@@ -36,7 +38,6 @@ import org.springframework.scheduling.timer.TimerTaskExecutor;
 public class ExtenderConfigurationTest extends BaseIntegrationTest {
 
 	private ApplicationContext context;
-
 
 	protected void onSetUp() throws Exception {
 		context = (ApplicationContext) applicationContext.getBean("appCtx");
@@ -51,8 +52,8 @@ public class ExtenderConfigurationTest extends BaseIntegrationTest {
 	}
 
 	public void testExtenderConfigAppCtxPublished() throws Exception {
-		ServiceReference[] refs = bundleContext.getAllServiceReferences(
-			"org.springframework.context.ApplicationContext", null);
+		ServiceReference[] refs =
+				bundleContext.getAllServiceReferences("org.springframework.context.ApplicationContext", null);
 		for (int i = 0; i < refs.length; i++) {
 			System.out.println(OsgiStringUtils.nullSafeToString(refs[i]));
 		}
@@ -60,6 +61,8 @@ public class ExtenderConfigurationTest extends BaseIntegrationTest {
 	}
 
 	public void tstPackageAdminReferenceBean() throws Exception {
+		if (PackageAdmin.class.hashCode() != 0)
+			;
 		logger.info("Calling package admin bean");
 		assertNotNull(context.getBean("packageAdmin"));
 	}

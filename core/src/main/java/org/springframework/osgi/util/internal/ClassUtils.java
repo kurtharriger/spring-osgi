@@ -145,20 +145,24 @@ public abstract class ClassUtils {
 		final Map<ClassLoader, Boolean> lookupMap = new ConcurrentHashMap<ClassLoader, Boolean>(8);
 		final List<ClassLoader> lookupList = Collections.synchronizedList(new ArrayList<ClassLoader>());
 
-		AccessController.doPrivileged(new PrivilegedAction<Object>() {
+		final ClassLoader classLoader = getFwkClassLoader();
 
-			public Object run() {
-
-				ClassLoader classLoader = getFwkClassLoader();
-				addNonOsgiClassLoader(classLoader, lookupList, lookupMap);
-
-				// get the system class loader
-				classLoader = ClassLoader.getSystemClassLoader();
-				addNonOsgiClassLoader(classLoader, lookupList, lookupMap);
-
-				return null;
-			}
-		});
+		if (System.getSecurityManager() != null) {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
+				public Object run() {
+					addNonOsgiClassLoader(classLoader, lookupList, lookupMap);
+					// get the system class loader
+					ClassLoader sysLoader = ClassLoader.getSystemClassLoader();
+					addNonOsgiClassLoader(sysLoader, lookupList, lookupMap);
+					return null;
+				}
+			});
+		} else {
+			addNonOsgiClassLoader(classLoader, lookupList, lookupMap);
+			// get the system class loader
+			ClassLoader sysLoader = ClassLoader.getSystemClassLoader();
+			addNonOsgiClassLoader(sysLoader, lookupList, lookupMap);
+		}
 
 		// wrap the fields as read-only collections
 		knownNonOsgiLoaders = Collections.unmodifiableList(lookupList);
@@ -167,12 +171,15 @@ public abstract class ClassUtils {
 	}
 
 	public static ClassLoader getFwkClassLoader() {
-		return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
-
-			public ClassLoader run() {
-				return Bundle.class.getClassLoader();
-			}
-		});
+		if (System.getSecurityManager() != null) {
+			return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+				public ClassLoader run() {
+					return Bundle.class.getClassLoader();
+				}
+			});
+		} else {
+			return Bundle.class.getClassLoader();
+		}
 	}
 
 	/**
@@ -619,9 +626,8 @@ public abstract class ClassUtils {
 						return clazz.getClassLoader();
 					}
 				});
-			}
-			else {
-				loader = clazz.getClassLoader(); 
+			} else {
+				loader = clazz.getClassLoader();
 			}
 			// quick boot/system check
 			if (loader != null) {

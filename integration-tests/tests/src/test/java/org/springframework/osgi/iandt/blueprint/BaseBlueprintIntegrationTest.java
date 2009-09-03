@@ -59,8 +59,17 @@ public abstract class BaseBlueprintIntegrationTest extends BaseIntegrationTest {
 
 	protected String[] getBundleContentPattern() {
 		String pkg = getClass().getPackage().getName().replace('.', '/').concat("/");
-		String[] patterns = new String[] { BaseIntegrationTest.class.getName().replace('.', '/').concat("*.class"),
-				BaseBlueprintIntegrationTest.class.getName().replace('.', '/').concat("*.class"), pkg + "**/*" };
+		String[] patterns =
+				new String[] { BaseIntegrationTest.class.getName().replace('.', '/').concat("*.class"),
+						BaseBlueprintIntegrationTest.class.getName().replace('.', '/').concat("*.class"), pkg + "**/*" };
 		return patterns;
+	}
+
+	protected boolean isDisabledInThisEnvironment(String testMethodName) {
+		return isKF();
+	}
+
+	protected boolean isKF() {
+		return (createPlatform().toString().startsWith("Knopflerfish"));
 	}
 }

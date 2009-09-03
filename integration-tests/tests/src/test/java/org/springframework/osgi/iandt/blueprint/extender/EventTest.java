@@ -33,6 +33,7 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.iandt.blueprint.BaseBlueprintIntegrationTest;
+import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * Check whether events are raised at the right time.
@@ -137,5 +138,10 @@ public class EventTest extends BaseBlueprintIntegrationTest {
 		Thread.sleep(1000 * 5);
 		assertEquals(failedBundles.size(), 1);
 		System.out.println("Failed bundles are " + failedBundles.values());
+	}
+	
+	@Override
+	protected String getPlatformName() {
+		return Platforms.KNOPFLERFISH;
 	}
 }
