@@ -109,9 +109,4 @@ public class IoTest extends BaseIoTest {
 		assertTrue(enm.hasMoreElements());
 		assertTrue(((URL) enm.nextElement()).getPath().endsWith("/"));
 	}
-
-	@Override
-	protected String getPlatformName() {
-		return Platforms.KNOPFLERFISH;
-	}
 }

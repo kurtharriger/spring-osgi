@@ -72,4 +72,8 @@ public abstract class BaseBlueprintIntegrationTest extends BaseIntegrationTest {
 	protected boolean isKF() {
 		return (createPlatform().toString().startsWith("Knopflerfish"));
 	}
+
+	protected boolean isFelix() {
+		return (createPlatform().toString().startsWith("Felix"));
+	}
 }

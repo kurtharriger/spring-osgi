@@ -41,4 +41,9 @@ public class EnvironmentBeanTest extends BaseBlueprintIntegrationTest {
 		System.out.println(container.getComponentIds());
 		ComponentMetadata metadata = container.getComponentMetadata("blueprintContainer");
 	}
+
+	@Override
+	protected boolean isDisabledInThisEnvironment(String testMethodName) {
+		return isKF() || isFelix();
+	}
 }
