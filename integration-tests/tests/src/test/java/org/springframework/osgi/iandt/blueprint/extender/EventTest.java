@@ -122,7 +122,7 @@ public class EventTest extends BaseBlueprintIntegrationTest {
 
 		assertEquals(1, failedBundles.size());
 		assertEquals(failingBundle, failedBundles.keySet().iterator().next());
-		
+
 		failingBundle.uninstall();
 	}
 
@@ -138,10 +138,5 @@ public class EventTest extends BaseBlueprintIntegrationTest {
 		Thread.sleep(1000 * 5);
 		assertEquals(failedBundles.size(), 1);
 		System.out.println("Failed bundles are " + failedBundles.values());
-	}
-	
-	@Override
-	protected String getPlatformName() {
-		return Platforms.KNOPFLERFISH;
 	}
 }

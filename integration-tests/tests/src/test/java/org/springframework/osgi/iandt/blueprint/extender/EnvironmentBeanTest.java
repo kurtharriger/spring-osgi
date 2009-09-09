@@ -25,7 +25,7 @@ import org.springframework.osgi.iandt.blueprint.BaseBlueprintIntegrationTest;
  */
 public class EnvironmentBeanTest extends BaseBlueprintIntegrationTest {
 
-	private static final String SYM_NAME = "org.springframework.osgi.rfc124.iandt.simpleservice";
+	private static final String SYM_NAME = "org.springframework.osgi.blueprint.iandt.simpleservice";
 
 	@Override
 	protected String[] getTestBundlesNames() {
