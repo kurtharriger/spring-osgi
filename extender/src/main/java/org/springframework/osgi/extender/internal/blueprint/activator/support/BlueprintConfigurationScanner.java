@@ -103,7 +103,6 @@ public class BlueprintConfigurationScanner implements ConfigurationScanner {
 						loc = loc + "*.xml";
 					}
 					Resource[] resources = loader.getResources(loc);
-					System.out.println("Retrieved locations for location " + loc + " = " + Arrays.toString(resources));
 					if (!ObjectUtils.isEmpty(resources)) {
 						for (Resource resource : resources) {
 							if (resource.exists()) {

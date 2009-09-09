@@ -14,7 +14,7 @@
   >
 
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="file:${project.build.directory}/classes/osgi.properties"/>
+		<property name="location" value="osgi.properties"/>
 	</bean>
 
 	<bean id="initializer" class="java.util.Properties" depends-on="weatherTest"/>
