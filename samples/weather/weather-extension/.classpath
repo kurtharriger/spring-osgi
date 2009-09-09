@@ -11,6 +11,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/3.0.0.BUILD-SNAPSHOT/org.springframework.context-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="M2_REPO/org/springframework/org.springframework.context/3.0.0.BUILD-SNAPSHOT/org.springframework.context-3.0.0.BUILD-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.beans/3.0.0.BUILD-SNAPSHOT/org.springframework.beans-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="M2_REPO/org/springframework/org.springframework.beans/3.0.0.BUILD-SNAPSHOT/org.springframework.beans-3.0.0.BUILD-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar" sourcepath="/EQUINOX_SRC/src.zip"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.springframework.osgi-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-core"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

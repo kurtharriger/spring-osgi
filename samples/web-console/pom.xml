@@ -54,6 +54,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>org.springframework.context.support</artifactId>
+      <version>${spring.maven.artifact.version}</version>
       <scope>provided</scope>      
     </dependency>
     

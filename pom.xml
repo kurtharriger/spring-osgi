@@ -499,7 +499,7 @@ limitations under the License.
         <plugin>
           <groupId>com.springsource.bundlor</groupId>
           <artifactId>com.springsource.bundlor.maven</artifactId>
-          <version>1.0.0.M5</version>
+          <version>1.0.0.M2</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -676,7 +676,6 @@ Ignored-Existing-Headers:
         <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
       <modules>
-        <module>blueprint/api</module>
         <module>blueprint/packaging</module>
       </modules>
     </profile>

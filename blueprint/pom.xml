@@ -20,7 +20,6 @@
   </properties>
 
   <modules>
-    <module>api</module>
     <module>packaging</module>
   </modules>
   
