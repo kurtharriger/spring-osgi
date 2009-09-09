@@ -452,11 +452,6 @@ limitations under the License.
           <version>2.3</version>
         </plugin>
         <plugin>
-          <groupId>org.apache.felix</groupId>
-          <artifactId>maven-bundle-plugin</artifactId>
-          <version>1.4.0</version>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.4.3</version>
@@ -510,34 +505,6 @@ limitations under the License.
     </pluginManagement>
     
     <plugins>
-       <!-- OSGi Felix bundle plugin 
-       <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <obrRepository>NONE</obrRepository>
-          <instructions>
-           <Bundle-Name>${artifactId}</Bundle-Name>
-           <Bundle-SymbolicName>${spring.osgi.symbolic.name}</Bundle-SymbolicName>
-           <Bundle-Vendor>SpringSource</Bundle-Vendor>
-           <Export-Package>${spring.osgi.export}</Export-Package>
-           <Import-Package>${spring.decorate.osgi.import}</Import-Package>
-           <Private-Package>${spring.osgi.private.pkg}</Private-Package>
-           <Include-Resource>${spring.osgi.include.res}</Include-Resource>
-           <Implementation-Title>Spring Dynamic Modules Framework</Implementation-Title>
-           <Implementation-Version>${pom.version}</Implementation-Version>
-           <Implementation-Vendor>SpringSource</Implementation-Vendor>
-           <Implementation-Vendor-Id>org.springframework.osgi</Implementation-Vendor-Id>
-           <Spring-DM-Version>${pom.version}</Spring-DM-Version>
-           <Spring-Version>${spring.maven.artifact.version}</Spring-Version>
-           <Build-Plan>${env.buildPlan}</Build-Plan>
-           <Build-Number>${env.buildNumber}</Build-Number>
-           <SVN-Revision>${env.svnRevision}</SVN-Revision>
-          </instructions>
-        </configuration>
-      </plugin>
-      -->
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
