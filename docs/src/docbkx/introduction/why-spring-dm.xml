@@ -54,4 +54,8 @@
 
     <para>We believe that the combination of OSGi and Spring offers a
     comprehensive model for building enterprise applications.</para>
+    
+    <para>The OSGi Alliance found valuable the programming model proposed by Spring DM and,
+    in OSGi 4.2, standardized it by introducing the Blueprint Container, as part of the Compendium
+    services.</para>
 </chapter>
