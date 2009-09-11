@@ -26,11 +26,15 @@
     contain a Spring application context, responsible for the instantiation,
     configuration, assembly, and decoration of the objects (beans) within the
     bundle. Some of these beans may optionally be exported as OSGi services
-    and thus made available to other bundles, beans within the bundle may also
+    and thus made available to other bundles; beans within the bundle may also
     be transparently injected with references to OSGi services.</para>
+    
+    <para>This chapter describes the lifecycle relationship between bundles and their 
+    application contexts, as imposed by Spring DM based on the events occurring at runtime,
+    inside an OSGi environment.</para>
 
     <section id="bnd-app-ctx:extender">
-      <title>The Spring Dynamic Modules Extender bundle</title>
+      <title>The Spring Dynamic Modules Extender Bundle</title>
 
       <sidebar id="extender-pattern">
 		<title>Extender Pattern</title>
@@ -42,10 +46,8 @@
 		</para>
       </sidebar>
 
-      <para>Spring Dynamic Modules provides an OSGi bundle
-      <literal>org.springframework.osgi.extender</literal>. This
-      bundle is responsible for instantiating the Spring application contexts
-      for your application bundles. It serves the same purpose as the <ulink
+      <para>The component responsible for detecting the <emphasis>Spring-powered bundles</emphasis> and instantiating 
+      their application context is the Spring DM <emphasis>extender</emphasis>. It serves the same purpose as the <ulink
       url="http://static.springframework.org/spring/docs/2.5.x/reference/webintegration.html">ContextLoaderListener</ulink>
       does for Spring web applications. Once the extender bundle is installed
       and started it looks for any existing Spring-powered bundles that are
@@ -54,16 +56,22 @@
       automatically creates an application context for any Spring-powered
       bundle that is subsequently started. <xref linkend="app-deploy:headers"/>
       describes what the extender recognizes as a "Spring-powered bundle" while 
-      <xref linkend="app-deploy:extender-configuration"/> how the extender can be configured.</para>
+      <xref linkend="app-deploy:extender-configuration"/> how the extender can be configured.
+      The extender monitors the lifecycle of the bundle it manages and will destroy automatically the contexts for bundles
+      that are stopped. When the extender bundle itself is stopped, it will automatically close all the contexts that it manages,
+      based on the service dependency between them.
+      The extender bundle symbolic name is <literal>org.springframework.osgi.extender</literal>. </para>
       
     </section>
 
     <section id="bnd-app-ctx:app-creation">
       <title>Application Context Creation</title>
 
-      <para>The extender bundle creates applications contexts asynchronously, on a different thread then the one starting the bundle.
-      This behaviour ensures that starting an OSGi Service Platform is fast and that bundles with service inter-dependencies do not 
-      cause deadlock (waiting for each other) on startup, as pictured below: </para>
+      <para>Once started, the extender analyses the existing started bundles and monitors any new bundle that will start. Once a
+      Blueprint or Spring-DM configuration is detected, the extender will create an application context for it in an asynchronous manner,
+      on a different thread then the one starting the bundle (or delivering the STARTED event).
+      This behaviour follows the OSGi specification recommendation and ensures that starting an OSGi Service Platform is fast and that 
+      bundles with service inter-dependencies do not cause deadlock (waiting for each other) on startup, as pictured below: </para>
       
       
       <para><mediaobject>
@@ -82,16 +90,16 @@
       
       <para>The extender considers only bundles successfully started, that is, bundles in 
       <emphasis>ACTIVE</emphasis> state; bundles in other states are ignored.    
-      Therefore a Spring-powered bundle will have its application context created <emphasis>after</emphasis>
-      it has been started. It is possible to force synchronous/serialized creation of application contexts 
+      Therefore a Spring-powered/Blueprint bundle will have its application context created <emphasis>after</emphasis>
+      it has been fully started. It is possible to force synchronous/serialized creation of application contexts 
       for started bundles, on a bundle-by-bundle basis. See <xref linkend="app-deploy:headers"/> for information 
       on how to specify this behaviour.</para>
 
       <para>If application context creation fails for any reason then the
-      failure cause is logged. The bundle remains in the ACTIVE state. There
-      will be no services exported to the registry from the application
-      context in this scenario.</para>
-
+      failure cause is logged. The bundle remains in the ACTIVE state; the application context lifecycle will not influence
+      the bundle lifecycle in anyway. Naturally, since the context has failed, so will the functionality associated with it;
+      for example there will be no services exported to the registry from the application context in this scenario.</para>
+      
       <section id="bnd-app-ctx:app-creation:mandatory-deps">
         <title>Mandatory Service Dependencies</title>
 
@@ -118,11 +126,14 @@
         can be configured using the <literal>timeout</literal> directive. See
         <xref linkend="app-deploy:headers"/> for details.</para>
 
+		<para>Blueprint users could achieve the same result through the <literal>blueprint.timeout</literal> 
+		attribute declared on the <literal>Bundle-SymbolicName</literal></para>
+		
         <para>It is possible to change the application context creation
         semantics so that application context creation fails if all mandatory
-        services are not immediately available upon startup (see the aformentioned 
+        services are not immediately available upon startup (see the aforementioned 
         section for more information).
-        However, regardless of the configuration chosen, the failure of the
+        Again, note that regardless of the configuration chosen, the failure of the
         application context will not change the bundle state.</para>
       </section>
 
@@ -138,7 +149,10 @@
         context). The published service has a service property named
         <literal>org.springframework.context.service.name</literal> whose
         value is set to the bundle symbolic name of the bundle hosting the
-        application context. It is possible to prevent publication of the
+        application context. In case of a Blueprint bundle, the container will be published
+        under <interfacename>org.osgi.service.blueprint.container.BlueprintContainer</interfacename> 
+        </para>
+        <para>It is possible to prevent publication of the
         application context as a service using a directive in the bundle's
         manifest. See <xref linkend="app-deploy:headers"/> for details.</para>
 
@@ -205,7 +219,7 @@
       packages exported by uninstalled bundles, are no longer available.
       Consult the OSGi specifications for full details.</para>
 
-      <para>When a Spring-powered bundle is stopped, the application context
+      <para>When a Spring-powered or Blueprint bundle is stopped, the application context
       created for it is automatically destroyed. All services exported by the
       bundle will be unregistered (removed from the service registry) and the
       normal application context tear-down life-cycle is observed
@@ -320,19 +334,19 @@
       <programlisting language="java">public interface BundleContextAware {
   public void setBundleContext(BundleContext context);
 }</programlisting>
-
+	
       <para>Any bean implementing this interface will be injected with a
       reference to the bundle context when it is configured by Spring. If you
       wish to use this facility within a bundle, remember to import the
       package <literal>org.springframework.osgi.context</literal> in your
-      bundle manifest.</para>
+      bundle manifest since otherwise the interface will not be visible to your bundle.</para>
 	</section>
 
     <section id="bnd-app-ctx:app-destruction">
       <title>Application Context Destruction</title>
       
       <para>The application context is bound to the bundle in which it lives. Thus, if the declaring 
-      bundle is being shutdown, the application context will be destroyed as well,
+      bundle is being shutdown (for whatever reasons), the application context will be destroyed as well,
       all exported services being unregistered and all service imported dispose of.
       </para>
       
@@ -366,8 +380,19 @@
     <section id="bnd-app-ctx:access-bnd-ctx:stop-extender">
       <title>Stopping the Extender Bundle</title>
 
+      <sidebar id="shutdown-2.x">
+		<title>Shutdown algorithm change in 2.x</title>
+		<para>The shutdown algorithm implementation in Spring DM 2.0 has been revised to be better
+		aligned with the Blueprint Container spec. Namely, the previous implementation performed ordering
+		in only one pass while the latter performs multiple steps to accommodate the service changes in
+		the OSGi space. Users should not discover any differences at runtime however, if that's not the case,
+		please let us know.
+		</para>
+      </sidebar>
+
       <para>If the extender bundle is stopped, then all the application
-      contexts created by the extender will be destroyed. Application contexts
+      contexts created by the extender will be destroyed. The algorithm described here is identical
+      to that used by the Blueprint specification (section 121.3.11). Application contexts
       are shutdown in the following order:</para>
 
       <orderedlist>

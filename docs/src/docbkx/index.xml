@@ -51,6 +51,7 @@
       <xi:include href="introduction/requirements.xml"/>
       <xi:include href="introduction/getting-started.xml"/>
       <xi:include href="introduction/what-is-new.xml"/>
+      <xi:include href="introduction/blueprint.xml"/>
 
       <!-- background on OSGi -->
   </part>
