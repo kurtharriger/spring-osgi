@@ -7,6 +7,45 @@
     <para>While a relatively young project, each version of Spring Dynamic Modules (even minor ones) offers new functionality. This chapter is a guide to the new
     and improved feature and intended as a high-level, short summary. Please follow the appropriate links for more in-depth information.</para>
 
+    <section id="dm-2.0.x">
+		<title>2.0.x</title>
+		
+		<section id="dm-2.0.x:blueprint">
+			<title>OSGi 4.2 Blueprint Reference Implementation (RI)</title>
+			<para>Spring DM served as the basis for the Blueprint Container specification, introduced by OSGi 4.2. Spring DM 2.0 stands as the RI for the 
+			aforementioned specification, providing the Blueprint API and implementation out of the box. Various aspect of Spring DM have been adjusted for
+			consistency to the Blueprint specification. For more information on the two models,	see <xref linkend="blueprint"/> for more information.</para>
+		</section>
+		<section id="dm-2.0.x:jdk5">
+			<title>Java 5</title>
+			<para>As of 2.x, Spring DM requires <ulink url="http://java.sun.com/j2se/1.5.0/">JDK 5</ulink> to run (or compile). The framework code has been
+			revised to take advantage of the JDK 5 features such as language improvements, concurrency and generics. Considerable effort has been spent to
+			keep the code backwards compatible however, it is recommended to do some sanity tests before upgrading.</para>
+		</section>
+		<section id="dm-2.0.x:spring-3.x">
+			<title>Spring 3.x</title>
+			<para>Besides the Java 5 upgrade, DM 2.0 requires Spring 3.x to get access to the latest framework features and JDK optimizations.</para>
+		</section>
+		<section id="dm-2.0.x:imports">
+			<title>Service imports</title>
+			<para>2.0.x provides several improvements for service imports (whether single or collection based) both in terms of speed and service lifecycle.
+			<xref linkend="service-registry:refs"/> provides more details.</para>
+		</section>		
+		<section id="dm-2.0.x:security">
+			<title>Java 2 Security Integration</title>
+			<para>Continuing the work in 1.2.x, Spring DM 2.0 executes all user code using its credentials (the managed bundle permissions). 
+			See <xref linkend="appendix-security"/> for more information.</para>
+		</section>
+		<!-- 
+		<section id="dm-2.0.x:artifacts-name">
+			<title>Aligned Spring DM artifact names with Spring framework</title>
+			<para>As of 2.x, the artifacts names have been align to the conventions of Spring 3.x and OSGi, namely to use the symbolic names as artifact names.
+			In practice, this means the <literal>spring-osgi-</literal> is being replaced with <literal>org.springframework.osgi.</literal> so for example,
+			<literal>spring-osgi-core</literal> becomes <literal>org.springframework.osgi.core</literal>. </para>
+		</section>
+ 		-->		
+	</section>
+
     <section id="dm-1.2.x">
 		<title>1.2.x</title>
 		
