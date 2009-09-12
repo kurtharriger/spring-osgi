@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+                 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="blueprint">
+    <title>OSGi 4.2 Blueprint Container</title>
+
+	<para>Based on the Spring DM programming model, the OSGi Alliance introduced in OSGi 4.2 Release
+	the Blueprint Container specification (part of the Compendium Service). Spring DM 2.0 serves as 
+	the Blueprint Reference <ulink url="http://en.wikipedia.org/wiki/Reference_implementation">Implementation</ulink>
+	- the official, complete implementation of the spec.
+	</para>
+	<para>For this reason, users familiar with Spring DM, will find Blueprint very familiar and vice versa. 
+	In fact, we recommend that the Blueprint specification is used as a complement to this documentation. It should be
+	mentioned that various aspects of Spring DM 1.x have been adjusted or slightly changed in 2.0, for consistency reason,
+	to closely follow the Blueprint specification. As a general rule, unless mentioned otherwise, the Spring DM 2.x and
+	Blueprint behaviour should be the same.</para>
+	<para>Existing and new users have the freedom to mix and match the programming model they want, since Spring 
+	DM 2.0 supports both the Spring/Spring DM 1.x declarations and the Blueprint one, inside the same application.
+	That is, one can declare inside the same configuration, beans using both namespaces, at any point, without 
+	having to make an up-front choice.</para>
+	
+	<para>Please note that this documentation will focus on Spring DM specific configurations and option; for Blueprint specific
+	behaviour please refer to the OSGi 4.2 Compendium spec, section 121.</para>
+	
+	<section id="blueprint:requirements">
+		<title>Blueprint Requirements</title>
+		<para>The Blueprint Container spec is part of the OSGi 4.2 release and relies on it, in its API. Thus, 
+		in order to use Blueprint, one must use an OSGi 4.2 compatible platform as a runtime environment. Spring DM itself 
+		requires only an OSGi 4.0 framework so if 4.2 is not an option, one can safely downgrade at the loss of the Blueprint
+		model which can be built on top of Spring/Spring DM.
+		</para>
+		<note>On environments prior to OSGi 4.2, Spring DM will disable the Blueprint functionality automatically - users will be notified 
+		through a log message like the following:
+
+	    <screen><![CDATA[Non OSGi 4.2 platform detected; disabling Blueprint Container functionality]]></screen>
+		
+		</note>
+	</section>
+	
+	<section id="blueprint:differences">
+		<title>Blueprint/Spring DM Differences</title>
+		<para>There are a lot of similarities in terms of functionality and configuration between Spring DM 1.x and Blueprint which should be 
+		no surprise considering that DM was the basis of the Blueprint spec. In addition to fully supporting the Blueprint spec, DM 2.x closes
+		the gap offering Blueprint behaviour directly from Spring DM configuration. The table below aggregates the most important user facing
+		differences between Spring/Spring DM configurations and Blueprint and the relevant configuration options. Again, one can simply switch
+		between the two definition styles, if need be.</para>
+
+	  <section id="blueprint:differences:mf">
+		  <title>Bundle Manifest Settings</title>
+
+		  <para>The table below summarizes the differences between the configuration options in Spring DM and Blueprint:</para>
+
+		  <table id="sdm-vs-blueprint-config-attr" pgwide="1">
+	          <title>Configuration Setting Differences</title>
+	          <tgroup cols="3">
+	            <thead>
+	              <row>
+	                <entry>Option</entry>
+	                <entry>Spring DM</entry>
+	                <entry>Blueprint</entry>
+	              </row>
+	            </thead>
+	            <tbody>
+	              <row>
+	                <entry>Default Configuration Location</entry>
+	                <entry><literal>META-INF/spring</literal></entry>
+	                <entry><literal>OSGI-INF/blueprint</literal></entry>
+	              </row>
+	              <row>
+	                <entry>Custom Locations Header</entry>
+	                <entry><literal>Spring-Context</literal></entry>
+	                <entry><literal>Bundle-Blueprint</literal></entry>
+	              </row>
+	              <row>
+	                <entry>Attribute Header</entry>
+	                <entry><literal>Spring-Context</literal></entry>
+	                <entry><literal>Bundle-SymbolicName</literal></entry>
+	              </row>
+	              <row>
+	                <entry>Asynchronous Creation Attribute</entry>
+	                <entry><literal>create-asynchronously</literal></entry>
+	                <entry><literal>-</literal></entry>
+	              </row>
+	              <row>
+	                <entry>Startup Mandatory Dependencies Attribute</entry>
+	                <entry><literal>wait-for-dependencies</literal></entry>
+	                <entry><literal>blueprint.graceperiod</literal></entry>
+	              </row>
+	              <row>
+	                <entry>Startup Mandatory Timeout Attribute</entry>
+	                <entry><literal>timeout</literal> (in s)</entry>
+	                <entry><literal>blueprint.timeout</literal> (in ms)</entry>
+	              </row>
+	              <row>
+	                <entry>Container API Service Publication Attribute</entry>
+	                <entry><literal>publish-context</literal></entry>
+	                <entry><literal>-</literal></entry>
+	              </row>
+	            </tbody>
+	          </tgroup>
+	      </table>
+		  
+		  <para>The manifests below are equivalent in terms of settings:</para>
+
+		<programlistingco>
+		  <areaspec>
+			<area id="blueprint:vs:mf:attr:sdm" coords="2 72"/>
+			<area id="blueprint:vs:mf:timeout:s" coords="4 72"/>
+  		  </areaspec>
+		  <programlisting><![CDATA[Bundle-SymbolicName: org.example.account.bundle
+Spring-Context: config/account-data-context.xml, config/osgi-*.xml;
+ wait-for-dependencies:=true;
+ timeout:=10
+]]></programlisting>
+		  <calloutlist>
+			<callout arearefs="blueprint:vs:mf:attr:sdm">
+				<para>All Spring DM specific attributes are grouped under <literal>Spring-Context</literal> header.</para>
+			</callout>
+			<callout arearefs="blueprint:vs:mf:timeout:s">
+				<para>Timeout specified in <emphasis>seconds</emphasis>.</para>
+			</callout>
+		  </calloutlist>
+		</programlistingco>
+
+		<programlistingco>
+		  <areaspec>
+			<areaset id="blueprint:vs:mf:attr:bp" coords="">
+				<area id="blueprint:vs:mf:attr:bp.1" coords="1 72"/>
+				<area id="blueprint:vs:mf:attr:bp.2" coords="4 72"/>
+			</areaset>
+			<area id="blueprint:vs:mf:timeout:ms" coords="3 72"/>
+  		  </areaspec>
+		  <programlisting><![CDATA[Bundle-SymbolicName: org.example.account.bundle;
+ blueprint.graceperiod:=true;
+ blueprint.timeout:=10000
+Blueprint-Bundle: config/account-data-context.xml, config/osgi-*.xml
+]]></programlisting>
+		  <calloutlist>
+			<callout arearefs="blueprint:vs:mf:attr:bp">
+				<para>Blueprint settings are spread between <literal>Bundle-SymbolicName</literal> and <literal>Blueprint-Bundle</literal>.</para>
+			</callout>
+			<callout arearefs="blueprint:vs:mf:timeout:ms">
+				<para>Timeout specified in <emphasis>milliseconds</emphasis>.</para>
+			</callout>
+		  </calloutlist>
+	  	</programlistingco>
+
+	  </section>
+
+	  <section id="blueprint:differences:xml">
+		<title>XML Declarations</title>
+
+		<para>Most of the XML declarations are similar between Spring and Blueprint. Using the Spring 
+		<ulink url="http://static.springsource.org/spring/docs/2.5.x/reference/new-in-2.html#new-in-2-ioc-configuration">namespace</ulink> mechanism, 
+		the same configuration can contain both Spring, Spring DM, Blueprint and other namespaces. Moreover, custom elements can be used for virtually
+		all elements of a Spring configuration (namespace, bean declaration, decoration, etc...). The table below focuses <emphasis>only</emphasis>
+		on the usual, standard Spring namespaces and their Blueprint equivalent.</para>
+
+  	 	<table id="spring-vs-blueprint-xml" pgwide="1">
+          <title>XML Configuration Differences</title>
+          <tgroup cols="3">
+            <thead>
+              <row>
+                <entry>Element/Attribute</entry>
+                <entry>Spring DM</entry>
+                <entry>Blueprint</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>Namespace Declaration</entry>
+                <entry><literal>http://www.osgi.org/xmlns/blueprint/v1.0.0</literal></entry>
+                <entry><para><literal>http://www.springframework.org/schema/beans</literal></para> 
+                <para>or <literal>http://www.springframework.org/schema/osgi</literal></para></entry>
+              </row>
+              <row>
+                <entry>Root Element</entry>
+                <entry><literal><![CDATA[<beans>]]></literal></entry>
+                <entry><literal><![CDATA[<blueprint>]]></literal></entry>
+              </row>
+              <row>
+                <entry>Default Lazy</entry>
+                <entry><literal><![CDATA[default-lazy]]></literal></entry>
+                <entry><literal><![CDATA[default-activation]]></literal></entry>
+              </row>
+              <row>
+                <entry>Default Init Method</entry>
+                <entry><literal><![CDATA[default-init-method]]></literal></entry>
+                <entry><literal>-</literal></entry>
+              </row>
+              <row>
+                <entry>Default Destroy Method</entry>
+                <entry><literal><![CDATA[default-destroy-method]]></literal></entry>
+                <entry><literal>-</literal></entry>
+              </row>
+              <row>
+                <entry>Default Autowire Strategy</entry>
+                <entry><literal><![CDATA[default-autowire]]></literal>, <literal><![CDATA[default-autowire-candidates]]></literal></entry>
+                <entry><literal>-</literal></entry>
+              </row>
+              <row>
+                <entry>Root Element</entry>
+                <entry><literal><![CDATA[<beans>]]></literal></entry>
+                <entry><literal><![CDATA[<blueprint>]]></literal></entry>
+              </row>
+              <row>
+                <entry>Bean ID</entry>
+                <entry><literal>id</literal></entry>
+                <entry><literal>id</literal></entry>
+              </row>
+              <row>
+                <entry>Bean Name/Alias</entry>
+                <entry><literal>name</literal>/<literal><![CDATA[<alias>]]></literal></entry>
+                <entry><literal>-</literal></entry>
+              </row>
+              <row>
+                <entry>Bean Class</entry>
+                <entry><literal>class</literal></entry>
+                <entry><literal>class</literal></entry>
+              </row>
+              <row>
+                <entry>Bean Scope Name</entry>
+                <entry><literal>scope</literal></entry>
+                <entry><literal>scope</literal></entry>
+              </row>
+              <row>
+                <entry>Built-in Scopes</entry>
+                <entry><literal>singleton</literal>, <literal>prototype</literal>, <literal>request</literal>, <literal>session</literal>, <literal>bundle</literal></entry>
+                <entry><literal>singleton</literal>, <literal>prototype</literal></entry>
+              </row>
+              <row>
+                <entry>Lazy Initialization Name/Values</entry>
+                <entry><literal>lazy-init</literal>=<literal>true/false</literal></entry>
+                <entry><literal>activation</literal>=<literal>lazy/eager</literal></entry>
+              </row>
+              <row>
+                <entry>Depends</entry>
+                <entry><literal>depends-on</literal></entry>
+                <entry><literal>depends-on</literal></entry>
+              </row>
+              <row>
+                <entry>Init Method</entry>
+                <entry><literal>init-method</literal></entry>
+                <entry><literal>init-method</literal></entry>
+              </row>
+              <row>
+                <entry>Destroy Method</entry>
+                <entry><literal>destroy-method</literal></entry>
+                <entry><literal>destroy-method</literal></entry>
+              </row>
+              <row>
+                <entry>Factory Method</entry>
+                <entry><literal>factory-method</literal></entry>
+                <entry><literal>factory-bean</literal></entry>
+              </row>
+              <row>
+                <entry>Factory Bean</entry>
+                <entry><literal>factory-bean</literal></entry>
+                <entry><literal>factory-ref</literal></entry>
+              </row>
+              <row>
+                <entry>Bean Inheritance</entry>
+                <entry><literal>parent</literal></entry>
+                <entry><literal>-</literal></entry>
+              </row>
+              <row>
+                <entry>Autowire Strategy</entry>
+                <entry><literal>autowire</literal>, <literal>autowire-candidate</literal></entry>
+                <entry><literal>-</literal></entry>
+              </row>
+              <row>
+                <entry>Constructor</entry>
+                <entry><literal><![CDATA[<constructor-arg>]]></literal></entry>
+                <entry><literal><![CDATA[<argument>]]></literal></entry>
+              </row>
+              <row>
+                <entry>Property</entry>
+                <entry><literal><![CDATA[<property>]]></literal></entry>
+                <entry><literal><![CDATA[<property>]]></literal></entry>
+              </row>
+              <row>
+                <entry>Value</entry>
+                <entry><literal><![CDATA[<value>]]></literal></entry>
+                <entry><literal><![CDATA[<value>]]></literal></entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        
+        <para>The configurations below are equivalent in terms of functionality:</para>
+        
+        <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" default-activation="lazy">
+    <bean id="object" class="java.lang.Object"/>
+    
+    <bean id="length" class="java.lang.Integer">
+        <argument value="4"/>
+    </bean>
+    
+    <bean id="buffer" class="java.lang.StringBuffer" depends-on="simple">
+    	<property name="length" ref="length"/>
+    </bean>
+    
+    <bean id="current-time" class="java.lang.System" factory-method="currentTimeMillis" scope="prototype"/>
+    
+    <bean id="list" class="java.util.ArrayList" destroy-method="clear" activation="eager">
+    	<argument ref="length"/>
+    </bean>
+</blueprint>]]></programlisting>
+        <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+    default-lazy-init="true">
+    
+    <bean id="object" class="java.lang.Object"/>
+    
+    <bean id="length" class="java.lang.Integer">
+        <constructor-arg value="4"/>
+    </bean>
+    
+    <bean id="buffer" class="java.lang.StringBuffer" depends-on="simple">
+    	<property name="length" ref="length"/>
+    </bean>
+    
+    <bean id="current-time" class="java.lang.System" factory-method="currentTimeMillis" scope="prototype"/>
+    
+    <bean id="list" class="java.util.ArrayList" destroy-method="clear" lazy-init="false">
+    	<constructor-arg ref="length"/>
+    </bean>
+</beans>]]></programlisting>
+
+		<para>As mentioned before, in Spring DM one can mix and match the namespaces:</para>
+		
+		<programlisting language="xml"><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:bp="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+		http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd		
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+    
+    <util:constant id="thread-priority" static-field="java.lang.Thread.MIN_PRIORITY"/>
+    
+    <bean id="exampleThread" class="java.lang.Thread" p:priority-ref="thread-priority">
+    	<constructor-arg>
+    	   <bp:bean class="org.example.SomeRunnable"/>
+    	</constructor-arg>
+    </bean>
+    
+    <task:executor id="rangeWithBoundedQueue" size="7-42" queue-capacity="#{ T(java.lang.Math).random() * 30.0 }"/>
+
+    <bp:reference-list id="cloneableServices" interface="java.lang.Cloneable" />
+<beans>]]></programlisting>
+		
+		<para>The example above, uses the Spring <literal>beans</literal>, <literal>util</literal>, <literal>p</literal>, Spring Expression Language (SpEL)
+		and the <literal>task</literal> namespace introduced in Spring 3.x, and Spring DM namespace.</para>
+	  </section>
+	
+		<para>Note that additional information is available through out the documentation, when each particular feature is discussed in detail.
+		These being said, it is highly recommended to read and use the Blueprint specification as guidance, if the Blueprint Container becomes 
+		the programming model of choice.</para>
+	</section>
+	
+	<section id="blueprint:using">
+		<title>Using Blueprint</title>
+		<para>There are no extra jars or steps that need to be executed to <emphasis>enable</emphasis> the Blueprint functionality in Spring DM. 
+		This is built directly into the core, in fact the Blueprint APIs are exported by the Spring DM core. Please see the next section for 
+		information on how to install Spring DM and the OSGi compendium spec (section 121) for Blueprint related information such as bootstrapping
+		and configuration locations. For those in a hurry, simply install and start the Spring DM jars (io, core, extender) and their dependencies
+		(namely Spring and slf4j) and you should be all set: Spring DM will automatically detect the running environment and the types of bundles started.
+		</para>
+	</section>
+</chapter>
