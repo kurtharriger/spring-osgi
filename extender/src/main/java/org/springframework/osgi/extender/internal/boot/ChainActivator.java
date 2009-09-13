@@ -22,6 +22,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.extender.internal.activator.ContextLoaderListener;
 import org.springframework.osgi.extender.internal.blueprint.activator.BlueprintLoaderListener;
+import org.springframework.osgi.util.OsgiPlatformDetector;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -34,17 +35,24 @@ public class ChainActivator implements BundleActivator {
 
 	protected final Log log = LogFactory.getLog(getClass());
 
-	private static final boolean BLUEPRINT_AVAILABLE = ClassUtils.isPresent(
-			"org.osgi.service.blueprint.container.BlueprintContainer", ChainActivator.class.getClassLoader());
+	private static final boolean BLUEPRINT_AVAILABLE =
+			ClassUtils.isPresent("org.osgi.service.blueprint.container.BlueprintContainer", ChainActivator.class
+					.getClassLoader());
 
 	private final BundleActivator[] CHAIN;
 
 	public ChainActivator() {
-		if (BLUEPRINT_AVAILABLE) {
-			log.info("Blueprint API detected; enabling Blueprint extender");
-			CHAIN = new BundleActivator[] { new ContextLoaderListener(), new BlueprintLoaderListener() };
+		if (OsgiPlatformDetector.isR42()) {
+			if (BLUEPRINT_AVAILABLE) {
+				log.info("Blueprint API detected; enabling Blueprint Container functionality");
+				CHAIN = new BundleActivator[] { new ContextLoaderListener(), new BlueprintLoaderListener() };
+			}
+			else {
+				log.warn("Blueprint API not found; disabling Blueprint Container functionality");
+				CHAIN = new BundleActivator[] { new ContextLoaderListener() };	
+			}
 		} else {
-			log.info("Blueprint API not found; disabling Blueprint extender");
+			log.warn("Non OSGi 4.2 platform detected; disabling Blueprint Container functionality");
 			CHAIN = new BundleActivator[] { new ContextLoaderListener() };
 		}
 	}

@@ -21,10 +21,11 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
- * Utility class that detects the running platform. Useful when certain quirks
- * or tweaks have to made for a specific implementations.
+ * Utility class that detects the running platform. Useful when certain quirks or tweaks have to made for a specific
+ * implementations.
  * 
  * Currently we can detect Equinox, Knopflerfish and Felix platforms.
  * 
@@ -39,19 +40,19 @@ public abstract class OsgiPlatformDetector {
 
 	private static final String[] FELIX_LABELS = new String[] { "Apache Software Foundation", "Felix", "felix" };
 
-	private static final boolean isR41;
+	private static final boolean isR41, isR42;
 
 	static {
 		boolean methodAvailable = false;
+		ClassLoader loader = Bundle.class.getClassLoader();
 		try {
 			methodAvailable = (Bundle.class.getMethod("start", new Class[] { int.class }) != null);
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 		}
 
 		isR41 = methodAvailable;
+		isR42 = ClassUtils.isPresent("org.osgi.framework.BundleReference", loader);
 	}
-
 
 	/**
 	 * Returns true if the given bundle context belongs to the Equinox platform.
@@ -64,12 +65,10 @@ public abstract class OsgiPlatformDetector {
 	}
 
 	/**
-	 * Returns true if the given bundle context belongs to the Knopflerfish
-	 * platform.
+	 * Returns true if the given bundle context belongs to the Knopflerfish platform.
 	 * 
 	 * @param bundleContext OSGi bundle context
-	 * @return true if the context indicates Knopflerfish platform, false
-	 *         otherwise
+	 * @return true if the context indicates Knopflerfish platform, false otherwise
 	 */
 	public static boolean isKnopflerfish(BundleContext bundleContext) {
 		return determinePlatform(bundleContext, KF_LABELS);
@@ -92,8 +91,7 @@ public abstract class OsgiPlatformDetector {
 		String vendorProperty = context.getProperty(Constants.FRAMEWORK_VENDOR);
 		if (vendorProperty == null) {
 			return false; // might be running outside of container
-		}
-		else {
+		} else {
 			// code defensively here to allow for variation in vendor name over
 			// time
 			if (containsAnyOf(vendorProperty, labels)) {
@@ -113,8 +111,7 @@ public abstract class OsgiPlatformDetector {
 	}
 
 	/**
-	 * Returns the OSGi platform version (using the manifest entries from the
-	 * system bundle). The version can be empty.
+	 * Returns the OSGi platform version (using the manifest entries from the system bundle). The version can be empty.
 	 * 
 	 * @param bundleContext bundle context to inspect
 	 * @return not-null system bundle version
@@ -130,12 +127,20 @@ public abstract class OsgiPlatformDetector {
 	}
 
 	/**
-	 * Determines if the current running platform implements OSGi Release 4.1
-	 * API or not.
+	 * Determines if the current running platform implements OSGi Release 4.1 API or not.
 	 * 
 	 * @return if the running platform implements OSGi 4.1 API
 	 */
 	public static boolean isR41() {
 		return isR41;
+	}
+
+	/**
+	 * Determines if the current running platform implements OSGi Release 4.2 API or not.
+	 * 
+	 * @return if the running platform implements OSGi 4.2 API
+	 */
+	public static boolean isR42() {
+		return isR42;
 	}
 }
