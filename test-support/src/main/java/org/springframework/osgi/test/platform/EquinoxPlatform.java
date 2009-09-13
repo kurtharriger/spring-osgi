@@ -75,7 +75,6 @@ public class EquinoxPlatform extends AbstractOsgiPlatform {
 			final Field field = EclipseStarter.class.getDeclaredField("context");
 
 			AccessController.doPrivileged(new PrivilegedAction<Object>() {
-
 				public Object run() {
 					field.setAccessible(true);
 					return null;
