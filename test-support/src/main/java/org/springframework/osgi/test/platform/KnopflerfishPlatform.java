@@ -147,6 +147,10 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 
 		public void stop() {
 			if (framework != null) {
+				try {
+					framework.stop();
+				} catch (Exception ex) {
+				}
 				Framework fwk = (Framework) framework;
 				try {
 					fwk.waitForStop(1000);
@@ -194,7 +198,7 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 		props.setProperty("org.knopflerfish.framework.patch", "false");
 		// new in KF 2.0.4 - automatically exports system packages based on the JRE version
 		props.setProperty("org.knopflerfish.framework.system.export.all", "true");
-		//props.setProperty("org.knopflerfish.framework.system.export.all_15", "true");
+		// props.setProperty("org.knopflerfish.framework.system.export.all_15", "true");
 		// add strict bootpath delegation (introduced in KF 2.3.0)
 		// since otherwise classes will be loaded from the booth classpath
 		// when generating JDK proxies instead of the OSGi space
