@@ -32,8 +32,8 @@ import org.apache.felix.main.Main;
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.osgi.test.internal.util.IOUtils;
-import org.springframework.osgi.util.internal.ReflectionUtils;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * Apache Felix (1.0.3+/1.4.x+/2.0.x) OSGi platform.
@@ -112,7 +112,8 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 				Class<?> autoProcessor =
 						ClassUtils.resolveClassName("org.apache.felix.main.AutoProcessor", getClass().getClassLoader());
 				Method process = autoProcessor.getMethod("process", Map.class, BundleContext.class);
-				ReflectionUtils.invokeMethod(process, null, new Object[] {configProperties, platform.getBundleContext()});
+				ReflectionUtils.invokeMethod(process, null, new Object[] { configProperties,
+						platform.getBundleContext() });
 			}
 			platform.start();
 			context = platform.getBundleContext();
