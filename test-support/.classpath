@@ -16,11 +16,11 @@
 	<classpathentry kind="var" path="M2_REPO/org/objectweb/asm/com.springsource.org.objectweb.asm/2.2.3/com.springsource.org.objectweb.asm-2.2.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/2.0.0-m1-SNAPSHOT/spring-osgi-mock-2.0.0-m1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/2.0.0-m1-SNAPSHOT/spring-osgi-core-2.0.0-m1-SNAPSHOT.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-extender"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.apache.felix.main/2.0.0/org.apache.felix.main-2.0.0.jar" sourcepath="/FELIX_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/3.0.0.alpha1/framework-3.0.0.alpha1.jar" sourcepath="/KF3_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/3.5.0.v20090429-1630/osgi-3.5.0.v20090429-1630.jar" sourcepath="/EQUINOX_SRC/src.zip"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.apache.felix.main/1.4.1/org.apache.felix.main-1.4.1.jar" sourcepath="/FELIX_SRC"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-extender"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
