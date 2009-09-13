@@ -36,13 +36,10 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.osgi.blueprint.container.BlueprintConverterConfigurer;
 import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
 import org.springframework.osgi.blueprint.container.SpringBlueprintConverter;
 import org.springframework.osgi.blueprint.container.SpringBlueprintConverterService;
 import org.springframework.osgi.blueprint.container.support.BlueprintContainerServicePublisher;
-import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
-import org.springframework.osgi.blueprint.reflect.internal.metadata.EnvironmentManagerFactoryBean;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
@@ -55,7 +52,6 @@ import org.springframework.osgi.extender.internal.activator.OsgiContextProcessor
 import org.springframework.osgi.extender.internal.blueprint.event.EventAdminDispatcher;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitStartingEvent;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.ObjectUtils;
 
 /**
  * Blueprint specific context processor.
@@ -67,6 +63,13 @@ public class BlueprintContainerProcessor implements
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(BlueprintContainerProcessor.class);
+	private static final Class<?> ENV_FB_CLASS;
+
+	static {
+		String className = "org.springframework.osgi.blueprint.reflect.internal.metadata.EnvironmentManagerFactoryBean";
+		ClassLoader loader = OsgiBundleApplicationContextEvent.class.getClassLoader();
+		ENV_FB_CLASS = ClassUtils.resolveClassName(className, loader);
+	}
 
 	private final EventAdminDispatcher dispatcher;
 	private final BlueprintListenerManager listenerManager;
@@ -194,11 +197,12 @@ public class BlueprintContainerProcessor implements
 						logger);
 
 				// add Blueprint conversion service
-//				String[] beans = beanFactory.getBeanNamesForType(BlueprintConverterConfigurer.class, false, false);
-//				if (ObjectUtils.isEmpty(beans)) {
-//					beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
-//				}
-				beanFactory.setConversionService(new SpringBlueprintConverterService(beanFactory.getConversionService(), beanFactory));
+				// String[] beans = beanFactory.getBeanNamesForType(BlueprintConverterConfigurer.class, false, false);
+				// if (ObjectUtils.isEmpty(beans)) {
+				// beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
+				// }
+				beanFactory.setConversionService(new SpringBlueprintConverterService(
+						beanFactory.getConversionService(), beanFactory));
 			}
 
 			private void addPredefinedBlueprintBean(ConfigurableListableBeanFactory beanFactory, String beanName,
@@ -209,7 +213,7 @@ public class BlueprintContainerProcessor implements
 						BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 
 						GenericBeanDefinition def = new GenericBeanDefinition();
-						def.setBeanClass(EnvironmentManagerFactoryBean.class);
+						def.setBeanClass(ENV_FB_CLASS);
 						ConstructorArgumentValues cav = new ConstructorArgumentValues();
 						cav.addIndexedArgumentValue(0, value);
 						def.setConstructorArgumentValues(cav);
