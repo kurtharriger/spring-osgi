@@ -24,9 +24,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Base class for OsgiPlatform classes. Provides common functionality such as
- * creation a temporary folder on startup and deletion on shutdown. Uses system
- * properties to allow easy configuration from the command line.
+ * Base class for OsgiPlatform classes. Provides common functionality such as creation a temporary folder on startup and
+ * deletion on shutdown. Uses system properties to allow easy configuration from the command line.
  * 
  * @author Costin Leau
  */
@@ -47,15 +46,12 @@ abstract class AbstractOsgiPlatform implements OsgiPlatform {
 
 	private Properties configurationProperties = null;
 
-
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * This implementation considers existing system properties as well as
-	 * platform specific ones, defined in this class. The system properties are
-	 * convenient for changing the configuration directly from the command line
-	 * (useful for CI builds) leaving the programmer to ultimately decide the
-	 * actual configuration used.
+	 * This implementation considers existing system properties as well as platform specific ones, defined in this
+	 * class. The system properties are convenient for changing the configuration directly from the command line (useful
+	 * for CI builds) leaving the programmer to ultimately decide the actual configuration used.
 	 */
 	public Properties getConfigurationProperties() {
 		// check if defaults should apply
@@ -93,8 +89,7 @@ abstract class AbstractOsgiPlatform implements OsgiPlatform {
 
 		try {
 			tempFileName = File.createTempFile(TMP_PREFIX, suffix);
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			if (log.isWarnEnabled()) {
 				log.warn("Could not create temporary directory, returning a temp folder inside the current folder", ex);
 			}

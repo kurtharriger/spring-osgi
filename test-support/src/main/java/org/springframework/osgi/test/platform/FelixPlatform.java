@@ -18,7 +18,6 @@ package org.springframework.osgi.test.platform;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,34 +27,137 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.felix.framework.Felix;
 import org.apache.felix.framework.util.StringMap;
+import org.apache.felix.main.AutoProcessor;
 import org.apache.felix.main.Main;
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.osgi.test.internal.util.IOUtils;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.ReflectionUtils;
 
 /**
- * Apache Felix (1.0.3+/1.4.x+/2.0.x) OSGi platform.
+ * Apache Felix (1.0.3+/1.4.x+/2.0.x) OSGi platform. Automatically detects the available version on the classpath and
+ * uses the appropriate means to configure and instantiate it.
  * 
  * @author Costin Leau
  */
 public class FelixPlatform extends AbstractOsgiPlatform {
+
+	private static abstract class Felix1XPlatform implements Platform {
+		private static final Constructor<?> CTOR;
+
+		static {
+			Class<?> autoActivator =
+					ClassUtils.resolveClassName("org.apache.felix.main.AutoActivator", Felix1XPlatform.class
+							.getClassLoader());
+			try {
+				CTOR = autoActivator.getConstructor(Map.class);
+			} catch (Exception ex) {
+				throw new IllegalStateException("Cannot instantiate class " + autoActivator, ex);
+			}
+		}
+
+		private Felix felix;
+
+		public final BundleContext start() throws Exception {
+			// load properties
+			Map<Object, Object> configMap = getConfiguration();
+
+			// pass the auto activator as a list
+			List<Object> list = new ArrayList<Object>(1);
+			list.add(BeanUtils.instantiateClass(CTOR, configMap));
+
+			felix = createFelix(configMap, list);
+			felix.start();
+			return felix.getBundleContext();
+		}
+
+		public final void stop() throws Exception {
+			felix.stop();
+		}
+
+		abstract Felix createFelix(Map<Object, Object> configMap, List<?> activators) throws Exception;
+	}
+
+	private static class Felix10XPlatform extends Felix1XPlatform {
+
+		private static final Constructor<Felix> CTOR;
+		static {
+			try {
+				CTOR = Felix.class.getConstructor(new Class<?>[] { Map.class, List.class });
+			} catch (NoSuchMethodException ex) {
+				throw new IllegalStateException("Cannot find Felix constructor", ex);
+			}
+		}
+
+		@Override
+		Felix createFelix(Map<Object, Object> configMap, List<?> activators) throws Exception {
+
+			return CTOR.newInstance(new Object[] { configMap, activators });
+		}
+	}
+
+	private static class Felix14XPlatform extends Felix1XPlatform {
+
+		@Override
+		Felix createFelix(Map<Object, Object> configMap, List<?> activators) throws Exception {
+			configMap.put("felix.systembundle.activators", activators);
+			return new Felix(configMap);
+		}
+	}
+
+	private static class Felix20XPlatform implements Platform {
+		private FrameworkTemplate fwkTemplate;
+		private final Log log;
+
+		Felix20XPlatform(Log log) {
+			this.log = log;
+		}
+
+		public BundleContext start() throws Exception {
+			Map<Object, Object> configMap = getConfiguration();
+			Felix fx = new Felix(configMap);
+			fwkTemplate = new DefaultFrameworkTemplate(fx, log);
+
+			fwkTemplate.init();
+			BundleContext context = fx.getBundleContext();
+			AutoProcessor.process(configMap, context);
+			fwkTemplate.start();
+			return context;
+		}
+
+		public void stop() throws Exception {
+			fwkTemplate.stopAndWait(1000);
+		}
+	}
+
+	private static enum FelixVersion {
+		V_10X, V_14X, V_20X
+	}
+
+	private static FelixVersion FELIX_VERSION;
 
 	private static final Log log = LogFactory.getLog(FelixPlatform.class);
 
 	private static final String FELIX_PROFILE_DIR_PROPERTY = "felix.cache.profiledir";
 	/** new property in 1.4.0 replacing cache.profiledir */
 	private static final String OSGI_STORAGE_PROPERTY = "org.osgi.framework.storage";
-	/** Felix 2.0.x class */
-	private static final boolean IS_FELIX_2_X =
-			ClassUtils.isPresent("org.apache.felix.main.AutoProcessor", Felix.class.getClassLoader());
+
+	static {
+		ClassLoader loader = Felix.class.getClassLoader();
+		// detect available Felix version
+		if (ClassUtils.isPresent("org.apache.felix.main.AutoProcessor", loader)) {
+			FELIX_VERSION = FelixVersion.V_20X;
+		} else {
+			if (ClassUtils.isPresent("org.apache.felix.main.RegularBundleInfo", loader)) {
+				FELIX_VERSION = FelixVersion.V_14X;
+			}
+			FELIX_VERSION = FelixVersion.V_10X;
+		}
+	}
 
 	private BundleContext context;
-
-	private Felix platform;
-
 	private File felixStorageDir;
+	private Platform platform;
 
 	public FelixPlatform() {
 		toString = "Felix OSGi Platform";
@@ -94,82 +196,39 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 
 		configProperties.setProperty(FELIX_PROFILE_DIR_PROPERTY, this.felixStorageDir.getAbsolutePath());
 		configProperties.setProperty(OSGI_STORAGE_PROPERTY, this.felixStorageDir.getAbsolutePath());
+		configProperties.setProperty("org.osgi.framework.storage.clean", "onFirstInit");
 	}
 
 	public void start() throws Exception {
 		if (platform == null) {
 			// initialize properties and set them as system wide so Felix can pick them up
-			Map configProperties = getConfigurationProperties();
+			Map<Object, Object> configProperties = getConfigurationProperties();
 			System.getProperties().putAll(configProperties);
 
-			platform = configureFelix();
-			// if running a 4.2 release, respect the Framework contract
-			if (IS_FELIX_2_X) {
-				// init
-				Method init = Felix.class.getMethod("init");
-				ReflectionUtils.invokeMethod(init, platform);
-				// load AutoProcessor
-				Class<?> autoProcessor =
-						ClassUtils.resolveClassName("org.apache.felix.main.AutoProcessor", getClass().getClassLoader());
-				Method process = autoProcessor.getMethod("process", Map.class, BundleContext.class);
-				ReflectionUtils.invokeMethod(process, null, new Object[] { configProperties,
-						platform.getBundleContext() });
+			switch (FELIX_VERSION) {
+			case V_20X:
+				platform = new Felix20XPlatform(null);
+				break;
+			case V_14X:
+				platform = new Felix14XPlatform();
+				break;
+			// fallback to 10-12 version
+			default:
+				platform = new Felix10XPlatform();
+				break;
 			}
-			platform.start();
-			context = platform.getBundleContext();
+
+			context = platform.start();
 		}
 	}
 
 	/**
-	 * Configures the embedded Felix instance. This facade-like method is needed since Felix 1.4.x breaks backwards
-	 * compatibility by defining different constructors.
+	 * Returns the platform configuration for creating a Felix instance. Uses Felix classes to load and process the
+	 * system properties.
 	 * 
-	 * @return a configured (but not started) Felix instance
+	 * @return Felix configuration
 	 */
-	private Felix configureFelix() throws Exception {
-		boolean is14 = false;
-		Constructor ctr = null;
-		// check for Felix 1.4.x constructor
-		try {
-			ctr = Felix.class.getConstructor(new Class<?>[] { Map.class });
-			is14 = true;
-		} catch (NoSuchMethodException nsme) {
-			ctr = Felix.class.getConstructor(new Class<?>[] { Map.class, List.class });
-		}
-
-		Object[] params = commonFelixSetup();
-		if (IS_FELIX_2_X) {
-			return configureFelix20X(ctr, params);
-		}
-		return (is14 ? configureFelix14X(ctr, params) : configureFelix10X_12X(ctr, params));
-	}
-
-	private Felix configureFelix20X(Constructor ctr, Object[] params) throws Exception {
-		Map configProps = (Map) params[0];
-		return (Felix) ctr.newInstance(new Object[] { configProps });
-	}
-
-	private Felix configureFelix14X(Constructor ctr, Object[] params) throws Exception {
-		Map configProps = (Map) params[0];
-		configProps.put("felix.systembundle.activators", params[1]);
-		return (Felix) ctr.newInstance(new Object[] { configProps });
-	}
-
-	private Felix configureFelix10X_12X(Constructor ctr, Object[] params) throws Exception {
-		// Create a case-insensitive property map
-		Map configMap = new StringMap((Map) params[0], false);
-		return (Felix) ctr.newInstance(new Object[] { configMap, params[1] });
-	}
-
-	/**
-	 * Runs the common 1.0.x/1.2.x/1.4.x Felix setup and returns two Felix specific objects, the configuration
-	 * properties and the list of AutoActivators.
-	 * 
-	 * Felix 2.x replaces the AutoActivator with AutoProcessor.
-	 * 
-	 * @return a 2 object array containing the configuration properties and the list of auto-activators
-	 */
-	private Object[] commonFelixSetup() {
+	private static Map<Object, Object> getConfiguration() {
 		// Load system properties.
 		Main.loadSystemProperties();
 
@@ -183,22 +242,8 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 		// Copy framework properties from the system properties.
 		Main.copySystemProperties(configProps);
 
-		if (IS_FELIX_2_X) {
-			return new Object[] { configProps };
-
-		} else {
-			List list = new ArrayList(1);
-			Class autoActivator =
-					ClassUtils.resolveClassName("org.apache.felix.main.AutoActivator", getClass().getClassLoader());
-			Constructor constructor;
-			try {
-				constructor = autoActivator.getConstructor(Map.class);
-			} catch (Exception ex) {
-				throw new IllegalArgumentException("Cannot instantiate class " + autoActivator, ex);
-			}
-			list.add(BeanUtils.instantiateClass(constructor, configProps));
-			return new Object[] { configProps, list };
-		}
+		// Create a (Felix specific) case-insensitive property map
+		return new StringMap(configProps, false);
 	}
 
 	public void stop() throws Exception {

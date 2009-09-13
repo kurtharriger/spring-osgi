@@ -26,15 +26,15 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.SynchronousBundleListener;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
+import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
  * 
- * http://sourceforge.net/tracker/index.php?func=detail&aid=1581187&group_id=82798&atid=567241
- * ClassCastException from Bundle.getResource when called on Bundle passed to
- * the caller
+ * http://sourceforge.net/tracker/index.php?func=detail&aid=1581187&group_id=82798&atid=567241 ClassCastException from
+ * Bundle.getResource when called on Bundle passed to the caller
  * 
  * 
  * @author Costin Leau
@@ -43,7 +43,6 @@ import org.springframework.util.ObjectUtils;
 public class CallingResourceOnDifferentBundlesTest extends BaseIntegrationTest {
 
 	private static final String LOCATION = "META-INF/";
-
 
 	public void testCallGetResourceOnADifferentBundle() throws Exception {
 		// find bundles
@@ -54,7 +53,7 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIntegrationTest {
 			URL url = bundle.getResource(LOCATION);
 			if (!OsgiBundleUtils.isFragment(bundle))
 				assertNotNull("bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " contains no META-INF/",
-					url);
+						url);
 		}
 	}
 
@@ -67,7 +66,7 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIntegrationTest {
 			Enumeration enm = bundle.getResources(LOCATION);
 			if (!OsgiBundleUtils.isFragment(bundle))
 				assertNotNull("bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " contains no META-INF/",
-					enm);
+						enm);
 		}
 	}
 
@@ -97,8 +96,7 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIntegrationTest {
 				// call getResources
 				try {
 					event.getBundle().getResources(LOCATION);
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
 
@@ -113,12 +111,15 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIntegrationTest {
 	}
 
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-
-		return ("testCallGetResourceOnADifferentBundle".equals(testMethodName) && isFelix()) || isKF();
+		return ("testCallGetResourceOnADifferentBundle".equals(testMethodName) || "testCallGetResourcesOnADifferentBundle"
+				.equals(testMethodName))
+				&& (isFelix() || isKF());
 	}
 
 	private boolean isFelix() {
-		return (getPlatformName().indexOf("Felix") > -1);
+		String platformName = getPlatformName();
+		System.out.println("Platform name is " + platformName);
+		return (platformName.indexOf("Felix") > -1);
 	}
 
 	private boolean isKF() {
@@ -133,5 +134,4 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIntegrationTest {
 		list.add(new AdminPermission("*", AdminPermission.RESOURCE));
 		return list;
 	}
-
 }
