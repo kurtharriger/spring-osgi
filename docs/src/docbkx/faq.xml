@@ -488,6 +488,15 @@
      	For more information on the <literal>uses</literal> directive please see the OSGi spec, 
      	section	3.6.4 or <ulink url="http://blog.springsource.com/2008/10/20/understanding-the-osgi-uses-directive/">this</ulink> SpringSource blog entry.
      	</para>
-     </section>            
+     </section>
+     
+     <section id="blueprint">
+     	<title>What can I use Spring DM with the Blueprint Container spec? What's the relationship between the two? Are the they compatible?
+     	Are there any differences?</title>
+     	
+     	<para>Spring DM 2.0 is the Reference Implementation for OSGi 4.2 Blueprint Container specification. Simply deploy your Blueprint bundles in a platform
+     	where Spring DM is already activated and you should be done. For more information about Blueprint and Spring DM, please see the 
+     	<emphasis>Blueprint Container</emphasis> chapter in the reference documentation.</para>
+     </section>
     </chapter>
 </book>

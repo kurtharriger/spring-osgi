@@ -30,9 +30,9 @@
 		model which can be built on top of Spring/Spring DM.
 		</para>
 		<note>On environments prior to OSGi 4.2, Spring DM will disable the Blueprint functionality automatically - users will be notified 
-		through a log message like the following:
+		through a log message similar to the following:
 
-	    <screen><![CDATA[Non OSGi 4.2 platform detected; disabling Blueprint Container functionality]]></screen>
+	    <screen><![CDATA[Pre-4.2 OSGi platform detected; disabling Blueprint Container functionality]]></screen>
 		
 		</note>
 	</section>
@@ -40,10 +40,10 @@
 	<section id="blueprint:differences">
 		<title>Blueprint/Spring DM Differences</title>
 		<para>There are a lot of similarities in terms of functionality and configuration between Spring DM 1.x and Blueprint which should be 
-		no surprise considering that DM was the basis of the Blueprint spec. In addition to fully supporting the Blueprint spec, DM 2.x closes
-		the gap offering Blueprint behaviour directly from Spring DM configuration. The table below aggregates the most important user facing
-		differences between Spring/Spring DM configurations and Blueprint and the relevant configuration options. Again, one can simply switch
-		between the two definition styles, if need be.</para>
+		no surprise considering that DM was the basis of the Blueprint spec. In addition to fully supporting the Blueprint configuration schema, 
+		DM 2.x enhanced its declarations by providing option that allow for Blueprint specific behaviour. The table below aggregates the most 
+		important user facing differences between Spring/Spring DM configurations and Blueprint and the relevant configuration options. 
+		Again, one can simply switch between the two definition styles, if need be.</para>
 
 	  <section id="blueprint:differences:mf">
 		  <title>Bundle Manifest Settings</title>
@@ -363,9 +363,123 @@ Blueprint-Bundle: config/account-data-context.xml, config/osgi-*.xml
 		and the <literal>task</literal> namespace introduced in Spring 3.x, and Spring DM namespace.</para>
 	  </section>
 	
-		<para>Note that additional information is available through out the documentation, when each particular feature is discussed in detail.
-		These being said, it is highly recommended to read and use the Blueprint specification as guidance, if the Blueprint Container becomes 
-		the programming model of choice.</para>
+	  <section id="blueprint:differences:container">
+		<title>Container Capabilities</title>
+		
+		<para>From a container perspective, the Blueprint spec standardizes the a subset of the Spring container. A high-level view comparison, by no 
+		means comprehensive, is summarized in the table below:</para>
+		
+		<table id="spring-vs-blueprint-container" pgwide="1">
+          <title>Container Capabilities Differences</title>
+          <tgroup cols="3">
+			<colspec colname='c1'/>
+			<colspec colname='c2'/>
+			<colspec colname='c3'/>
+			<spanspec spanname="wide" namest="c1" nameend="c3" align="center"/>
+            <thead>
+              <row>
+                <entry>Feature</entry>
+                <entry>Spring DM</entry>
+                <entry>Blueprint</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row rowsep="1">
+              	<entry spanname="wide"><emphasis>Object Instantiation</emphasis></entry>
+              </row>
+              <row>
+                <entry>Constructor Instantiation</entry>
+                <entry>Y</entry>
+                <entry>Y</entry>
+              </row>
+              <row>
+                <entry>Static Factory Instantiation</entry>
+                <entry>Y</entry>
+                <entry>Y</entry>
+              </row>
+              <row>
+                <entry>Instance Factory Instantiation</entry>
+                <entry>Y</entry>
+                <entry>Y</entry>
+              </row>
+              <row rowsep="1">
+              	<entry spanname="wide"><emphasis>Dependency Injection</emphasis></entry>
+              </row>
+              <row>
+                <entry>Constructor Injection</entry>
+                <entry>Y</entry>
+                <entry>Y</entry>
+              </row>
+              <row>
+                <entry>Setter Injection</entry>
+                <entry>Y</entry>
+                <entry>Y</entry>
+              </row>
+              <row>
+                <entry>Field Injection</entry>
+                <entry>Y</entry>
+                <entry>N</entry>
+              </row>
+              <row>
+                <entry>Method Injection</entry>
+                <entry>Y</entry>
+                <entry>N</entry>
+              </row>
+              <row>
+                <entry>Arbitrary Method Injection</entry>
+                <entry>Y</entry>
+                <entry>N</entry>
+              </row>
+              <row>
+                <entry>Autowiring</entry>
+                <entry>Y</entry>
+                <entry>N</entry>
+              </row>
+              <row rowsep="1">
+              	<entry spanname="wide"><emphasis>Component Lifecycle</emphasis></entry>
+              </row>
+              <row>
+                <entry>Lazy Initialization</entry>
+                <entry>Y</entry>
+                <entry>Y</entry>
+              </row>
+              <row>
+                <entry>Bean Scopes</entry>
+                <entry>Y</entry>
+                <entry>Y</entry>
+              </row>
+              <row>
+                <entry>Custom Bean Scopes</entry>
+                <entry>Y</entry>
+                <entry>N</entry>
+              </row>
+              <row>
+                <entry>Built-in Callbacks</entry>
+                <entry>Y</entry>
+                <entry>N</entry>
+              </row>
+              <row>
+                <entry>Custom Callbacks</entry>
+                <entry>Y</entry>
+                <entry>Y</entry>
+              </row>
+              <row>
+                <entry>Initialization Processing</entry>
+                <entry>Y</entry>
+                <entry>N</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+
+		<para>As with the XML configuration, since Spring DM translates the Blueprint configuration into Spring metadata, one can rely on Spring for features
+		beyond the Blueprint container. For example, one can configure a bean using Blueprint and use annotation on the same instance, for field injection. 
+		The same object can implement Spring's <literal>Aware</literal> interfaces or rely on other post processors for certain behaviour.</para>		
+	  </section>
+	  
+		<para>Note that additional information on Blueprint is available through out the documentation.	These being said, it is highly recommended to read 
+		and use the Blueprint specification as guidance, if the Blueprint Container becomes	the programming model of choice.</para>
+	  
 	</section>
 	
 	<section id="blueprint:using">
