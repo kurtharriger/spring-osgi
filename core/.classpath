@@ -28,6 +28,6 @@
 	<classpathentry kind="lib" path="D:/work/i21/spring-osgi/rfc-124.osgi-svn/org.osgi.test.cases.blueprint/generated/org.osgi.test.cases.blueprint.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/log4j/com.springsource.org.apache.log4j/1.2.15/com.springsource.org.apache.log4j-1.2.15.jar"/>
 	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/3.0.0.alpha1/framework-3.0.0.alpha1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.0.v20090513/org.eclipse.osgi-3.5.0.v20090513.jar" sourcepath="/M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.0.v20090513/org.eclipse.osgi.source_3.5.0.v20090520.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.0.v20090520/org.eclipse.osgi-3.5.0.v20090520.jar" sourcepath="/M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.0.v20090513/org.eclipse.osgi.source_3.5.0.v20090520.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

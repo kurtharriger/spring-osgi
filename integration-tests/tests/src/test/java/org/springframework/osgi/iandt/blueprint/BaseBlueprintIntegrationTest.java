@@ -16,9 +16,6 @@
 
 package org.springframework.osgi.iandt.blueprint;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.util.ObjectUtils;
 
@@ -32,28 +29,29 @@ public abstract class BaseBlueprintIntegrationTest extends BaseIntegrationTest {
 
 	protected String[] getTestFrameworkBundlesNames() {
 		String[] bundles = super.getTestFrameworkBundlesNames();
-		String[] matches = new String[] { "4j", "asm", "osgi-test", "junit" };
-
-		List<String> list = new ArrayList<String>(bundles.length);
-		for (int i = 0; i < bundles.length; i++) {
-			String bundle = bundles[i];
-			for (int j = 0; j < matches.length; j++) {
-				String match = matches[j];
-				if (bundle.indexOf(match) > -1) {
-					list.add(bundle);
-				}
-			}
-		}
-		System.out.println(ObjectUtils.nullSafeToString(bundles));
+		// String[] matches = new String[] { "4j", "asm", "osgi-test", "junit" };
+		//
+		// List<String> list = new ArrayList<String>(bundles.length);
+		// for (int i = 0; i < bundles.length; i++) {
+		// String bundle = bundles[i];
+		// for (int j = 0; j < matches.length; j++) {
+		// String match = matches[j];
+		// if (bundle.indexOf(match) > -1) {
+		// list.add(bundle);
+		// }
+		// }
+		// }
 
 		// install event admin
-		list.add("org.apache.felix, org.apache.felix.eventadmin, 1.0.0");
+		// list.add("org.apache.felix, org.apache.felix.eventadmin, 1.0.0");
+		bundles =
+				(String[]) ObjectUtils
+						.addObjectToArray(bundles, "org.apache.felix, org.apache.felix.eventadmin, 1.0.0");
 
 		// install the blueprint uber bundle
-		list.add("org.springframework.osgi.blueprint.ri,uber," + getSpringDMVersion());
+		// list.add("org.springframework.osgi.blueprint.ri,uber," + getSpringDMVersion());
 
-		System.out.println(list);
-		return list.toArray(new String[list.size()]);
+		return bundles;
 	}
 
 	protected String[] getBundleContentPattern() {

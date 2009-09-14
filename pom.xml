@@ -38,7 +38,7 @@
    <slf4j.version>1.5.6</slf4j.version>
    
    <!-- platform versions -->
-   <equinox.ver>3.5.0.v20090513</equinox.ver>
+   <equinox.ver>3.5.0.v20090520</equinox.ver>
    <kf.ver>3.0.0.alpha1</kf.ver>
    <felix.ver>2.0.0</felix.ver>
    
