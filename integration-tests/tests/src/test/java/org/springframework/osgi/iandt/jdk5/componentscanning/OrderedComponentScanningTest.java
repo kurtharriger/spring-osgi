@@ -48,6 +48,12 @@ public class OrderedComponentScanningTest extends BaseIntegrationTest {
 		assertNotNull(bean.getFieldInjection());
 	}
 
+	public void testInjectionIdentity() throws Exception {
+		assertSame(shape, bean.getSetterInjection());
+		assertSame(shape, bean.getConstructorInjection());
+		assertSame(shape, bean.getFieldInjection());
+	}
+
 	@Override
 	protected String[] getConfigLocations() {
 		return new String[] { "/org/springframework/osgi/iandt/jdk5/componentscanning/context.xml" };

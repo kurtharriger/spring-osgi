@@ -28,22 +28,19 @@ import org.springframework.osgi.util.internal.ClassUtils;
 import org.springframework.util.Assert;
 
 /**
- * Chaining class loader implementation that delegates the resource and class
- * loading to a number of class loaders passed in.
+ * Chaining class loader implementation that delegates the resource and class loading to a number of class loaders
+ * passed in.
  * 
- * <p/>
- * This class loader parent (by default the AppClassLoader) can be specified and
- * will be added automatically as the last entry in the list.
+ * <p/> This class loader parent (by default the AppClassLoader) can be specified and will be added automatically as the
+ * last entry in the list.
  * 
- * <p/>
- * Additionally, the class space of this class loader can be extended at runtime
- * (by allowing more class loaders to be added).
+ * <p/> Additionally, the class space of this class loader can be extended at runtime (by allowing more class loaders to
+ * be added).
  * 
- * <strong>Note:</strong>non-OSGi class loaders are considered as special cases.
- * As there are classes that are loaded by the Boot, Ext, App and Fwk
- * ClassLoaders through boot delegation, this implementation tries to identify
- * them and place them last in the chain. Otherwise, these loaders can pull in
- * classes from outside OSGi causing {@link ClassCastException}s.
+ * <strong>Note:</strong>non-OSGi class loaders are considered as special cases. As there are classes that are loaded by
+ * the Boot, Ext, App and Fwk ClassLoaders through boot delegation, this implementation tries to identify them and place
+ * them last in the chain. Otherwise, these loaders can pull in classes from outside OSGi causing
+ * {@link ClassCastException}s.
  * 
  * @author Costin Leau
  */
@@ -58,18 +55,14 @@ public class ChainedClassLoader extends ClassLoader {
 	/** parent class loader */
 	private final ClassLoader parent;
 
-
 	/**
 	 * Constructs a new <code>ChainedClassLoader</code> instance.
 	 * 
-	 * Equivalent to {@link #ChainedClassLoader(ClassLoader[], ClassLoader)}
-	 * with the parent class loader initialized to the AppClassLoader
-	 * (practically the system bundle class loader).
+	 * Equivalent to {@link #ChainedClassLoader(ClassLoader[], ClassLoader)} with the parent class loader initialized to
+	 * the AppClassLoader (practically the system bundle class loader).
 	 * 
-	 * Note that the AppClassLoader can be different then the
-	 * {@link #getSystemClassLoader()}, used by
-	 * {@link #ChainedClassLoader(ClassLoader[], ClassLoader)} if no parent is
-	 * specified.
+	 * Note that the AppClassLoader can be different then the {@link #getSystemClassLoader()}, used by
+	 * {@link #ChainedClassLoader(ClassLoader[], ClassLoader)} if no parent is specified.
 	 * 
 	 * @param loaders array of non-null class loaders
 	 */
@@ -107,8 +100,7 @@ public class ChainedClassLoader extends ClassLoader {
 					return doGetResource(name);
 				}
 			});
-		}
-		else {
+		} else {
 			return doGetResource(name);
 		}
 	}
@@ -118,8 +110,7 @@ public class ChainedClassLoader extends ClassLoader {
 
 		if (url != null) {
 			return url;
-		}
-		else {
+		} else {
 			url = doGetResource(name, nonOsgiLoaders);
 		}
 
@@ -153,12 +144,10 @@ public class ChainedClassLoader extends ClassLoader {
 						return doLoadClass(name);
 					}
 				});
-			}
-			catch (PrivilegedActionException pae) {
+			} catch (PrivilegedActionException pae) {
 				throw (ClassNotFoundException) pae.getException();
 			}
-		}
-		else {
+		} else {
 			return doLoadClass(name);
 		}
 	}
@@ -168,8 +157,7 @@ public class ChainedClassLoader extends ClassLoader {
 
 		if (clazz != null) {
 			return clazz;
-		}
-		else {
+		} else {
 			clazz = doLoadClass(name, nonOsgiLoaders);
 		}
 
@@ -195,8 +183,7 @@ public class ChainedClassLoader extends ClassLoader {
 				try {
 					clazz = loader.loadClass(name);
 					return clazz;
-				}
-				catch (ClassNotFoundException e) {
+				} catch (ClassNotFoundException e) {
 					// keep moving through the class loaders
 				}
 			}
@@ -206,19 +193,21 @@ public class ChainedClassLoader extends ClassLoader {
 	}
 
 	/**
-	 * Adds a class loader defining the given class, to the chained class loader
-	 * space.
+	 * Adds a class loader defining the given class, to the chained class loader space.
 	 * 
 	 * @param clazz
 	 */
 	public void addClassLoader(final Class<?> clazz) {
 		Assert.notNull(clazz, "a non-null class required");
-		addClassLoader(AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
-
-			public ClassLoader run() {
-				return ClassUtils.getClassLoader(clazz);
-			}
-		}));
+		if (System.getSecurityManager() != null) {
+			addClassLoader(AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+				public ClassLoader run() {
+					return ClassUtils.getClassLoader(clazz);
+				}
+			}));
+		} else {
+			addClassLoader(ClassUtils.getClassLoader(clazz));
+		}
 	}
 
 	/**
@@ -235,16 +224,15 @@ public class ChainedClassLoader extends ClassLoader {
 	}
 
 	/**
-	 * Checks if the given classloader is a known, non-OSGi loader. If it is,
-	 * then it is added to a specific list based on the known ordering (ignoring
-	 * the user defined one). This is done so that the discovered hierarchy is
-	 * respected regardless of the user configuration.
+	 * Checks if the given classloader is a known, non-OSGi loader. If it is, then it is added to a specific list based
+	 * on the known ordering (ignoring the user defined one). This is done so that the discovered hierarchy is respected
+	 * regardless of the user configuration.
 	 * 
 	 * @param classLoader
 	 * @return true if the class loader was added/is known, false otherwise
 	 */
 	private boolean addNonOsgiLoader(ClassLoader classLoader) {
-		// check if the classloader is known or not before doing any locking 
+		// check if the classloader is known or not before doing any locking
 		if (ClassUtils.knownNonOsgiLoadersSet.contains(classLoader)) {
 			synchronized (nonOsgiLoaders) {
 				if (!nonOsgiLoaders.contains(classLoader)) {
@@ -257,8 +245,7 @@ public class ChainedClassLoader extends ClassLoader {
 							int presentLoaderIndex = ClassUtils.knownNonOsgiLoaders.indexOf(nonOsgiLoaders.get(i));
 							if (presentLoaderIndex >= 0 && presentLoaderIndex < index) {
 								insertIndex = i + 1;
-							}
-							else {
+							} else {
 								continue;
 							}
 						}

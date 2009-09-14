@@ -44,7 +44,7 @@ public class ExtenderShutdownBundleTest extends BaseBlueprintIntegrationTest {
 	public void testExtenderShutdown() throws Exception {
 		final List<Event> events = Collections.synchronizedList(new ArrayList<Event>());
 		Bundle extenderBundle =
-				OsgiBundleUtils.findBundleBySymbolicName(bundleContext, "org.springframework.osgi.blueprint.uber");
+				OsgiBundleUtils.findBundleBySymbolicName(bundleContext, "org.springframework.osgi.extender");
 		assertNotNull(extenderBundle);
 
 		EventHandler handler = new EventHandler() {
@@ -76,13 +76,13 @@ public class ExtenderShutdownBundleTest extends BaseBlueprintIntegrationTest {
 
 	public void testExtenderLifecycle() throws Exception {
 		Bundle extenderBundle =
-				OsgiBundleUtils.findBundleBySymbolicName(bundleContext, "org.springframework.osgi.blueprint.uber");
+				OsgiBundleUtils.findBundleBySymbolicName(bundleContext, "org.springframework.osgi.extender");
 		assertNotNull(extenderBundle);
 
 		extenderBundle.stop();
 		extenderBundle.start();
-//		extenderBundle.stop();
-//		extenderBundle.start();
-//		extenderBundle.stop();
+		// extenderBundle.stop();
+		// extenderBundle.start();
+		// extenderBundle.stop();
 	}
 }
