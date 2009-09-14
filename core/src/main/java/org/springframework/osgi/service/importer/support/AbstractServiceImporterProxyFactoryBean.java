@@ -39,7 +39,7 @@ import org.springframework.osgi.context.support.internal.classloader.ClassLoader
 abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean implements
 		SmartFactoryBean<Object> {
 
-	private boolean initialized = false;
+	private volatile boolean initialized = false;
 	protected Object proxy;
 	private boolean useBlueprintException = false;
 	private volatile boolean lazyProxy = false;
@@ -116,7 +116,8 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 	 */
 	public Class<?> getObjectType() {
 		if (!initialized)
-			throw new FactoryBeanNotInitializedException();
+			// not yet initialized, cannot determine type
+			return null;
 		if (proxy == null) {
 			synchronized (this) {
 				if (proxy == null) {
