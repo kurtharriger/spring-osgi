@@ -472,6 +472,22 @@
      	<literal>org.springframework.bundle.osgi.extender</literal> to <literal>org.springframework.osgi.extender</literal> 
 		(notice the missing <literal>bundle</literal> word).
 		To fix this problem, change the reference to the old symbolic name (usually inside the fragments manifests or LDAP filters) to the new one.</para>
-     </section>       
+     </section>
+     <section id="linkage-error">
+     	<title>I get a <literal>java.lang.LinkageError: loader constraint violation</literal> if I use Spring DM. Things work fine with vanilla OSGi. 
+     	What's wrong?</title>
+     	
+     	<para>Most likely the bundle imports do not identify all the transitive packages dependencies (through the <emphasis>uses</emphasis> directive). Packages
+     	imported from a bundle, can in turn, depend on other packages from other bundles - these are sometime called transitive or indirect dependencies. If
+     	these are not properly identified, the OSGi platform cannot validate the wiring and allows multiple versions of the same class to be available inside the
+     	same class space. This problem appears whether Spring DM is used or not. However, due to the usage of proxies inside Spring DM (which forces eager class loading
+     	for the classes proxies), the class graph is evaluated at runtime causing the problem to occur early. With vanilla OSGi, the loading occurs lazy which means
+     	the problem is going to occur at runtime rather then at startup.
+     	To fix the problem, add the relevant transitive packages to the list of exported packages, either manually or automatically through tools such as  
+     	<ulink url="http://www.springsource.org/bundlor">Bundlor</ulink> or <ulink url="http://www.aqute.biz/Code/Bnd">Bnd</ulink>.
+     	For more information on the <literal>uses</literal> directive please see the OSGi spec, 
+     	section	3.6.4 or <ulink url="http://blog.springsource.com/2008/10/20/understanding-the-osgi-uses-directive/">this</ulink> SpringSource blog entry.
+     	</para>
+     </section>            
     </chapter>
 </book>
