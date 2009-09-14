@@ -51,7 +51,6 @@
       <xi:include href="introduction/requirements.xml"/>
       <xi:include href="introduction/getting-started.xml"/>
       <xi:include href="introduction/what-is-new.xml"/>
-      <xi:include href="introduction/blueprint.xml"/>
 
       <!-- background on OSGi -->
   </part>
@@ -59,6 +58,7 @@
 	  <title>Reference Documentation</title>
 
       <xi:include href="reference/introduction.xml"/>
+      <xi:include href="reference/blueprint.xml"/>
       <xi:include href="reference/bundle-app-context.xml"/>
       <xi:include href="reference/deployment.xml"/>
 	  <xi:include href="reference/service-registry.xml"/>

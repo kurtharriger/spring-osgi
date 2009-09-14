@@ -3,6 +3,10 @@
 
 	  <para>This part of the reference documentation explains the core functionality
 	  offered by Spring Dynamic Modules.</para>
+
+      <para><xref linkend="blueprint"/> describes the relationship between Spring DM and OSGi 4.2
+      Blueprint Container specification (part of the Compendium Services) and the similiarities and
+      differences between them.</para>
       
       <para><xref linkend="bnd-app-ctx"/> describes the relationship between an OSGi Bundle and a 
       Spring Application Context,
