@@ -19,7 +19,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.org.apache.commons.logging/1.5.6/com.springsource.slf4j.org.apache.commons.logging-1.5.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.test/3.0.0.BUILD-SNAPSHOT/org.springframework.test-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="/SPRING_MOCK_SRC"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
-	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.0.v20090520/org.eclipse.osgi-3.5.0.v20090520.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-core"/>
 	<classpathentry kind="var" path="M2_REPO/org/mortbay/jetty/jetty/6.1.9/jetty-6.1.9.jar" sourcepath="/JETTY_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/mortbay/jetty/jetty-util/6.1.9/jetty-util-6.1.9.jar" sourcepath="/JETTY_UTIL_SRC"/>
