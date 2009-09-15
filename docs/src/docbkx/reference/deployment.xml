@@ -226,7 +226,108 @@ context ::= path ( ';' path ) * (';' directive) *
         </listitem>
       </itemizedlist>
       
-      <para>A comparison to the options in the Blueprint specification is given in section <xref linkend="blueprint:differences:mf"/></para>
+    </section>
+
+	<section id="app-deploy:headers:blueprint">
+		<title>Blueprint Manifest Configuration Comparison</title>
+
+		<para>The table below summarizes the differences between the manifest configuration options in Spring DM and Blueprint Container:</para>
+
+		  <table id="sdm-vs-blueprint-config-attr" pgwide="1">
+	          <title>Configuration Setting Differences</title>
+	          <tgroup cols="3">
+	            <thead>
+	              <row>
+	                <entry>Option</entry>
+	                <entry>Spring DM</entry>
+	                <entry>Blueprint</entry>
+	              </row>
+	            </thead>
+	            <tbody>
+	              <row>
+	                <entry>Default Configuration Location</entry>
+	                <entry><literal>META-INF/spring</literal></entry>
+	                <entry><literal>OSGI-INF/blueprint</literal></entry>
+	              </row>
+	              <row>
+	                <entry>Custom Locations Header</entry>
+	                <entry><literal>Spring-Context</literal></entry>
+	                <entry><literal>Bundle-Blueprint</literal></entry>
+	              </row>
+	              <row>
+	                <entry>Attribute Header</entry>
+	                <entry><literal>Spring-Context</literal></entry>
+	                <entry><literal>Bundle-SymbolicName</literal></entry>
+	              </row>
+	              <row>
+	                <entry>Asynchronous Creation Attribute</entry>
+	                <entry><literal>create-asynchronously</literal></entry>
+	                <entry><literal>-</literal></entry>
+	              </row>
+	              <row>
+	                <entry>Startup Mandatory Dependencies Attribute</entry>
+	                <entry><literal>wait-for-dependencies</literal></entry>
+	                <entry><literal>blueprint.graceperiod</literal></entry>
+	              </row>
+	              <row>
+	                <entry>Startup Mandatory Timeout Attribute</entry>
+	                <entry><literal>timeout</literal> (in s)</entry>
+	                <entry><literal>blueprint.timeout</literal> (in ms)</entry>
+	              </row>
+	              <row>
+	                <entry>Container API Service Publication Attribute</entry>
+	                <entry><literal>publish-context</literal></entry>
+	                <entry><literal>-</literal></entry>
+	              </row>
+	            </tbody>
+	          </tgroup>
+	      </table>
+		  
+		  <para>The manifests below are equivalent in terms of settings:</para>
+
+		<programlistingco>
+		  <areaspec>
+			<area id="blueprint:vs:mf:attr:sdm" coords="2 72"/>
+			<area id="blueprint:vs:mf:timeout:s" coords="4 72"/>
+  		  </areaspec>
+		  <programlisting><![CDATA[Bundle-SymbolicName: org.example.account.bundle
+Spring-Context: config/account-data-context.xml, config/osgi-*.xml;
+ wait-for-dependencies:=true;
+ timeout:=10
+]]></programlisting>
+		  <calloutlist>
+			<callout arearefs="blueprint:vs:mf:attr:sdm">
+				<para>All Spring DM specific attributes are grouped under <literal>Spring-Context</literal> header.</para>
+			</callout>
+			<callout arearefs="blueprint:vs:mf:timeout:s">
+				<para>Timeout specified in <emphasis>seconds</emphasis>.</para>
+			</callout>
+		  </calloutlist>
+		</programlistingco>
+
+		<programlistingco>
+		  <areaspec>
+			<areaset id="blueprint:vs:mf:attr:bp" coords="">
+				<area id="blueprint:vs:mf:attr:bp.1" coords="1 72"/>
+				<area id="blueprint:vs:mf:attr:bp.2" coords="4 72"/>
+			</areaset>
+			<area id="blueprint:vs:mf:timeout:ms" coords="3 72"/>
+  		  </areaspec>
+		  <programlisting><![CDATA[Bundle-SymbolicName: org.example.account.bundle;
+ blueprint.graceperiod:=true;
+ blueprint.timeout:=10000
+Blueprint-Bundle: config/account-data-context.xml, config/osgi-*.xml
+]]></programlisting>
+		  <calloutlist>
+			<callout arearefs="blueprint:vs:mf:attr:bp">
+				<para>Blueprint settings are spread between <literal>Bundle-SymbolicName</literal> and <literal>Blueprint-Bundle</literal>.</para>
+			</callout>
+			<callout arearefs="blueprint:vs:mf:timeout:ms">
+				<para>Timeout specified in <emphasis>milliseconds</emphasis>.</para>
+			</callout>
+		  </calloutlist>
+	  	</programlistingco>
+
     </section>
     
     <section id="app-deploy:extender-configuration">
@@ -516,7 +617,6 @@ context ::= path ( ';' path ) * (';' directive) *
           <para>cglib-nodep (when proxying classes rather then
           interfaces, needed in most cases)</para>
         </listitem>
-
         <listitem>
           <para>commons-logging API (<ulink url="http://www.slf4j.org/">SLF4J</ulink> version <emphasis>highly</emphasis> recommended:</para>
           <itemizedlist>
@@ -531,7 +631,6 @@ context ::= path ( ';' path ) * (';' directive) *
             </listitem>
             
           </itemizedlist>
-          <para>)</para>
         </listitem>
         
         <listitem>

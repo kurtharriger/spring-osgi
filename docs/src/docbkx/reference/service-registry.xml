@@ -152,18 +152,6 @@
       the target bean being registered (<literal>beanToPublish</literal> in
       this case).</para>
 
-      <para>The bean <emphasis>defined</emphasis> by the
-      <literal>service</literal> element is of type
-      <interfacename>org.osgi.framework.ServiceRegistration</interfacename> and is the
-      <interfacename>ServiceRegistration</interfacename> object resulting from registering
-      the exported bean with the OSGi service registry. By giving this bean an
-      id you can inject a reference to the
-      <interfacename>ServiceRegistration</interfacename> object into other beans if
-      needed. For example:</para>
-
-      <programlisting language="xml"><![CDATA[<service id="myServiceRegistration" ref="beanToPublish"
-    interface="com.xyz.MessageService"/>]]></programlisting>
-
       <para>As an alternative to exporting a named bean, the bean to be
       exported to the service registry may be defined as an anonymous inner
       bean of the service element. Typically the top-level namespace would be
@@ -175,25 +163,78 @@
   </bean>
 </osgi:service>]]></programlisting>
 
-      <para>If the bean to be exported implements the
-      <interfacename>org.osgi.framework.ServiceFactory</interfacename> interface then the
-      <interfacename>ServiceFactory</interfacename> contract is honored as per section 5.6
-      of the OSGi Service Platform Core Specification. As an alternative to
-      implementing this OSGi API, Spring Dynamic Modules introduces a new bean
-      scope, the <literal>bundle</literal> scope. When a bean with bundle
-      scope is exported as an OSGi service then one instance of the bean will
-      be created for each unique client (service importer) bundle that
-      obtains a reference to it through the OSGi service registry. When a
-      service importing bundle is stopped, the bean instance associated with
-      it is disposed. To declare a bean with <literal>bundle</literal> scope
+	<section id="service-registry:export:registration">
+	 <title>Using The Service Registration</title>
+     <para>Each <literal>service</literal> declaration, provides control access to the exported service.
+	 The declaration returns an element of type <interfacename>org.osgi.framework.ServiceRegistration</interfacename> which can be
+	 used to read or even modify the properties published for the OSGi service. Since DM 2.X, the definition
+	 has been aligned with the Blueprint spec and unregistration of the service is not possible any more (an exception is thrown
+	 if the <methodname>unregister</methodname> is called). Additionally, the returned service registration will track
+	 the service being registered (if multiple registration occur, these will be reflected in the returned registration object).
+	 See <xref linkend="service-registry:export-import-relationship"/> for more information on when registration/unregistration of
+	 exported services can occur.</para>
+
+     <para>To use the service registration, simply inject the service bean definition into the relevant class; the example below
+     shows one way of updating the service properties from Java:
+     </para>
+     
+     <programlisting language="xml"><![CDATA[<service id="myServiceRegistration" ref="beanToPublish"
+     interface="com.xyz.MessageService"/>
+
+<bean id="propUpdater" class="com.xyz.ServicePropertiesUpdater">
+   <property name="serviceRegistration ref="myServiceRegistration"/>
+</bean>]]></programlisting>
+
+      <para>Where <classname>ServicePropertiesUpdater</classname> can have the following definition:</para>
+      
+      <programlisting language="java"><![CDATA[public class ServicePropertiesUpdater implements BeanNameAware {
+
+	private ServiceRegistration serviceRegistration;
+	private String beanName;
+
+	public void setServiceRegistration(ServiceRegistration serviceRegistration) {
+		this.serviceRegistration = serviceRegistration;
+	}
+
+	public void setBeanName(String beanName) {
+		this.beanName = beanName;
+	}
+
+	public void update() {
+		ServiceReference reference = serviceRegistration.getReference();
+		// get current properties
+		Dictionary dictionary = OsgiServiceReferenceUtils.getServiceProperties(reference);
+		dictionary.put("last-update", new Date());
+		dictionary.put("updated-by", beanName);
+		dictionary.put("user.name", System.getProperties().getProperty("java.version"));
+		// update properties
+		serviceRegistration.setProperties(dictionary);
+	}
+}]]></programlisting>
+      
+      <para>Each time the update() method is called, the service properties are retrived, new ones are added and finally the service
+      registration updated.</para>
+     </section>
+
+ 
+	<section id="service-registry:export:service-factory">
+	  <title><interfacename>org.osgi.framework.ServiceFactory</interfacename> Support</title>
+      <para>OSGi Service Platform Core Specification allows services not just to be registered directly,
+      but also to be created on demand, through the <interfacename>org.osgi.framework.ServiceFactory</interfacename>
+      interface (see section 5.6). Spring DM recognizes this OSGi interface and honours its contract,
+      by forwarding each new bundle request, to the backing bean implementing the aforementioned interface.</para>
+      
+      <para> As an alternative to implementing the OSGi API, one can use the <literal>bundle</literal> scope, introduced
+      by Spring DM which offers a <emphasis>instance-per-bundle</emphasis> contract (see <xref linkend="bnd-app-ctx:bundle-scope"/>
+	  for more information). To declare a bean with <literal>bundle</literal> scope
       simply use the <literal>scope</literal> attribute of the
       <literal>bean</literal> element:</para>
 
       <programlisting language="xml"><![CDATA[<osgi:service ref="beanToBeExported" interface="com.xyz.MessageService"/>
 
 <bean id="beanToBeExported" scope="bundle" class="com.xyz.MessageServiceImpl"/>]]></programlisting>
-
-      <section id="service-registry:export:intfs">
+	</section>
+    <section id="service-registry:export:intfs">
         <title>Controlling The Set Of Advertised Service Interfaces For
         An Exported Service</title>
 
@@ -314,7 +355,10 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <para>As previously described, an exported service is always
         registered with the service property
         <literal>org.springframework.osgi.bean.name</literal> set to the name
-        of the bean being exported. Additional service properties can be
+        of the bean being exported. Since DM 2.x, the bean name is also published
+        under <literal>osgi.service.blueprint.compname</literal> (introduced by 
+        the OSGi 4.2 Blueprint spec).
+        Additional service properties can be
         specified using the nested <literal>service-properties</literal>
         element. The <literal>service-properties</literal> element contains
         key-value pairs to be included in the advertised properties of the
@@ -450,7 +494,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
       </section>
       
       <section id="service-registry:export:ranking">
-        <title>The ranking Attribute</title>
+        <title>The <literal>ranking</literal> Attribute</title>
 
         <para>When registering a service with the service registry, you may
         optionally specify a service ranking (see section 5.2.5 of the OSGi
@@ -464,6 +508,22 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
   ranking="9"/>]]></programlisting>
       </section>
 
+      <section id="service-registry:export:cache">
+        <title>The <literal>cache-target</literal> Attribute</title>
+
+        <para>By default, services exported are being retrieved from the container each time they are requested.
+        This allows <emphasis>scoped</emphasis> beans to behave correctly depending on the context available
+        when the request is being performed. However, there are cases when the target bean (the entity being
+        exported) needs to be cached no matter its scope. The Blueprint spec for example requires this behaviour
+        for all exported services.</para>
+        <para>To accommodate both cases one, Spring DM 2.0 introduces a new attribute, <literal>cache-target</literal>
+        which, as the name suggests, enables the caching of the exported bean. The instance of the bean retrieved,
+        for the first service registration is cached internally by the exporter which will later reuse it.</para>
+
+		
+        <programlisting language="xml"><![CDATA[<service ref="beanToBeExported" interface="com.xyz.MyServiceInterface"
+  cache-target="true"/>]]></programlisting>
+      </section>
 
       <section id="service-registry:export:service:attributes">
        <title><literal>service</literal> Element Attributes</title>
@@ -479,13 +539,13 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
           	<colspec colname="c3"/>
           	<colspec colname="c4"/>
           	<colspec colname="c5"/>
-          	<colspec colname="c6" align="justify"/>
+          	<colspec colname="c6" align="center"/>
             <spanspec spanname="values" namest="c2" nameend="c5" align="center"/>
             <thead>
               <row>
                 <entry>Name</entry>
                 <entry spanname="values">Values</entry>
-                <entry>Description</entry>
+                <entry align="center">Description</entry>
               </row>
             </thead>
             <tbody>
@@ -526,6 +586,12 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
                 <entry spanname="values">any integer value</entry>
                 <entry>Specify the service ranking to be used when advertising the service. Default value is 0.</entry>
               </row>
+              <row>
+                <entry>cache-target</entry>
+                <entry namest="c2" nameend="c3">true</entry>
+                <entry namest="c4" nameend="c5">false</entry>
+                <entry>Specify whether the bean exported as an OSGi service is cached (on first registration) or not. Default value is <literal>false</literal></entry>
+              </row>
             </tbody>
           </tgroup>
       </table>        
@@ -537,8 +603,10 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <para>The service defined by a <literal>service</literal> element is
         registered with the OSGi service registry when the application context
         is first created. It will be unregistered automatically when the
-        bundle is stopped and the application context is disposed.</para>
-
+        bundle is stopped and the application context is disposed. Additionally,
+        based on the mandatory service import availability, the service can be
+        unregistered and registered at runtime 
+        (see <xref linked="service-registry:export-import-relationship"/>).</para>
 
         <para>If you need to take some action when a service is unregistered
         because its dependencies are not satisfied (or when it is registered),
@@ -550,7 +618,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         definition, or declare an anonymous listener bean inline. For
         example:</para>
 
-	<programlistingco>
+	  <programlistingco>
 	   <areaspec>
 	   	  <area id="service-registry.exporter.listener.ref" coords="2"/>
 	   	  
@@ -630,7 +698,52 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <para>It is possible for a listener to implement <interfacename>OsgiServiceRegistrationListener</interfacename> interface and
         declare custom methods. In this case, the Spring DM interface methods will be called first, followed by the custom methods.
         </para>
-        </section>
+      </section>
+      
+      <section id="service-registry:export:blueprint">
+       <title>Blueprint <literal>service</literal> Comparison</title>
+       
+       <para>The Blueprint Container offers a <literal>service</literal> element, identical in functionality with the one in Spring DM. In most cases,
+       the configuration should be identical. Below is a summary of the configuration options available in Spring DM and Blueprint:</para>
+       
+       <table id="service-registry:export:blueprint:comparison" pgwide="1" align="center">
+          <title>Spring DM / Blueprint <literal><![CDATA[<service>]]></literal> Configuration Comparison</title>
+          <tgroup cols="2">
+           <thead>
+              <row>
+                <entry align="center">Spring DM</entry>
+                <entry align="center">Blueprint</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>interface</entry>
+                <entry>interface</entry>
+              </row>
+              <row>
+                <entry>ref</entry>
+                <entry>ref</entry>
+              </row>
+              <row>
+                <entry>auto-export</entry>
+                <entry>auto-export</entry>
+              </row>
+              <row>
+                <entry>context-class-loader</entry>
+                <entry>-</entry>
+              </row>
+              <row>
+                <entry>cache-target</entry>
+                <entry>- (caching is always enabled)</entry>
+              </row>
+            </tbody>            
+          </tgroup>
+        </table>
+        
+        <para>Since the <literal>registration-listener</literal> declaration is identical in declaration and functionality between Blueprint 
+        and Spring DM, this section does not mention it.</para>
+      </section>
+        
       </section>
     </section>
 
@@ -638,8 +751,8 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
       <title>Defining References To OSGi Services</title>
 
       <para>Spring Dynamic Modules supports the declaration of beans that
-      represent services accessed via the OSGi Service Registry. In this
-      manner references to OSGi services can be injected into application
+      represent services accessed via the OSGi Service Registry. In such
+      manner, references to OSGi services can be injected into application
       components. The service lookup is made using the service interface type
       that the service is required to support, plus an optional filter
       expression that matches against the service properties published in the

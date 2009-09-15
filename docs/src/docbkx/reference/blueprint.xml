@@ -42,110 +42,10 @@
 		<para>There are a lot of similarities in terms of functionality and configuration between Spring DM 1.x and Blueprint which should be 
 		no surprise considering that DM was the basis of the Blueprint spec. In addition to fully supporting the Blueprint configuration schema, 
 		DM 2.x enhanced its declarations by providing option that allow for Blueprint specific behaviour. The table below aggregates the most 
-		important user facing differences between Spring/Spring DM configurations and Blueprint and the relevant configuration options. 
+		important user facing differences between Spring/Spring DM configurations and Blueprint. Additional comparison information is available
+		throughout the documentation (such as <xref linkend="app-deploy:headers:blueprint"/> or <xref linkend="service-registry:export:blueprint"/>).
 		Again, one can simply switch between the two definition styles, if need be.</para>
 
-	  <section id="blueprint:differences:mf">
-		  <title>Bundle Manifest Settings</title>
-
-		  <para>The table below summarizes the differences between the configuration options in Spring DM and Blueprint:</para>
-
-		  <table id="sdm-vs-blueprint-config-attr" pgwide="1">
-	          <title>Configuration Setting Differences</title>
-	          <tgroup cols="3">
-	            <thead>
-	              <row>
-	                <entry>Option</entry>
-	                <entry>Spring DM</entry>
-	                <entry>Blueprint</entry>
-	              </row>
-	            </thead>
-	            <tbody>
-	              <row>
-	                <entry>Default Configuration Location</entry>
-	                <entry><literal>META-INF/spring</literal></entry>
-	                <entry><literal>OSGI-INF/blueprint</literal></entry>
-	              </row>
-	              <row>
-	                <entry>Custom Locations Header</entry>
-	                <entry><literal>Spring-Context</literal></entry>
-	                <entry><literal>Bundle-Blueprint</literal></entry>
-	              </row>
-	              <row>
-	                <entry>Attribute Header</entry>
-	                <entry><literal>Spring-Context</literal></entry>
-	                <entry><literal>Bundle-SymbolicName</literal></entry>
-	              </row>
-	              <row>
-	                <entry>Asynchronous Creation Attribute</entry>
-	                <entry><literal>create-asynchronously</literal></entry>
-	                <entry><literal>-</literal></entry>
-	              </row>
-	              <row>
-	                <entry>Startup Mandatory Dependencies Attribute</entry>
-	                <entry><literal>wait-for-dependencies</literal></entry>
-	                <entry><literal>blueprint.graceperiod</literal></entry>
-	              </row>
-	              <row>
-	                <entry>Startup Mandatory Timeout Attribute</entry>
-	                <entry><literal>timeout</literal> (in s)</entry>
-	                <entry><literal>blueprint.timeout</literal> (in ms)</entry>
-	              </row>
-	              <row>
-	                <entry>Container API Service Publication Attribute</entry>
-	                <entry><literal>publish-context</literal></entry>
-	                <entry><literal>-</literal></entry>
-	              </row>
-	            </tbody>
-	          </tgroup>
-	      </table>
-		  
-		  <para>The manifests below are equivalent in terms of settings:</para>
-
-		<programlistingco>
-		  <areaspec>
-			<area id="blueprint:vs:mf:attr:sdm" coords="2 72"/>
-			<area id="blueprint:vs:mf:timeout:s" coords="4 72"/>
-  		  </areaspec>
-		  <programlisting><![CDATA[Bundle-SymbolicName: org.example.account.bundle
-Spring-Context: config/account-data-context.xml, config/osgi-*.xml;
- wait-for-dependencies:=true;
- timeout:=10
-]]></programlisting>
-		  <calloutlist>
-			<callout arearefs="blueprint:vs:mf:attr:sdm">
-				<para>All Spring DM specific attributes are grouped under <literal>Spring-Context</literal> header.</para>
-			</callout>
-			<callout arearefs="blueprint:vs:mf:timeout:s">
-				<para>Timeout specified in <emphasis>seconds</emphasis>.</para>
-			</callout>
-		  </calloutlist>
-		</programlistingco>
-
-		<programlistingco>
-		  <areaspec>
-			<areaset id="blueprint:vs:mf:attr:bp" coords="">
-				<area id="blueprint:vs:mf:attr:bp.1" coords="1 72"/>
-				<area id="blueprint:vs:mf:attr:bp.2" coords="4 72"/>
-			</areaset>
-			<area id="blueprint:vs:mf:timeout:ms" coords="3 72"/>
-  		  </areaspec>
-		  <programlisting><![CDATA[Bundle-SymbolicName: org.example.account.bundle;
- blueprint.graceperiod:=true;
- blueprint.timeout:=10000
-Blueprint-Bundle: config/account-data-context.xml, config/osgi-*.xml
-]]></programlisting>
-		  <calloutlist>
-			<callout arearefs="blueprint:vs:mf:attr:bp">
-				<para>Blueprint settings are spread between <literal>Bundle-SymbolicName</literal> and <literal>Blueprint-Bundle</literal>.</para>
-			</callout>
-			<callout arearefs="blueprint:vs:mf:timeout:ms">
-				<para>Timeout specified in <emphasis>milliseconds</emphasis>.</para>
-			</callout>
-		  </calloutlist>
-	  	</programlistingco>
-
-	  </section>
 
 	  <section id="blueprint:differences:xml">
 		<title>XML Declarations</title>
@@ -283,6 +183,17 @@ Blueprint-Bundle: config/account-data-context.xml, config/osgi-*.xml
                 <entry><literal><![CDATA[<value>]]></literal></entry>
                 <entry><literal><![CDATA[<value>]]></literal></entry>
               </row>
+              <row>
+                <entry>Service Exporter</entry>
+                <entry><literal><![CDATA[<service>]]></literal></entry>
+                <entry><literal><![CDATA[<service>]]></literal></entry>
+              </row>
+              <row>
+                <entry>Service Importer</entry>
+                <entry><literal><![CDATA[<reference>/<list>/<set>]]></literal></entry>
+                <entry><literal><![CDATA[<reference>/<list>]]></literal></entry>
+              </row>
+
             </tbody>
           </tgroup>
         </table>
