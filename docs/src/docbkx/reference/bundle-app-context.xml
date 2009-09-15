@@ -150,7 +150,9 @@
         <literal>org.springframework.context.service.name</literal> whose
         value is set to the bundle symbolic name of the bundle hosting the
         application context. In case of a Blueprint bundle, the container will be published
-        under <interfacename>org.osgi.service.blueprint.container.BlueprintContainer</interfacename> 
+        under <interfacename>org.osgi.service.blueprint.container.BlueprintContainer</interfacename>
+        while the bundle symbolic name will be published under <literal>osgi.blueprint.container.symbolicname</literal>
+        property. 
         </para>
         <para>It is possible to prevent publication of the
         application context as a service using a directive in the bundle's
@@ -396,7 +398,7 @@
       are shutdown in the following order:</para>
 
       <orderedlist>
-        <listitem>
+        <listitem id="bnd-app-ctx:access-bnd-ctx:stop-extender:shutdown.step.1">
           <para>Application contexts that do not export any services, or that
           export services that are not currently referenced, are shutdown in
           reverse order of bundle id. (Most recently installed bundles have
@@ -404,10 +406,10 @@
         </listitem>
 
         <listitem>
-          <para>Shutting down the application contexts in step (1) may have
+          <para>Shutting down the application contexts in step 1 may have
           released references these contexts were holding such that there are
           now additional application contexts that can be shutdown. If so,
-          repeat step 1 again.</para>
+          repeat <link linkend="bnd-app-ctx:access-bnd-ctx:stop-extender:shutdown.step.1">step 1</link> again.</para>
         </listitem>
 
         <listitem>
@@ -417,7 +419,7 @@
           circle is broken by determining the highest ranking service exported
           by each context: the bundle with the lowest ranking service in this
           set (or in the event of a tie, the highest service id), is shut
-          down. Repeat from step (1).</para>
+          down. Repeat from <link linkend="bnd-app-ctx:access-bnd-ctx:stop-extender:shutdown.step.1">step 1</link>.</para>
         </listitem>
       </orderedlist>
     </section>
