@@ -317,6 +317,25 @@
       particular OSGi implementation.</para>
     </section>
 
+    <section id="bnd-app-ctx:bundle-scope">
+      <title>Bundle Scope</title>
+      
+      <para>Spring Dynamic Modules introduces a new bean scope named <literal>bundle</literal>. This scope is relevant for
+      beans exported as an OSGi service and can be described as <emphasis>one instance per bundle</emphasis>. 
+      Beans exported as OSGi service, that have <literal>bundle</literal> scope, will result in a different instance created for 
+      each unique bundle that imports the service through the OSGi service registry. Consumers of the same bundle (whether defined
+      through Spring DM or not) will see the same bean instance. When a bundle has stopped importing the bundle (for whatever reason),
+      the bean instance is disposed.
+	  To the declaring bundle, a <literal>bundle</literal>-scoped bean behaves just like a singleton (i.e. there is only
+	  one instance per bundle, including the declaring one).This contract lifecycle is similar to that of the 
+	  <interfacename>org.osgi.framework.ServiceFactory</interfacename> interface.</para>
+	  <para>For more information regarding service publication and consumption, see <xref linkend="service-registry"/>.</para>
+	  
+	  <important>The bundle scope is relevant, only if the declaring bean is consumed through the OSGi service registry. That is,
+	  instances are created and destroyed (tracked) only when the bean exported as a service, is requested or released as an OSGi service
+	  by other bundles.</important>
+	</section>
+	
     <section id="bnd-app-ctx:access-bnd-ctx">
       <title>Accessing the BundleContext</title>
 
