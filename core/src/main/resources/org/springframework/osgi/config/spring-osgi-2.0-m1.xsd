@@ -258,7 +258,7 @@
                       	]]></xsd:documentation>
                       </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="sticky" type="xsd:boolean" default="false">
+                <xsd:attribute name="sticky" type="xsd:boolean" default="true">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[
     Defines whether the backing service should be changed if a 'better' OSGi service becomes

@@ -46,6 +46,7 @@ Package org.springframework.osgi.service
 * improved laziness of the backing service retrieval
 * added 'sticky' option on single importers to prevent rebinds if higher ranking services appear while the backing
   service is still alive
+* made single service imports 'sticky' by default
 * deprecated ExportContextClassLoader in favour of ExportContextClassLoaderEnum
 * deprecated ImportContextClassLoader in favour of ImportContextClassLoaderEnum
 * service collection can now contain service references instead of just service proxies

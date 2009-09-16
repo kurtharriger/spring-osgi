@@ -52,7 +52,7 @@ public class ChainActivator implements BundleActivator {
 				CHAIN = new BundleActivator[] { new ContextLoaderListener() };	
 			}
 		} else {
-			log.warn("Non OSGi 4.2 platform detected; disabling Blueprint Container functionality");
+			log.warn("Pre-4.2 OSGi platform detected; disabling Blueprint Container functionality");
 			CHAIN = new BundleActivator[] { new ContextLoaderListener() };
 		}
 	}

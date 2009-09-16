@@ -103,7 +103,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	/** convenience field * */
 	private volatile boolean mandatory = true;
 
-	private volatile boolean sticky = false;
+	private volatile boolean sticky = true;
 	private final Object monitor = new Object();
 
 	public OsgiServiceProxyFactoryBean() {
@@ -261,7 +261,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	}
 
 	/**
-	 * Sets the stickiness of this proxy. If 'true', the proxy will rebind only if the backing service is no longer
+	 * Sets the stickiness of this proxy. If 'true' (default), the proxy will rebind only if the backing service is no longer
 	 * available. If 'false', the rebind will occur every time a 'better' candidate appears. A better service is defined
 	 * by having either a higher ranking or the same ranking and a lower service id.
 	 * 
