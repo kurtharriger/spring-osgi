@@ -103,20 +103,13 @@
       <section id="bnd-app-ctx:app-creation:mandatory-deps">
         <title>Mandatory Service Dependencies</title>
 
-        <para>If an application context declares mandatory dependencies on the
-        availability of certain OSGi services (see <xref linkend="service-registry"/>) then creation
-        of the application context is blocked until all mandatory dependencies
-        can be satisfied through matching services available in the OSGi
-        service registry. Since a service may come and go at any moment in an
-        OSGi environment, this behaviour only guarantees that all mandatory
-        services were available at the moment creation of the application
-        context began. One or more services may subsequently become
-        unavailable again during the process of application context creation.
-        <xref linkend="service-registry"/> describes what happens when a mandatory service reference
-        becomes unsatisfied. In practice, for most enterprise applications
+        <para>If an application context declares mandatory availability for certain
+        imported OSGi services, the creation of the application context is blocked 
+        until all the mandatory dependencies can be satisfied through matching services 
+        available in the OSGi service registry. In practice, for most enterprise applications
         built using Spring Dynamic Modules services, the set of available
         services and bundles will reach a steady state once the platform and
-        its installed bundles are all started. In such a world the behaviour of
+        its installed bundles are all started. In such a world, the behaviour of
         waiting for mandatory dependencies simply ensures that bundles A and
         B, where bundle A depends on services exported by bundle B, may be
         started in any order.</para>
@@ -135,6 +128,9 @@
         section for more information).
         Again, note that regardless of the configuration chosen, the failure of the
         application context will not change the bundle state.</para>
+        
+        <para>For more information on the <emphasis>availability</emphasis> of imported services,
+        see <xref linkend="service-registry:refs:availability"/></para>
       </section>
 
       <section id="bnd-app-ctx:app-creation:app-ctx-publication">

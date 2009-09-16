@@ -750,26 +750,164 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
     <section id="service-registry:refs">
       <title>Defining References To OSGi Services</title>
 
-      <para>Spring Dynamic Modules supports the declaration of beans that
-      represent services accessed via the OSGi Service Registry. In such
-      manner, references to OSGi services can be injected into application
-      components. The service lookup is made using the service interface type
+      <para>To use services, clients need to look for them inside the OSGi service registry.
+      If found, the platform returns a reference which can be used to get the actual service instance.
+      Consumers should return the service instance as soon as possible and not hold on to it since
+      the service provider can unpublish the service at any point.
+      Since there is no mechanism in Java to force such cleanup, the OSGi specification uses the service
+      references and the aforementioned <emphasis>protocol</emphasis> to decouple service providers from
+      service consumers. Please see chapter 5, the Service Layer inside the OSGi Core spec for an in-depth
+      discussion.
+      </para>
+      
+      <para>Spring Dynamic Modules facilitates the consumption of OSGi services by taking care of not 
+      just of the retrieval of service references and instances but also considering the service dynamics.
+      With Spring DM, imported OSGi services become Spring beans which can be injected, as usual, 
+      into other application components. The service lookup is made using the service interface type
       that the service is required to support, plus an optional filter
       expression that matches against the service properties published in the
-      registry.</para>
+      registry. The service instance retrieval is done on demand, on the first request. Once the service
+      becomes unavailable, Spring DM automatically unregisters the service to avoid using <emphasis>stale</emphasis>
+      references.</para>
 
-      <para>For some scenarios, a single matching service that meets the
-      application requirements is all that is needed. The
+      <para>As a consumer, one can find zero, one or multiple services matching the desired description.
+      In most scenarios, a single matching service is all that is needed; for those the
       <literal>reference</literal> element defines a reference to a single
-      service that meets the required specification. In other scenarios,
-      especially when using the OSGi <ulink
+      service that meets the required specification. 
+      In other cases, especially when using the OSGi <ulink
       url="http://www.osgi.org/documents/osgi_technology/whiteboard.pdf">whiteboard
       pattern</ulink>, references to <emphasis>all available</emphasis>
       matching services are required. Spring Dynamic Modules supports the
-      management of this set of references as a <interfacename>List</interfacename>,
+      management of this group of references as either a <interfacename>List</interfacename> or a
       <interfacename>Set</interfacename> collection.</para>
 
+	  <section id="service-registry:refs:availability">
+	  	<title>Imported Service Availability</title>
+	  	
+	  	<sidebar>
+	  	<title>What happened to <literal>cardinality</literal>?</title>
+	  	<para>
+	  	Since Spring DM 2.x, the <literal>cardinality</literal> notion has been deprecated in favour
+	  	of <literal>availability</literal>. The main reasons behind it were aligning the terminology
+	  	with the Blueprint spec and eliminating the repetition of specifying the number of imported
+	  	services: as <literal>osgi</literal> elements already specify whether one or multiple services
+	  	are imported, the <literal>cardinality</literal> right side (<literal>..N/..1</literal>) was
+	  	redundant.
+	  	</para>
+	  	</sidebar>
+	  	
+	  	<para>Due to the dynamic nature of OSGi, services can come and go, be available or unavailable
+	  	at certain points in time. Depending on the type of service, this can have a negative impact
+	  	on the consumers. Spring DM alleviates this problem by introducing the
+	  	notion of <literal>availability</literal> (formerly known as <literal>cardinality</literal>)
+	  	which indicates whether an imported service is <literal>mandatory</literal> or 
+	  	<literal>optional</literal>.</para>
+	  	
+	  	<para>As the name implies, a <literal>mandatory</literal> service implies a crucial application dependency:
+	  	the service is <emphasis>required</emphasis> and its presence can heavily impact the application, in
+	  	a negative way.
+	  	</para>
+	  	<para>An <literal>optional</literal> service means just the opposite. The service is tracked and bound 
+	  	(if present), just like a <literal>mandatory</literal> reference, but its presence is not required. It is
+	  	fine, from an application perspective if the service is not available - its existence (or lack of) does
+	  	not impact the application functionality.</para>
+	  	
+	  	<para>As an example, an application could have a <literal>mandatory</literal> dependency on a <literal>
+	  	DataSource</literal> and an <literal>optional</literal> one for a logging service: the application can run fine
+	  	if it cannot log (it does not impact the runtime) but it fails if the backing database is not available.</para>
+	  	
+	  	<para>In Spring DM, a <literal>mandatory</literal> service import that is unsatisfied (there are no services
+	  	matching the description) can either prevent an application context from starting up or, if already started,
+	  	cause the unregistration of the exported services dependent on it.</para>
+	  	
+	  	<section id="service-registry:refs:availability:startup">
+	  	<title>Mandatory Services and Application Startup</title>
+	  	<para>
+	  	The availability of a service impacts the startup of an Spring-powered application and 
+	  	the publication of any exported services that depend on it.
+	  	As mentioned in <xref linkend="bnd-app-ctx:app-creation:mandatory-deps"/>, a SpringDM application will not start 
+	  	unless <emphasis>all</emphasis> <literal>mandatory</literal> services are available, at the same time.
 
+	  	Before initializing the context, Spring DM discovers all the <literal>mandatory</literal> service
+	  	declarations and waits for a period of time (5 minutes by default unless otherwise specified by
+	  	each bundle - see the <literal>timeout</literal> directive in <xref linkend="app-deploy:headers"/>) for all imports
+	  	to be satisfied, at the same time.
+	  	If the timeout occurs, the application initialization fails (since the required or mandatory services
+	  	are not available) or succeeds, meaning the application context is being initialized.
+	  	</para>
+	  	
+	  	<para>This way, the framework prevents the application from starting up only to fail since its required
+	  	services are unavailable. This feature avoids the need for ordering the bundle startup sequence as the 
+	  	configuration already acts as a service <emphasis>barrier</emphasis> blueprint: no matter the order of the services
+	  	started, on whether they come and go, only when all of them are present, will the context initialization
+	  	commence.</para>
+	  	
+	  	<note>The fact that an application has mandatory service references, gives no guarantee 
+	  	that a valid service object is available when the service reference is used, since services can 
+	  	get unregistered at any time. Spring DM guarantees that all the mandatory services were present, at
+	  	the same time, before the application was started but it cannot prevent or guarantee that this services
+	  	will not be disappear during the application life span.</note>
+
+        <warning>
+          It is an error to declare a mandatory reference to a
+          service that is also exported by the same bundle, this behaviour can
+          cause application context creation to fail through either deadlock
+          or timeout.
+        </warning>
+	  	
+	  	</section>
+	  	
+	  	<!-- keep the old name in case the old chapter in 1.2 is still referred to -->
+    	<section id="service-registry:export-import-relationship">
+     	<title>Relationship Between The Service Exporter And Service Importer</title>
+       	
+        <para>An exported service may depend, either directly or indirectly,
+        on other (imported) services in order to perform its function. If one of these
+        services is marked as a <emphasis>mandatory</emphasis> dependency and the 
+        dependency can no longer be satisfied
+        (because the backing service has gone away and there is no suitable
+        replacement available), then the exported service that depends on it
+        will be automatically unregistered from the service registry - meaning
+        that it is no longer available to clients. If the mandatory dependency
+        becomes satisfied once more (by registration of a suitable service),
+        then the exported service will be re-registered in the service
+        registry.</para>
+
+		<para>This automatic publication management ensures that only when the exported service can work reliable,
+		it is made available for potential OSGi clients. This behaviour takes advantage of the OSGi dynamic nature
+		allowing an application to cope with the ongoing changing without being restarted. 
+		</para>
+
+        <para>This automatic unregistering and re-registering of exported
+        services based on the availability of mandatory dependencies only
+        takes into account declarative dependencies. If exported service
+        <literal>S</literal> depends on bean <literal>A</literal>, which in
+        turn depends on mandatory imported service <literal>M</literal>, and
+        these dependencies are explicit in the Spring configuration file as
+        per the example below, then when <literal>M</literal> becomes
+        unsatisfied <literal>S</literal> will be unregistered. When
+        <literal>M</literal> becomes satisfied again, <literal>S</literal>
+        will be re-registered.</para>
+
+        <programlisting language="xml"><![CDATA[<osgi:service id="S" ref="A" interface="SomeInterface"/>
+
+<bean id="A" class="SomeImplementation">
+   <property name="helperService" ref="M"/>
+</bean> 
+
+<!-- the reference element is used to refer to a service
+     in the service registry -->
+<osgi:reference id="M" interface="HelperService" availability="mandatory"/>]]></programlisting>
+
+        <para>If however the dependency from <literal>A</literal> on
+        <literal>M</literal> is not established through configuration as shown
+        above, but instead at runtime through for example passing a reference
+        to <literal>M</literal> to <literal>A</literal> without any
+        involvement from the Spring container, then Spring Dynamic Modules
+        will <emphasis>not</emphasis> track this dependency.</para>
+        </section>	  	
+	  </section>
+	  
       <section id="service-registry:refs:singular">
         <title>Referencing An Individual Service</title>
 
@@ -888,7 +1026,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         </section>
 
         <section id="service-registry:refs:singular:cardinality">
-          <title>The <literal>cardinality</literal> Attribute</title>
+          <title>The <literal>availability</literal> Attribute</title>
 
 		  <sidebar>
 		    <title><![CDATA[Nested <reference> declarations]]></title>
@@ -898,29 +1036,21 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 		    one with a generated name.</para>
 		  </sidebar>
 
-          <para>The <literal>cardinality</literal> attribute is used to
+          <para>The <literal>availability</literal> attribute is used to
           specify whether or not a matching service is required at all times.
-          A cardinality value of <literal>1..1</literal> (the default)
-          indicates that a matching service must always be available. A
-          cardinality value of <literal>0..1</literal> indicates that a
+          An <literal>mandatory</literal> availability (the default)
+          indicates that a matching service must always be present. A
+          value of <literal>optional</literal> indicates that a
           matching service is not required at all times (see 
           <xref linkend="service-registry:refs:singular:dynamics"/>
-          for more details). A <literal>reference</literal> with cardinality
-          <literal>1..1</literal> is also known as a
-          <emphasis>mandatory</emphasis> service reference and, by default,
-          application context creation is deferred until the reference is
-          satisfied. More information about context creation and mandatory
-          dependencies is available at <xref linkend="service-registry:refs:singular:dynamics"/>
+          for more details). The differences in behaviour between <literal>mandatory</literal>
+          and <literal>optional</literal> services are explained at length in 
+          <xref linkend="service-registry:refs:availability"/>.
           </para>
-
-          <note>It is an error to declare a mandatory reference to a
-          service that is also exported by the same bundle, this behavior can
-          cause application context creation to fail through either deadlock
-          or timeout.</note>
         </section>
 
         <section id="service-registry:refs:singular:depends-on">
-          <title>The depends-on Attribute</title>
+          <title>The <literal>depends-on</literal> Attribute</title>
 
           <para>The <literal>depends-on</literal> attribute is used to specify
           that the service reference should not be looked up in the service
@@ -929,7 +1059,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         </section>
 
         <section id="service-registry:refs:singular:tccl">
-          <title>The context-class-loader Attribute</title>
+          <title>The <literal>context-class-loader</literal> Attribute</title>
 
           <para>The OSGi Service Platform Core Specification (latest
           version is 4.1 at time of writing) does not specify what types and
@@ -977,9 +1107,22 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
           	management will occur during the service invocation</para>
           	</listitem>
           </itemizedlist>
-          
         </section>
         
+        <section id="service-registry:refs:singular:sticky">
+          <title>The <literal>sticky</literal> Attribute</title>
+          
+          <para>Newly introduced in DM 2.x, the <literal>sticky</literal> attribute specifies whether an importer will use
+          a backing service until it becomes unavailable or whether it will consider other <emphasis>better</emphasis> candidates 
+          (defined as services matching the importer criteria but with a higher ranking or a lower service id) that might appear.
+          In Spring DM 1.x, the importer would always select the best service available at any point in time. Thus, if a service with
+          a higher ranking id becomes available, the proxy would automatically bind to it. In highly dynamic environments, this lack
+          of service affinity becomes problematic so in DM 2.x, the behaviour has changed (aligning itself with the Blueprint spec).
+          Thus, service importers become <literal>sticky</literal> by default meaning that a proxy will use the bound backing service
+          until it becomes unavailable, ignoring any other service updates. Only when the backing service goes down, the proxy will
+          look for a replacement selecting the best candidate at that point in time.
+          To revert to the Spring DM 1.x behaviour, mark the importers as being non-sticky.</para>
+		</section>        
         
       	<section id="service-registry:refs:singular:reference:attributes">
       	<title><literal>reference</literal> Element Attributes</title>
@@ -1036,19 +1179,28 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
                	which does not do any management of the context class loader.</entry>
               </row>
               <row>
-                <entry>cardinality</entry>
-                <entry namest="c2" nameend="c3" align="center">0..1</entry>
-                <entry namest="c4" nameend="c5" align="center">1..1</entry>
+                <entry>availability</entry>
+                <entry namest="c2" nameend="c3" align="center">optional</entry>
+                <entry namest="c4" nameend="c5" align="center">mandatory</entry>
                 <entry>Defines the required cardinality of the relationship to the backing service. If not specified, 
-                the <literal>default-cardinality</literal> attribute will apply. A value is '1..1' means that a backing service 
-                must exist (this is a mandatory service reference). A value of '0..1' indicates that it is 
-                acceptable to be no backing service (an optional service reference).</entry>
+                the <literal>default-cardinality</literal> attribute will apply. 'mandatory' value (the default) means that a backing service 
+                must exist at all times. The 'optional' value indicates that it is acceptable to be for an importer to have no 
+                backing service.</entry>
               </row>
               <row>
                 <entry>timeout</entry>
                 <entry spanname="values">any positive long</entry>
                 <entry>The amount of time (in milliseconds) to wait for a backing service to be 
 				available when an operation is invoked. If not specified, the <literal>default-timeout</literal> attribute will apply.
+                </entry>
+              </row>
+              <row>
+                <entry>sticky</entry>
+                <entry namest="c2" nameend="c3" align="center">true</entry>
+                <entry namest="c4" nameend="c5" align="center">false</entry>
+                <entry>Indicates the <emphasis>stickiness</emphasis> of the service import. If 'true' (default), the proxy will rebind only if the
+                backing service is no longer available. If 'false' (Spring DM 1.x behaviour), the rebind will occur every time a 'better' candidate
+                appears. A better service is defined by having either a higher ranking or the same ranking and a lower service id.
                 </entry>
               </row>              
             </tbody>
@@ -1064,12 +1216,9 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 	      is unchanged throughout the lifetime of the application context
 	      (the object reference remains constant). However, the OSGi service
 	      that backs the reference may come and go at any time. For a
-	      mandatory service reference (cardinality <literal>1..1</literal>),
-	      creation of the application context will block until a matching
-	      service is available. For an optional service reference 
-	      (cardinality <literal>0..1</literal>), the
-	      reference bean will be created immediately, regardless of whether or
-	      not there is currently a matching service.</para>
+	      mandatory service reference, the creation of the application context will block until a matching
+	      service is available. <xref linkend="service-registry:refs:availability"/> provides
+	      more details.</para>
 	
 	      <para>When the service backing a <literal>reference</literal> bean
 	      goes away, Spring Dynamic Modules tries to replace the backing
@@ -1088,9 +1237,8 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 	      the invocation blocks until the reference becomes satisfied. The
 	      optional <literal>timeout</literal> attribute of the
 	      <literal>reference</literal> element enables a timeout value (in
-	      milliseconds) to be specified. If a timeout value is specified and
-	      no matching service becomes available within the timeout period, an
-	      unchecked <classname>ServiceUnavailableException</classname> is
+	      milliseconds) to be specified. If no matching service becomes available 
+	      within the timeout period, an unchecked <classname>ServiceUnavailableException</classname> is
 	      thrown.</para>
 	      
         </section>        
@@ -2071,53 +2219,5 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       
       <para>The <literal>default-*</literal> attributes allow for concise and shorter declarations as well
       as easy propagation of changes (such as increasing or decreasing the timeout).</para>
-    </section>
-    
-    <section id="service-registry:export-import-relationship">
-    
-     <title>Relationship Between The Service Exporter And Service Importer</title>
-       	
-        <para>An exported service may depend, either directly or indirectly,
-        on other services in order to perform its function. If one of these
-        services is considered a <emphasis>mandatory</emphasis> dependency
-        (has cardinality <literal>1..x</literal>) and the 
-        dependency can no longer be satisfied
-        (because the backing service has gone away and there is no suitable
-        replacement available) then the exported service that depends on it
-        will be automatically unregistered from the service registry - meaning
-        that it is no longer available to clients. If the mandatory dependency
-        becomes satisfied once more (by registration of a suitable service),
-        then the exported service will be re-registered in the service
-        registry.</para>
-
-        <para>This automatic unregistering and re-registering of exported
-        services based on the availability of mandatory dependencies only
-        takes into account declarative dependencies. If exported service
-        <literal>S</literal> depends on bean <literal>A</literal>, which in
-        turn depends on mandatory imported service <literal>M</literal>, and
-        these dependencies are explicit in the Spring configuration file as
-        per the example below, then when <literal>M</literal> becomes
-        unsatisfied <literal>S</literal> will be unregistered. When
-        <literal>M</literal> becomes satisfied again, <literal>S</literal>
-        will be re-registered.</para>
-
-        <programlisting language="xml"><![CDATA[<osgi:service id="S" ref="A" interface="SomeInterface"/>
-
-<bean id="A" class="SomeImplementation">
-   <property name="helperService" ref="M"/>
-</bean> 
-
-<!-- the reference element is used to refer to a service
-     in the service registry -->
-<osgi:reference id="M" interface="HelperService"
-     cardinality="1..1"/>]]></programlisting>
-
-        <para>If however the dependency from <literal>A</literal> on
-        <literal>M</literal> is not established through configuration as shown
-        above, but instead at runtime through for example passing a reference
-        to <literal>M</literal> to <literal>A</literal> without any
-        involvement from the Spring container, then Spring Dynamic Modules
-        will <emphasis>not</emphasis> track this dependency.</para>
-    
     </section>
   </chapter>

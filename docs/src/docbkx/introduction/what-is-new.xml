@@ -19,8 +19,10 @@
 		<section id="dm-2.0.x:jdk5">
 			<title>Java 5</title>
 			<para>As of 2.x, Spring DM requires <ulink url="http://java.sun.com/j2se/1.5.0/">JDK 5</ulink> to run (or compile). The framework code has been
-			revised to take advantage of the JDK 5 features such as language improvements, concurrency and generics. Considerable effort has been spent to
-			keep the code backwards compatible however, it is recommended to do some sanity tests before upgrading.</para>
+			revised to take advantage of the JDK 5 features such as language improvements, concurrency and generics: for example, various enum-like classes
+			used by the exporter and importer API have been deprecated and replaced with proper Java 5<classname>enum</classname>s.
+			Considerable effort has been spent to keep the code backwards compatible however, it is recommended to compile the code against the Spring DM 2.x
+			code and perform sanity checks before upgrading.</para>
 		</section>
 		<section id="dm-2.0.x:spring-3.x">
 			<title>Spring 3.x</title>
