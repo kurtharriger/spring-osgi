@@ -1943,8 +1943,8 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
         and Spring DM, this section does not mention it.</para>
       </section>
         
-      </section>
-    </section>    
+    </section>
+        
     <section id="service-registry:refs:listener-and-proxies">
        <title>Listener And Service Proxies</title>
        <para>While the importer listener provides access to the OSGi service bound at a certain point, it is important to note that the given argument is <emphasis>not</emphasis> 
@@ -1970,8 +1970,6 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       a <classname>ThreadLocal</classname>, through <methodname>getInvokerBundleContext()</methodname>.
       </para>
       <para>Please be careful when using this class since it ties your code to Spring DM API.</para>
-    </section>
-    
     </section>
     
     <section id="service-registry:refs:listener-best-practices">
