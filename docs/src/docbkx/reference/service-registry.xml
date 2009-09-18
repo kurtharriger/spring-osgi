@@ -728,6 +728,10 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
                 <entry>auto-export</entry>
               </row>
               <row>
+                <entry>ranking</entry>
+                <entry>ranking</entry>
+              </row>
+              <row>
                 <entry>context-class-loader</entry>
                 <entry>-</entry>
               </row>
@@ -1703,8 +1707,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         </section>
         
       </section>
-      
-      
+
      <section id="service-registry:refs:dynamics">
       <title>Dealing With The Dynamics Of OSGi Imported Services</title>
 
@@ -1854,7 +1857,94 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
 	     </table>      
       
     </section>
-    
+
+
+    <section id="service-registry:refs:blueprint">
+       <title>Blueprint <literal>reference</literal> Comparison</title>
+       
+       <para>Similar to Spring DM, the Blueprint Container offers a <literal>reference</literal> and <literal>list</literal> elements, 
+       identical in functionality with the those in Spring DM. Below is a summary of the configuration options available in Spring DM and Blueprint:</para>
+       
+       <table id="service-registry:refs:blueprint:comparison" pgwide="1" align="center">
+          <title>Spring DM / Blueprint Service Importer Configuration Comparison</title>
+          <tgroup cols="2">
+           <colspec colnum="c1"/>
+           <colspec colnum="c2"/>
+           <spanspec spanname="wide" namest="c1" nameend="c2" align="center"/>
+           <thead>
+              <row>
+                <entry align="center">Spring DM</entry>
+                <entry align="center">Blueprint</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry spanname="wide">Common Elements/Attributes</entry>
+              </row>
+              <row>
+                <entry>interface</entry>
+                <entry>interface</entry>
+              </row>
+              <row>
+                <entry>interfaces</entry>
+                <entry>- (multiple interfaces not supported)</entry>
+              </row>
+              <row>
+                <entry>ref</entry>
+                <entry>ref</entry>
+              </row>
+              <row>
+                <entry>filter</entry>
+                <entry>filter</entry>
+              </row>
+              <row>
+                <entry>bean-name</entry>
+                <entry>component-name</entry>
+              </row>
+              <row>
+                <entry>availability</entry>
+                <entry>availability</entry>
+              </row>
+              <row>
+                <entry>context-class-loader</entry>
+                <entry>-</entry>
+              </row>
+              <row>
+                <entry spanname="wide"><literal><![CDATA[<reference>]]></literal></entry>
+              </row>
+              <row>
+                <entry>timeout</entry>
+                <entry>timeout</entry>
+              </row>
+              <row>
+                <entry>sticky</entry>
+                <entry>- (the importer is always sticky)</entry>
+              </row>
+              <row>
+                <entry spanname="wide"><literal><![CDATA[<list>]]></literal></entry>
+              </row>
+              <row>
+                <entry>member-type</entry>
+                <entry>member-type</entry>
+              </row>
+              <row>
+                <entry>comparator-ref</entry>
+                <entry>-</entry>
+              </row>
+              <row>
+                <entry>greedy-proxying</entry>
+                <entry>-</entry>
+              </row>
+            </tbody>            
+          </tgroup>
+        </table>
+        
+        <para>Since the <literal>registration-listener</literal> declaration is identical in declaration and functionality between Blueprint 
+        and Spring DM, this section does not mention it.</para>
+      </section>
+        
+      </section>
+    </section>    
     <section id="service-registry:refs:listener-and-proxies">
        <title>Listener And Service Proxies</title>
        <para>While the importer listener provides access to the OSGi service bound at a certain point, it is important to note that the given argument is <emphasis>not</emphasis> 

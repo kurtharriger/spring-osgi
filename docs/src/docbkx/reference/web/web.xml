@@ -15,17 +15,6 @@
       </para>
     </sidebar>
 
-    <sidebar>
-      <title>Deployment scenarios</title>
-      <para>
-      Users new to OSGi can benefit greatly from the SpringSource dm Server <ulink url="http://www.springsource.org/dmserver">documentation</ulink> which explains
-      how OSGi can work in various development and production scenarios.
-      </para>
-    </sidebar>
-    
-    This will help you to understand how osgi can work in a development / production environment. The programmer guide describes the sophisticated eclipse tooling in detail.
-    
-
     <para>A major feature introduced in the 1.1.0 release is <emphasis>support for web applications</emphasis> which enables easy deployment of web artifacts 
     to OSGi.</para>
     <para>
@@ -39,6 +28,14 @@
     particular to the target container. In short, everything that the target container supports is available to the OSGi WAR through Spring DM.
     </para>
     
+    <sidebar>
+      <title>Deployment scenarios</title>
+      <para>
+      Users new to OSGi can benefit greatly from the SpringSource dm Server <ulink url="http://www.springsource.org/dmserver">documentation</ulink> which explains
+      how OSGi can work in various development and production scenarios. The programmer guide describes the sophisticated eclipse tooling in detail.
+      </para>
+    </sidebar>
+
     <tip>As a complement to this chapter, the Spring DM distribution contains a number of web samples involving static resources, Servlets and JSPs running inside
     OSGi.</tip>
     
