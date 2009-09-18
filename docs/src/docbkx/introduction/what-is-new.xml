@@ -29,9 +29,9 @@
 			<para>Besides the Java 5 upgrade, DM 2.0 requires Spring 3.x to get access to the latest framework features and JDK optimizations.</para>
 		</section>
 		<section id="dm-2.0.x:imports">
-			<title>Service imports</title>
-			<para>2.0.x provides several improvements for service imports (whether single or collection based) both in terms of speed and service lifecycle.
-			<xref linkend="service-registry:refs"/> provides more details.</para>
+			<title>Service Importer Improvements</title>
+			<para>2.0.x provides several improvements for service imports (whether single or collection based) in terms of speed, configuration and 
+			service lifecycle. <xref linkend="service-registry:refs"/> provides more details. </para>
 		</section>		
 		<section id="dm-2.0.x:security">
 			<title>Java 2 Security Integration</title>

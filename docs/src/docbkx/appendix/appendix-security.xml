@@ -6,7 +6,7 @@
 
     <para>Since 1.2.0, Spring DM integrates with Java 2 <link linkend="http://java.sun.com/j2se/1.4.2/docs/guide/security/spec/security-spec.doc.html">security</link>. 
     Namely Spring DM uses <link linkend="http://java.sun.com/j2se/1.4.2/docs/guide/security/doprivileged.html">privileged blocks</link> for executing security 
-    sensitive operations using its own permissions.  
+    sensitive operations using its own permissions. 
     </para>
     
     <para>Being a framework, Spring DM needs to introspect bundles to determine their content and configuration. In general, it is recommended to grant
@@ -86,6 +86,10 @@
             </tbody>
     	</tgroup>
     </table>
+    
+    <para>Note that as of Spring DM 2.0, the extender will use the target bundle permissions for all actions executed on its behalf. That is, loading of
+    classes, publishing the services, importing packages or the method invocations are executed using the bundle credentials just as if the user bundle
+    would </para>
     
     <para>As a general recommendation, for security sensible environments, to determine the minimum number of permissions start with a basic set of bundles 
     and no permissions. This way, on each run, one can find out what permissions are needed and by whom and tweak the system accordingly.</para>

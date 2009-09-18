@@ -19,7 +19,7 @@
 				<area id="compendium:ns:xml:uri.prefix.2" coords="4 10"/>
 			</areaset>
 			<area id="compendium:ns:xml:uri" coords="8 95"/>
-			<area id="compendium:ns:xml:uri.loc" coords="9 96"/>
+			<area id="compendium:ns:xml:uri.loc" coords="9 95"/>
 		</areaspec>
     	<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <beans:beans xmlns="http://www.springframework.org/schema/osgi"

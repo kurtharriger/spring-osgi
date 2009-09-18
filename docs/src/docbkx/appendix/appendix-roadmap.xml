@@ -15,17 +15,6 @@
 	</para>
 
     <section>
-      <title>Access to Service References for Collections</title>
-
-      <para>The current specification does not provide for access to the
-      <literal>ServiceReference</literal> objects for services in a managed
-      collection (i.e. obtained via a <literal>set</literal> or
-      <literal>list</literal> declaration). A future release of Spring Dynamic
-      Modules will provide an easy means of gaining access to these
-      references.</para>
-    </section>
-
-    <section>
       <title>Start Level Integration</title>
 
       <para>A future release of Spring Dynamic Modules may offer the following
@@ -69,16 +58,5 @@
       pooling libraries that at the moment require special <literal>DynamicImport-Package</literal>.</para>
     </section>
 
-	<section>
-	  <title>OSGi Standards</title>
-	
-	  <para>While OSGi 4.0 is currently required, work is underway to take advantage of the
-	  new features available in 4.1. SpringSource is an active participant in the 
-	  <ulink url="http://www2.osgi.org/EEG/HomePage">OSGi Enterprise Expert Group</ulink> 
-	  and we hope to help many of the ideas found in the Spring Dynamic Modules project 
-	  to make their way into the OSGi R5 specification.
-	  Spring Dynamic Modules would obviously seek to support any such standards at that 
-	  point in time.</para>
-	</section>
-    
+   
 </appendix>
