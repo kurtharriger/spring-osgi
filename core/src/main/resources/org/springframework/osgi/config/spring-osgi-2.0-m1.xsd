@@ -368,7 +368,7 @@
                         <xsd:documentation>
                           <![CDATA[
     Indicates the type of object that will be placed within the reference collection.  
-    'service-instance' indicates the collection contains service proxies for imported services.
+    'service-object' indicates the collection contains service proxies for imported services.
     'service-reference' indicates the collection contains ServiceReference objects matching the 
     target service type.
                           ]]>

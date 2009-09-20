@@ -27,9 +27,9 @@ import org.osgi.service.blueprint.container.ReifiedType;
 import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.convert.ConversionException;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.ConverterNotFoundException;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.context.support.internal.security.SecurityUtils;
@@ -40,6 +40,17 @@ import org.springframework.osgi.context.support.internal.security.SecurityUtils;
  * @author Costin Leau
  */
 public class SpringBlueprintConverterService implements ConversionService {
+
+	private static final class BlueprintConverterException extends ConversionException {
+
+		public BlueprintConverterException(String message, Throwable cause) {
+			super(message, cause);
+		}
+
+		public BlueprintConverterException(String message) {
+			super(message);
+		}
+	}
 
 	/** fallback delegate */
 	private final ConversionService delegate;
@@ -71,16 +82,16 @@ public class SpringBlueprintConverterService implements ConversionService {
 		return true;
 	}
 
-	public boolean canConvert(Class<?> sourceType, TypeDescriptor targetType) {
+	public boolean canConvert(TypeDescriptor sourceType, TypeDescriptor targetType) {
 		return true;
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T> T convert(Object source, Class<T> targetType) {
-		return (T) convert(source, TypeDescriptor.valueOf(targetType));
+		return (T) convert(source, TypeDescriptor.forObject(source), TypeDescriptor.valueOf(targetType));
 	}
 
-	public Object convert(final Object source, TypeDescriptor targetType) {
+	public Object convert(final Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
 		final ReifiedType type = TypeFactory.getType(targetType);
 		boolean hasSecurity = (System.getSecurityManager() != null);
 		AccessControlContext acc = (hasSecurity ? SecurityUtils.getAccFrom(cbf) : null);
@@ -108,15 +119,16 @@ public class SpringBlueprintConverterService implements ConversionService {
 				for (int i = 0; i < type.size(); i++) {
 					ReifiedType arg = type.getActualTypeArgument(i);
 					if (!Object.class.equals(arg.getRawClass())) {
-						throw new ConverterNotFoundException(source.getClass(), tType,
-								"No conversion found for generic argument(s) for reified type " + arg.getRawClass());
+						throw new BlueprintConverterException(
+								"No conversion found for generic argument(s) for reified type " + arg.getRawClass()
+										+ "source type " + sourceType + "| targetType =" + tType, null);
 					}
 				}
 			}
 		}
 
 		if (delegate != null) {
-			delegate.convert(source, targetType);
+			delegate.convert(source, sourceType, targetType);
 		}
 
 		lazyInitConverter();
@@ -145,7 +157,8 @@ public class SpringBlueprintConverterService implements ConversionService {
 						return converter.convert(source, type);
 					}
 				} catch (Exception ex) {
-					throw new ConversionFailedException(source, source.getClass(), type.getRawClass(), ex);
+					throw new BlueprintConverterException("Conversion between source " + source + " and reified type "
+							+ type + " failed", ex);
 				}
 			}
 		}
