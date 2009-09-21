@@ -420,6 +420,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 				vals.addPropertyValue(TARGET_PROP, target);
 
 			wrapperDef.setPropertyValues(vals);
+			wrapperDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 
 			postProcessListenerDefinition(wrapperDef);
 
