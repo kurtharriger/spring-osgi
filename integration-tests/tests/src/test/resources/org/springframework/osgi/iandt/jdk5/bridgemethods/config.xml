@@ -9,9 +9,9 @@
 
 	<osgi:list id="collection" interface="java.awt.Shape"
 		cardinality="0..N">
-		<osgi:listener bind-method="bind" unbind-method="unbind">
+		<osgi:reference-listener bind-method="bind" unbind-method="unbind">
 			<bean class="org.springframework.osgi.iandt.jdk5.bridgemethods.Listener" />
-		</osgi:listener>
+		</osgi:reference-listener>
 	</osgi:list>
 
 </beans>

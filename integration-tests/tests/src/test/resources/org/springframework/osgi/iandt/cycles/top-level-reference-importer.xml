@@ -16,7 +16,7 @@
 	</bean>
 
 	<osgi:reference id="importer" interface="java.awt.Shape" cardinality="0..1">
-		<osgi:listener bind-method="bind" ref="listenerA" />
-		<osgi:listener bind-method="bind" ref="listenerB" />			 
+		<osgi:reference-listener bind-method="bind" ref="listenerA" />
+		<osgi:reference-listener bind-method="bind" ref="listenerB" />			 
 	</osgi:reference>
 </beans>

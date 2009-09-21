@@ -116,12 +116,20 @@
     class type.
                     		]]></xsd:documentation>
                     	</xsd:annotation>
-                    </xsd:element>                
+                    </xsd:element>
+                    <xsd:element name="reference-listener" type="Tlistener" minOccurs="0" maxOccurs="unbounded">
+                      <xsd:annotation>
+                      	<xsd:documentation><![CDATA[
+    Defines a listener that will receive notification when a service backing this reference is 
+    bound or unbound.
+                      	]]></xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:element>
                     <xsd:element name="listener" type="Tlistener" minOccurs="0" maxOccurs="unbounded">
                       <xsd:annotation>
                       	<xsd:documentation><![CDATA[
     Defines a listener that will receive notification when a service backing this reference is 
-    bound or unbound. 
+    bound or unbound. Deprecated since Spring DM 2.x, in favour of 'reference-listener'. 
                       	]]></xsd:documentation>
                       </xsd:annotation>
                     </xsd:element>

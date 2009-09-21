@@ -10,7 +10,7 @@
 	
 	<!-- single shared instance of the imported service -->
     <osgi:reference id="reference" interface="java.awt.Shape" availability="optional">
-        <osgi:listener bind-method="bind" unbind-method="unbind" ref="listener"/>
+        <osgi:reference-listener bind-method="bind" unbind-method="unbind" ref="listener"/>
     </osgi:reference>
     	
 </beans>

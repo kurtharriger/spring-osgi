@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -133,6 +134,8 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 
 	// XML attributes/elements
 	private static final String LISTENER = "listener";
+
+	private static final String REFERENCE_LISTENER = "reference-listener";
 
 	private static final String REF = "ref";
 
@@ -302,10 +305,12 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	protected void parseNestedElements(Element element, ParserContext context, BeanDefinitionBuilder builder) {
 		parseInterfaces(element, context, builder);
 		parseListeners(element, getListenerElementName(), context, builder);
+		// deprecated listener
+		parseListeners(element, LISTENER, context, builder);
 	}
 
 	protected String getListenerElementName() {
-		return LISTENER;
+		return REFERENCE_LISTENER;
 	}
 
 	/**
@@ -428,6 +433,14 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 			listenersRef.add(wrapperDef);
 		}
 
+		PropertyValue previousListener =
+				builder.getRawBeanDefinition().getPropertyValues().getPropertyValue(LISTENERS_PROP);
+
+		if (previousListener != null) {
+			ManagedList ml = (ManagedList) previousListener.getValue();
+			listenersRef.addAll(0, ml);
+		}
+		
 		builder.addPropertyValue(LISTENERS_PROP, listenersRef);
 	}
 

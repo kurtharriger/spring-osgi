@@ -45,8 +45,8 @@
 	<!-- sorted osgi:set (testing osgi:comparator variants) 	-->
 	<osgi:set id="sortedSetWithNaturalOrderingOnRefs"
 		interface="java.io.Externalizable" cardinality="0..N">
-		<osgi:listener ref="firstListener" />
-		<osgi:listener ref="secondListener" />
+		<osgi:reference-listener ref="firstListener" />
+		<osgi:reference-listener ref="secondListener" />
 		<osgi:comparator>
 			<osgi:natural basis="service-reference" />
 		</osgi:comparator>
@@ -54,7 +54,7 @@
 
 	<osgi:list id="sortedListWithNaturalOrderingOnServs"
 		interface="java.io.Externalizable" cardinality="0..N">
-		<osgi:listener ref="firstListener" />
+		<osgi:reference-listener ref="firstListener" />
 		<osgi:comparator>
 			<osgi:natural basis="service" />
 		</osgi:comparator>
