@@ -65,6 +65,7 @@ Package org.springframework.osgi.service
 * added cleanup for services on destruction to avoid postponing bundle shutdown
 * improved static service importers by adding caching of the service to ease service cleanup
 * added 'cache target' option on service exporter for compatible behaviour with OSGi 4.2 Blueprint spec
+* added 'reference-listener' as alias for the 'listener' reference declaration
 
 Package org.springframework.osgi.mock
 * added specific OSGi r4.2 methods

@@ -1227,7 +1227,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 	      goes away, Spring Dynamic Modules tries to replace the backing
 	      service with another service matching the reference criteria. An
 	      application may be notified of a change in backing service by
-	      registering a <literal>listener</literal>. If no matching service is
+	      registering a <literal>reference-listener</literal>. If no matching service is
 	      available, then the <literal>reference</literal> is said to be
 	      <emphasis>unsatisfied</emphasis>. An unsatisfied mandatory service
 	      causes any exported service (<literal>service</literal> bean) that
@@ -1711,6 +1711,15 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
      <section id="service-registry:refs:dynamics">
       <title>Dealing With The Dynamics Of OSGi Imported Services</title>
 
+	  <sidebar>
+	  	<title>Where is the <literal>listener</literal> element ?</title>
+	  	<para>Since Spring DM 2.x, the <literal>reference-listener</literal> replaced
+	  	the <literal>listener</literal> element which has been deprecated. The main reasons
+	  	behind the decisions were to align the configuration format closer with the Blueprint
+	  	spec and to avoid some of the confusion regarding the type of listener declared (service or reference
+	  	based). Note that <literal>listener</literal> element is still supported.</para>
+	  </sidebar>
+	  
       <para>Whether you are using <literal>reference</literal>
       or <literal>set</literal> or <literal>list</literal>, Spring Dynamic
       Modules will manage the backing service. However there are cases
@@ -1720,14 +1729,14 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
       <para>Such applications, that need to be aware of when the service
       backing a <literal>reference</literal> bean is bound and unbound, can
       register one or more listeners using the nested
-      <literal>listener</literal> element.
+      <literal>reference-listener</literal> (or <literal>listener</literal>) element.
       This element is available on both <literal>reference</literal> and
       <literal>set</literal>, <literal>list</literal> declarations.
       In many respects, the service importer listener declaration 
       is similar to the service exporter listener declaration 
       (<xref linkend="service-registry:export:lifecycle"/>).
       
-      The <literal>listener</literal> element refers to a bean (either by name, 
+      The <literal>reference-listener</literal> element refers to a bean (either by name, 
       or by defining one inline)
       that will receive bind and unbind notifications. If this bean
       implements Spring DM's
@@ -1741,16 +1750,16 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
       <interfacename>OsgiServiceLifecycleListener</interfacename>:</para>
 
       <programlisting language="xml"><![CDATA[<reference id="someService" interface="com.xyz.MessageService">
-  <listener ref="aListenerBean"/>
+  <reference-listener ref="aListenerBean"/>
 </reference>]]></programlisting>
 
       <para>An example of declaring an inline listener bean with custom
       bind and unbind methods:</para>
 
       <programlisting language="xml"><![CDATA[<reference id="someService" interface="com.xyz.MessageService">
-  <listener bind-method="onBind" unbind-method="onUnbind">
+  <reference-listener bind-method="onBind" unbind-method="onUnbind">
      <beans:bean class="MyCustomListener"/>
-  </listener>
+  </reference-listener>
 </reference>]]></programlisting>
 
       <para>If the listener bean implements the
@@ -1827,7 +1836,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
 	     <para>The table below lists the attributes available for the <literal>reference</literal> <literal>listener</literal> sub element.</para>
 
        	 <table id="reference-import-listener-options" pgwide="1">
-          <title><![CDATA[OSGi <listener> attributes]]></title>
+          <title><![CDATA[OSGi <reference-listener> attributes]]></title>
           <tgroup cols="3">
             <thead>
               <row>
