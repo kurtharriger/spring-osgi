@@ -11,8 +11,8 @@
 	<bean id="listener" class="org.springframework.osgi.config.DummyListener"/>
 	
 	<osgi:reference interface="java.io.Serializable">
-		<osgi:listener ref="listener">
+		<osgi:reference-listener ref="listener">
 			<bean class="org.springframework.osgi.config.DummyListener"/>
-		</osgi:listener>
+		</osgi:reference-listener>
 	</osgi:reference>
 </beans>

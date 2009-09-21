@@ -17,9 +17,9 @@
 
 
 	<osgi:list id="list" interface="java.io.Serializable" cardinality="0..N">
-		<osgi:listener bind-method="bind" unbind-method="unbind">
+		<osgi:reference-listener bind-method="bind" unbind-method="unbind">
 			<bean class="org.springframework.osgi.iandt.exportimport.Listener" />
-		</osgi:listener>
+		</osgi:reference-listener>
 	</osgi:list>
 	
 	<osgi:reference id="na" interface="java.util.Queue"/>
