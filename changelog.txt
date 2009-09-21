@@ -21,6 +21,7 @@ Package org.springframework.osgi.bundle
 
 Package org.springframework.osgi.config
 * fixed race condition affecting configuration defaults in concurrent startups
+* improved further the definition of generated definitions to avoid IDE validation complains
 
 Package org.springframework.osgi.context
 * improved serviceability by using NamedThreadLocal
