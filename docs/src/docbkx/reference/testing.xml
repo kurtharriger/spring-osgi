@@ -283,7 +283,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
     
     <section id="testing:integration:customize-manifest">
       <title>Customizing The Test Manifest</title>
-      <para>There are cases where the auto-generated test manifest does not suite the needs of the test.
+      <para>There are cases where the auto-generated test manifest does not suit the needs of the test.
       For example the manifest requires some different headers or a certain package needs to be an optional import.</para>
       <para>
       For simple cases, one can work directly with the generated manifest - in the example below, the bundle class path
