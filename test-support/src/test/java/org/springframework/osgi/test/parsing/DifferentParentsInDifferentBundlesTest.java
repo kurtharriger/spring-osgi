@@ -84,7 +84,6 @@ public class DifferentParentsInDifferentBundlesTest extends TestCase {
 			}
 		};
 
-		System.out.println("Import package");
 		String importPackage = getImportPackage(test);
 	}
 

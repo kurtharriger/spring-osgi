@@ -15,9 +15,8 @@
  */
 package org.springframework.osgi.test.internal.util;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,15 +46,17 @@ import org.objectweb.asm.signature.SignatureVisitor;
 public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, ClassVisitor, FieldVisitor,
 		MethodVisitor {
 
-	private Set packages = new HashSet();
+	private Set packages = new LinkedHashSet();
 
-	private Map groups = new HashMap();
+	private Map groups = new LinkedHashMap();
 
 	private Map current;
 
 	private String tempLdc;
 
 	private String ownerName;
+
+	private Set innerClasses = new LinkedHashSet(4);
 
 	private static final String CLASS_NAME = Class.class.getName();
 
@@ -67,9 +68,14 @@ public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, C
 		return packages;
 	}
 
+	public Set getInnerClasses() {
+		return innerClasses;
+	}
+
 	// ClassVisitor
 	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
 		tempLdc = null;
+		this.ownerName = name;
 		String p = getGroupKey(name);
 		current = (Map) groups.get(p);
 		if (current == null) {
@@ -127,6 +133,10 @@ public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, C
 		addName(name);
 		addName(outerName);
 		addName(innerName);
+
+		if (!ownerName.equals(name)) {
+			innerClasses.add(name);
+		}
 	}
 
 	public void visitOuterClass(String owner, String name, String desc) {
@@ -169,7 +179,6 @@ public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, C
 
 		addName(owner);
 		addMethodDesc(desc);
-
 	}
 
 	public void visitLdcInsn(Object cst) {
@@ -179,7 +188,6 @@ public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, C
 		else if (cst instanceof String) {
 			tempLdc = (String) cst;
 		}
-
 	}
 
 	public void visitMultiANewArrayInsn(String desc, int dims) {
