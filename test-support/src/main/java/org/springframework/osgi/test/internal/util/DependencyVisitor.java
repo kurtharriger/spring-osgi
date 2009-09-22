@@ -132,7 +132,6 @@ public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, C
 		tempLdc = null;
 		addName(name);
 		addName(outerName);
-		addName(innerName);
 
 		if (!ownerName.equals(name)) {
 			innerClasses.add(name);
