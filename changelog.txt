@@ -72,6 +72,9 @@ Package org.springframework.osgi.service
 Package org.springframework.osgi.mock
 * added specific OSGi r4.2 methods
 
+Package org.springframework.osgi.test
+* added small improvement for improving detection of inner classes
+
 Package org.springframework.osgi.util
 * improved fallback mechanism for OSGi r4.1 features running in OSGi r4.0 platforms
 
