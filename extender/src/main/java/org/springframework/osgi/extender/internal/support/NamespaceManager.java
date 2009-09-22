@@ -19,6 +19,7 @@ package org.springframework.osgi.extender.internal.support;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,6 +29,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
+import org.springframework.osgi.extender.internal.util.BundleUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
@@ -89,6 +91,12 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	public void maybeAddNamespaceHandlerFor(Bundle bundle, boolean isLazyBundle) {
 		// Ignore system bundle
 		if (OsgiBundleUtils.isSystemBundle(bundle)) {
+			return;
+		}
+
+		// Ignore non-wired Spring DM bundles
+		if ("org.springframework.osgi.core".equals(bundle.getSymbolicName())
+				&& !bundle.equals(BundleUtils.getDMCoreBundle(context))) {
 			return;
 		}
 
@@ -179,12 +187,19 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 			log.debug("Registering Spring NamespaceHandlerResolver and EntityResolver...");
 		}
 
+		Bundle bnd = BundleUtils.getDMCoreBundle(context);
+		Properties props = null;
+		if (bnd != null) {
+			props = new Properties();
+			props.setProperty(BundleUtils.DM_CORE_ID, "" + bnd.getBundleId());
+			props.setProperty(BundleUtils.DM_CORE_TS, "" + bnd.getLastModified());
+		}
 		nsResolverRegistration =
 				context.registerService(new String[] { NamespaceHandlerResolver.class.getName() },
-						this.namespacePlugins, null);
+						this.namespacePlugins, props);
 
 		enResolverRegistration =
-				context.registerService(new String[] { EntityResolver.class.getName() }, this.namespacePlugins, null);
+				context.registerService(new String[] { EntityResolver.class.getName() }, this.namespacePlugins, props);
 
 	}
 

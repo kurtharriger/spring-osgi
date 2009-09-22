@@ -31,6 +31,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.osgi.util.internal.BundleUtils;
 import org.springframework.util.Assert;
 import org.xml.sax.EntityResolver;
 
@@ -115,17 +116,21 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 
 		final Object[] resolvers = new Object[2];
 
+		final BundleContext ctx = getBundleContext();
+
 		if (System.getSecurityManager() != null) {
 			AccessController.doPrivileged(new PrivilegedAction<Object>() {
 				public Object run() {
-					resolvers[0] = createNamespaceHandlerResolver(getBundleContext(), getClassLoader());
-					resolvers[1] = createEntityResolver(getBundleContext(), getClassLoader());
+					String filter = BundleUtils.createNamespaceFilter(ctx);
+					resolvers[0] = createNamespaceHandlerResolver(ctx, filter, getClassLoader());
+					resolvers[1] = createEntityResolver(ctx, filter, getClassLoader());
 					return null;
 				}
 			});
 		} else {
-			resolvers[0] = createNamespaceHandlerResolver(getBundleContext(), getClassLoader());
-			resolvers[1] = createEntityResolver(getBundleContext(), getClassLoader());
+			String filter = BundleUtils.createNamespaceFilter(ctx);
+			resolvers[0] = createNamespaceHandlerResolver(ctx, filter, getClassLoader());
+			resolvers[1] = createEntityResolver(ctx, filter, getClassLoader());
 		}
 
 		beanDefinitionReader.setNamespaceHandlerResolver((NamespaceHandlerResolver) resolvers[0]);
@@ -210,10 +215,11 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	 * priority over namespace provided by other bundles.
 	 * 
 	 * @param bundleContext the OSGi context of which the resolver should be aware of
+	 * @param filter OSGi service filter
 	 * @param bundleClassLoader classloader for creating the OSGi namespace resolver proxy
 	 * @return a OSGi aware namespace handler resolver
 	 */
-	private NamespaceHandlerResolver createNamespaceHandlerResolver(BundleContext bundleContext,
+	private NamespaceHandlerResolver createNamespaceHandlerResolver(BundleContext bundleContext, String filter,
 			ClassLoader bundleClassLoader) {
 		Assert.notNull(bundleContext, "bundleContext is required");
 		// create local namespace resolver
@@ -222,7 +228,7 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 
 		// hook in OSGi namespace resolver
 		NamespaceHandlerResolver osgiServiceNamespaceResolver =
-				lookupNamespaceHandlerResolver(bundleContext, localNamespaceResolver);
+				lookupNamespaceHandlerResolver(bundleContext, filter, localNamespaceResolver);
 
 		DelegatedNamespaceHandlerResolver delegate = new DelegatedNamespaceHandlerResolver();
 		delegate.addNamespaceHandler(localNamespaceResolver, "LocalNamespaceResolver for bundle "
@@ -238,15 +244,17 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	 * service provided by the Spring DM extender.
 	 * 
 	 * @param bundleContext the OSGi context of which the resolver should be aware of
+	 * @param filter OSGi service filter
 	 * @param bundleClassLoader classloader for creating the OSGi namespace resolver proxy
 	 * @return a OSGi aware entity resolver
 	 */
-	private EntityResolver createEntityResolver(BundleContext bundleContext, ClassLoader bundleClassLoader) {
+	private EntityResolver createEntityResolver(BundleContext bundleContext, String filter,
+			ClassLoader bundleClassLoader) {
 		Assert.notNull(bundleContext, "bundleContext is required");
 		// create local namespace resolver
 		EntityResolver localEntityResolver = new DelegatingEntityResolver(bundleClassLoader);
 		// hook in OSGi namespace resolver
-		EntityResolver osgiServiceEntityResolver = lookupEntityResolver(bundleContext, localEntityResolver);
+		EntityResolver osgiServiceEntityResolver = lookupEntityResolver(bundleContext, filter, localEntityResolver);
 
 		ChainedEntityResolver delegate = new ChainedEntityResolver();
 		delegate.addEntityResolver(localEntityResolver, "LocalEntityResolver for bundle "
@@ -258,14 +266,15 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		return delegate;
 	}
 
-	private NamespaceHandlerResolver lookupNamespaceHandlerResolver(final BundleContext bundleContext,
+	private NamespaceHandlerResolver lookupNamespaceHandlerResolver(final BundleContext bundleContext, String filter,
 			final Object fallbackObject) {
 		return (NamespaceHandlerResolver) TrackingUtil.getService(new Class<?>[] { NamespaceHandlerResolver.class },
-				null, NamespaceHandlerResolver.class.getClassLoader(), bundleContext, fallbackObject);
+				filter, NamespaceHandlerResolver.class.getClassLoader(), bundleContext, fallbackObject);
 	}
 
-	private EntityResolver lookupEntityResolver(final BundleContext bundleContext, final Object fallbackObject) {
-		return (EntityResolver) TrackingUtil.getService(new Class<?>[] { EntityResolver.class }, null,
+	private EntityResolver lookupEntityResolver(final BundleContext bundleContext, String filter,
+			final Object fallbackObject) {
+		return (EntityResolver) TrackingUtil.getService(new Class<?>[] { EntityResolver.class }, filter,
 				EntityResolver.class.getClassLoader(), bundleContext, fallbackObject);
 	}
 
