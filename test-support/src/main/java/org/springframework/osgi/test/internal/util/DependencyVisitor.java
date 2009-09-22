@@ -17,6 +17,7 @@ package org.springframework.osgi.test.internal.util;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,14 +33,12 @@ import org.objectweb.asm.signature.SignatureReader;
 import org.objectweb.asm.signature.SignatureVisitor;
 
 /**
- * ASM based class for determining a class imports. The code is heavily based on
- * an Eugene Kuleshov's ASM <a
+ * ASM based class for determining a class imports. The code is heavily based on an Eugene Kuleshov's ASM <a
  * href="http://asm.objectweb.org/doc/tutorial-asm-2.0.html">tutorial</a>.
  * 
- * <p/>The main differences from the original source in the article are the 1.4
- * compatibility, the handling of class objects not instantiated
- * (MyClass.class.getName()) as these are specially handled by the compiler and
- * analysis of inner classes.
+ * <p/>The main differences from the original source in the article are the 1.4 compatibility, the handling of class
+ * objects not instantiated (MyClass.class.getName()) as these are specially handled by the compiler and analysis of
+ * inner classes, including ones from different packages.
  * 
  * @author Eugene Kuleshov
  * @author Costin Leau
@@ -55,6 +54,8 @@ public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, C
 	private Map current;
 
 	private String tempLdc;
+
+	private String ownerName;
 
 	private static final String CLASS_NAME = Class.class.getName();
 
@@ -72,15 +73,14 @@ public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, C
 		String p = getGroupKey(name);
 		current = (Map) groups.get(p);
 		if (current == null) {
-			current = new HashMap();
+			current = new LinkedHashMap();
 			groups.put(p, current);
 		}
 
 		if (signature == null) {
 			addName(superName);
 			addNames(interfaces);
-		}
-		else {
+		} else {
 			addSignature(signature);
 		}
 	}
@@ -99,8 +99,7 @@ public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, C
 		tempLdc = null;
 		if (signature == null) {
 			addDesc(desc);
-		}
-		else {
+		} else {
 			addTypeSignature(signature);
 		}
 		if (value instanceof Type)
@@ -112,8 +111,7 @@ public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, C
 		tempLdc = null;
 		if (signature == null) {
 			addMethodDesc(desc);
-		}
-		else {
+		} else {
 			addSignature(signature);
 		}
 		addNames(exceptions);
@@ -126,13 +124,14 @@ public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, C
 
 	public void visitInnerClass(String name, String outerName, String innerName, int access) {
 		tempLdc = null;
-		
-		// addName( outerName);
-		// addName( innerName);
+		addName(name);
+		addName(outerName);
+		addName(innerName);
 	}
 
 	public void visitOuterClass(String owner, String name, String desc) {
 		tempLdc = null;
+
 		// addName(owner);
 		// addMethodDesc(desc);
 	}
@@ -366,8 +365,7 @@ public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, C
 		String p = getGroupKey(name);
 		if (current.containsKey(p)) {
 			current.put(p, new Integer(((Integer) current.get(p)).intValue() + 1));
-		}
-		else {
+		} else {
 			current.put(p, new Integer(1));
 		}
 	}
@@ -408,5 +406,4 @@ public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, C
 		if (signature != null)
 			new SignatureReader(signature).acceptType(this);
 	}
-
 }
