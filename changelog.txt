@@ -27,6 +27,7 @@ Package org.springframework.osgi.context
 * improved serviceability by using NamedThreadLocal
 * added class loader aware default Class/Class[] property editors
 * fixed cleanup of an internal input stream used for loading property editors
+* added support for schema handler filtering
 
 Package org.springframework.osgi.compendium
 * enhanced cm-properties to reflect Config Admin changes in the returned Properties object
@@ -37,6 +38,7 @@ Package org.springframework.osgi.extender
 * improved importers detection by avoiding early initialization of lazy beans
 * align the bundles shutdown algorithm with the OSGi 4.2 Blueprint spec 
 * fixed delayed cancelation of bundles being stopped while waiting for mandatory services
+* added support for schema handler filtering
 
 Package org.springframework.osgi.service
 * improved serviceability by using NamedInheritableThreadLocal
