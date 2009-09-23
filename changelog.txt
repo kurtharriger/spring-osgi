@@ -71,6 +71,7 @@ Package org.springframework.osgi.service
 
 Package org.springframework.osgi.mock
 * added specific OSGi r4.2 methods
+* added case insensitive filter comparison to avoid different behaviours between OSGi platforms
 
 Package org.springframework.osgi.test
 * added small improvement for improving detection of inner classes
