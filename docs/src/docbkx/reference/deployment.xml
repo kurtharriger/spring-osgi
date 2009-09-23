@@ -440,7 +440,7 @@ context ::= path ( ';' path ) * (';' directive) *
       <title>Required Spring Framework And Spring Dynamic Modules
       Bundles</title>
 
-      <para>The Spring Dynamic Modules project provides an number of bundle
+      <para>The Spring Dynamic Modules project provides a number of bundle
       artifacts that must be installed in your OSGi platform in order for the
       Spring extender to function correctly:</para>
 
