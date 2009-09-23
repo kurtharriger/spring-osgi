@@ -504,7 +504,8 @@
      	
      	<para>Since 2.3.0, Knopflerfish changed the way it does bootpath delegation which causes classes to be loaded from inside and outside OSGi. Set
      	the system property <literal>org.knopflerfish.framework.strictbootclassloading</literal> to <literal>true</literal> before starting up the Knopflerfish
-     	platform to prevent this from happening. See Knopflerfish 2.3.x release notes for more information.</para>
+     	platform to prevent this from happening. See Knopflerfish 2.3.x release <ulink url="http://www.knopflerfish.org/release_notes_2.3.html">notes</ulink> for more
+     	information.</para>
      </section>     
     </chapter>
 </book>
