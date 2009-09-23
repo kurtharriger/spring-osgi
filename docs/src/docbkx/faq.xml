@@ -473,5 +473,12 @@
 		(notice the missing <literal>bundle</literal> word).
 		To fix this problem, change the reference to the old symbolic name (usually inside the fragments manifests or LDAP filters) to the new one.</para>
      </section>       
+     <section id="kf-2.3-boot-delegation">
+     	<title>I'm using Knopflerfish 2.3.x and I have a lot of visibility exception. How can I fix this?</title>
+     	
+     	<para>Since 2.3.0, Knopflerfish changed the way it does bootpath delegation which causes classes to be loaded from inside and outside OSGi. Set
+     	the system property <literal>org.knopflerfish.framework.strictbootclassloading</literal> to <literal>true</literal> before starting up the Knopflerfish
+     	platform to prevent this from happening. See Knopflerfish 2.3.x release <ulink url="http://www.knopflerfish.org/release_notes_2.3.html">notes</ulink> for more information.</para>
+     </section>     
     </chapter>
 </book>
