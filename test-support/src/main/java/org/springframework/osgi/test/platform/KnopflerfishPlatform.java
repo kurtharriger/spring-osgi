@@ -65,6 +65,12 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 		// new in KF 2.0.4 - automatically exports system packages based on the JRE version
 		props.setProperty("org.knopflerfish.framework.system.export.all", "true");
 
+		// add strict bootpath delegation (introduced in KF 2.3.0)
+		// since otherwise classes will be loaded from the booth classpath
+		// when generating JDK proxies instead of the OSGi space
+		// since KF thinks that a non-OSGi class is making the call.
+		props.setProperty("org.knopflerfish.framework.strictbootclassloading", "true");
+
 		return props;
 	}
 
