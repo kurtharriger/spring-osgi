@@ -108,16 +108,16 @@ public class PublishingServiceFactory implements ServiceFactory {
 		if (createTCCLProxy) {
 			// check proxy cache
 			synchronized (proxyCache) {
-				Object proxy = proxyCache.get(bn);
+                WeakReference value = (WeakReference) proxyCache.get(bn);
+				Object proxy = null;
+				if (value != null) {
+					proxy = value.get();
+				}				
 				if (proxy == null) {
 					proxy = createCLLProxy(bn);
 					proxyCache.put(bn, new WeakReference(proxy));
-					bn = proxy;
 				}
-				else {
-					bn = ((WeakReference) proxy).get();
-				}
-
+				bn = proxy;
 			}
 		}
 
