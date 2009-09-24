@@ -26,38 +26,42 @@ import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.tccl.TCCLService;
 
 /**
- * Test for TCCL handling from the server side. This test checks that the
- * service provider has always priority no matter the client setting.
+ * Test for TCCL handling from the server side. This test checks that the service provider has always priority no matter
+ * the client setting.
  * 
  * @author Costin Leau
  * 
  */
 public class ServiceTcclTest extends BaseIntegrationTest {
 
-	private static final String CLIENT_RESOURCE = "/org/springframework/osgi/iandt/tcclManagement/client-resource.properties";
+	private static final String CLIENT_RESOURCE =
+			"/org/springframework/osgi/iandt/tcclManagement/client-resource.properties";
 
-	private static final String SERVICE_RESOURCE = "/org/springframework/osgi/iandt/tccl/internal/internal-resource.file";
+	private static final String SERVICE_RESOURCE =
+			"/org/springframework/osgi/iandt/tccl/internal/internal-resource.file";
 
 	private static final String SERVICE_PUBLIC_RESOURCE = "/org/springframework/osgi/iandt/tccl/service-resource.file";
 
 	private static final String CLIENT_CLASS = "org.springframework.osgi.iandt.tcclManagement.ServiceTcclTest";
 
-	private static final String SERVICE_CLASS = "org.springframework.osgi.iandt.tccl.internal.PrivateTCCLServiceImplementation";
+	private static final String SERVICE_CLASS =
+			"org.springframework.osgi.iandt.tccl.internal.PrivateTCCLServiceImplementation";
 
 	private static final String SERVICE_PUBLIC_CLASS = "org.springframework.osgi.iandt.tccl.TCCLService";
-
 
 	protected String[] getConfigLocations() {
 		return new String[] { "/org/springframework/osgi/iandt/tcclManagement/service-context.xml" };
 	}
 
 	protected String[] getTestBundlesNames() {
-		return new String[] { "org.springframework.osgi.iandt,tccl," + getSpringDMVersion() };
+		return new String[] { "org.springframework.osgi.iandt,tccl.intf," + getSpringDMVersion(),
+				"org.springframework.osgi.iandt,tccl," + getSpringDMVersion() };
 	}
 
 	public void testSanity() throws Exception {
-		ServiceReference[] refs = bundleContext.getServiceReferences("org.springframework.osgi.iandt.tccl.TCCLService",
-			"(tccl=service-provider)");
+		ServiceReference[] refs =
+				bundleContext.getServiceReferences("org.springframework.osgi.iandt.tccl.TCCLService",
+						"(tccl=service-provider)");
 		System.out.println(bundleContext.getService(refs[0]));
 	}
 
@@ -73,8 +77,7 @@ public class ServiceTcclTest extends BaseIntegrationTest {
 			Thread.currentThread().setContextClassLoader(null);
 			ClassLoader cl = getUnmanagedTCCL().getTCCL();
 			assertNotNull("service provide CL hasn't been set", cl);
-		}
-		finally {
+		} finally {
 			Thread.currentThread().setContextClassLoader(previous);
 		}
 	}
@@ -87,8 +90,7 @@ public class ServiceTcclTest extends BaseIntegrationTest {
 			Thread.currentThread().setContextClassLoader(dummyCL);
 			ClassLoader cl = getUnmanagedTCCL().getTCCL();
 			assertNotSame(dummyCL, cl);
-		}
-		finally {
+		} finally {
 			Thread.currentThread().setContextClassLoader(previous);
 		}
 	}
@@ -108,7 +110,7 @@ public class ServiceTcclTest extends BaseIntegrationTest {
 	}
 
 	public void testServiceProviderTCCLWithClientTCCLWithServiceResource() throws Exception {
-		assertNotNull(getClientTCCL().getTCCL().getResource(SERVICE_PUBLIC_RESOURCE));
+		assertNotNull(getClientTCCL().getTCCL().getResource(SERVICE_PUBLIC_CLASS.replace(".", "/").concat(".class")));
 		assertNotNull(getClientTCCL().getTCCL().getResource(SERVICE_RESOURCE));
 	}
 
@@ -135,8 +137,7 @@ public class ServiceTcclTest extends BaseIntegrationTest {
 		try {
 			cl.loadClass(className);
 			fail("shouldn't be able to load class " + className);
-		}
-		catch (ClassNotFoundException cnfe) {
+		} catch (ClassNotFoundException cnfe) {
 			// expected
 		}
 	}
@@ -160,5 +161,4 @@ public class ServiceTcclTest extends BaseIntegrationTest {
 		perms.add(new AdminPermission("(name=org.springframework.osgi.iandt.tccl)", AdminPermission.RESOURCE));
 		return perms;
 	}
-
 }
