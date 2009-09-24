@@ -28,6 +28,7 @@ Package org.springframework.osgi.context
 * added class loader aware default Class/Class[] property editors
 * fixed cleanup of an internal input stream used for loading property editors
 * added support for schema handler filtering
+* fixed incorrect transitive dependency between exporters and optional importers
 
 Package org.springframework.osgi.compendium
 * enhanced cm-properties to reflect Config Admin changes in the returned Properties object

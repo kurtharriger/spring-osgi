@@ -356,10 +356,9 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 	}
 
 	private boolean isMandatory(Object importer) {
-		if (importer instanceof OsgiServiceProxyFactoryBean) {
-			return Availability.MANDATORY.equals(((OsgiServiceProxyFactoryBean) importer).getAvailability());
-		} else {
-			return Availability.MANDATORY.equals(((OsgiServiceCollectionProxyFactoryBean) importer).getAvailability());
+		if (importer instanceof AbstractOsgiServiceImportFactoryBean) {
+			return Availability.MANDATORY.equals(((AbstractOsgiServiceImportFactoryBean) importer).getAvailability());
 		}
+		return false;
 	}
 }
