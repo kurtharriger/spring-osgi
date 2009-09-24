@@ -19,6 +19,7 @@ package org.springframework.osgi.web.deployer.support;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Dictionary;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,41 +32,26 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link ContextPathStrategy} default implementation. This class takes into
- * account the OSGi bundle properties for determining the war context path. by
- * iterating through the following properties, considering the first one that is
+ * {@link ContextPathStrategy} default implementation. This class takes into account the OSGi bundle properties for
+ * determining the war context path. by iterating through the following properties, considering the first one that is
  * available in the following order:
  * 
- * <ol>
- * <li><tt>Web-ContextPath</tt> manifest header (identical to the one in SpringSource
- * Application Platform). If present, the value of this header will be used as
- * the context path.
- * </li>
+ * <ol> <li><tt>Web-ContextPath</tt> manifest header (identical to the one in SpringSource Application Platform). If
+ * present, the value of this header will be used as the context path. </li>
  * 
- * <li>bundle location - if present, the implementation will try to determine
- * if the location points to a file or a folder. In both cases, the name will be
- * returned without the extension (if it's present):
+ * <li>bundle location - if present, the implementation will try to determine if the location points to a file or a
+ * folder. In both cases, the name will be returned without the extension (if it's present):
  * 
- * <pre class="code">
- * /root/bundle.jar -&gt; /bundle
- * /root/bundle/ -&gt; /bundle
- * /root/bundle.jar/ -&gt; /bundle
- * file:/path/bundle.jar -&gt; /bundle
- * jar:url:/root/bundle.jar -&gt; /bundle
- * </pre>
+ * <pre class="code"> /root/bundle.jar -&gt; /bundle /root/bundle/ -&gt; /bundle /root/bundle.jar/ -&gt; /bundle
+ * file:/path/bundle.jar -&gt; /bundle jar:url:/root/bundle.jar -&gt; /bundle </pre>
  * 
- * </li>
- * <li>bundle name - if present, it is used as a fall back to the bundle
- * location (ex: <tt>/myBundle</tt>)</li>
- * <li>bundle symbolic name - if present, it used as a fall back to the bundle
- * name (ex: <tt>/org.comp.osgi.some.bundle</tt>)</li>
- * <li>bundle identity - if neither of the properties above is present, the
- * bundle object identity will be used as context path (ex:
- * <tt>/BundleImpl-15a0305</tt>)</li>
- * </ol>
+ * </li> <li>bundle name - if present, it is used as a fall back to the bundle location (ex: <tt>/myBundle</tt>)</li>
+ * <li>bundle symbolic name - if present, it used as a fall back to the bundle name (ex:
+ * <tt>/org.comp.osgi.some.bundle</tt>)</li> <li>bundle identity - if neither of the properties above is present, the
+ * bundle object identity will be used as context path (ex: <tt>/BundleImpl-15a0305</tt>)</li> </ol>
  * 
- * Additionally, the returned context path will be HTML encoded (using 'UTF-8')
- * to avoid problems with unsafe characters (such as whitespace).
+ * Additionally, the returned context path will be HTML encoded (using 'UTF-8') to avoid problems with unsafe characters
+ * (such as whitespace).
  * 
  * @see Bundle#getLocation()
  * @see Constants#BUNDLE_NAME
@@ -88,19 +74,20 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 
 	private static final String PREFIX_DELIMITER = ":";
 
+	// "/" should not be encoded
+	private static final Pattern ENCODED_SLASH_PTRN = Pattern.compile("%2F");
+
 	/** determine encoding */
 	static {
 		// do encoding
 		try {
 			URLEncoder.encode(" \"", encodingScheme);
 
-		}
-		catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedEncodingException e) {
 			// platform default
 			encodingScheme = null;
 		}
 	}
-
 
 	public String getContextPath(Bundle bundle) {
 		Assert.notNull(bundle);
@@ -118,9 +105,8 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 	}
 
 	/**
-	 * Determines the context path associated with this bundle. This method can
-	 * be overridden by possible subclasses that wish to decorate or modify the
-	 * existing behaviour.
+	 * Determines the context path associated with this bundle. This method can be overridden by possible subclasses
+	 * that wish to decorate or modify the existing behaviour.
 	 * 
 	 * @param bundle bundle for which the context path needs to be determined
 	 * @return non-null context path determined for the given bundle
@@ -156,24 +142,22 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 
 					// fall back to object identity
 					if (!StringUtils.hasText(path)) {
-						path = ClassUtils.getShortName(bundle.getClass()) + "-"
-								+ ObjectUtils.getIdentityHexString(bundle);
+						path =
+								ClassUtils.getShortName(bundle.getClass()) + "-"
+										+ ObjectUtils.getIdentityHexString(bundle);
 						if (trace)
 							log.trace("No bundle symbolic found; returning bundle identity [" + path
 									+ "] as context path");
-					}
-					else {
+					} else {
 						if (trace)
 							log.trace("Returning bundle symbolic name [" + path + "] as context path");
 					}
-				}
-				else {
+				} else {
 					if (trace)
 						log.trace("Returning bundle name [" + path + "] as context path");
 				}
 			}
-		}
-		else {
+		} else {
 			if (trace)
 				log.trace("Using the bundle " + CONTEXT_PATH_HEADER + " header as context path [" + path + "]");
 		}
@@ -222,9 +206,10 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 
 	private String encodePath(String path) {
 		try {
-			return URLEncoder.encode(path, encodingScheme);
-		}
-		catch (UnsupportedEncodingException ex) {
+			String encode = URLEncoder.encode(path, encodingScheme);
+			String result = ENCODED_SLASH_PTRN.matcher(encode).replaceAll(SLASH);
+			return result;
+		} catch (UnsupportedEncodingException ex) {
 			throw (RuntimeException) new IllegalStateException((encodingScheme == null ? "default " : encodingScheme)
 					+ " encoding scheme detected but unsable").initCause(ex);
 		}
