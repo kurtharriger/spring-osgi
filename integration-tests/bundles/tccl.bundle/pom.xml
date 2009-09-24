@@ -15,5 +15,14 @@
     <description>An OSGi test bundle that gives access to the TCCL during service invocations</description>
     <url>http://www.springframework.org/osgi</url>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>tccl.intf</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
 </project>
 
