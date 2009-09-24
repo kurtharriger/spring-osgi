@@ -36,7 +36,6 @@ public class DefaultContextPathStrategyTest extends TestCase {
 
 	private ContextPathStrategy strategy;
 
-
 	protected void setUp() throws Exception {
 		strategy = new DefaultContextPathStrategy();
 	}
@@ -106,8 +105,8 @@ public class DefaultContextPathStrategyTest extends TestCase {
 		final String expectedContextPath = "/folder";
 		final String location = "/root" + expectedContextPath + ".extension/";
 
-		assertEquals("extension should not be removed when dealing with folders", expectedContextPath,
-			strategy.getContextPath(createBundleWithLocation(location)));
+		assertEquals("extension should not be removed when dealing with folders", expectedContextPath, strategy
+				.getContextPath(createBundleWithLocation(location)));
 	}
 
 	public void testBundleWithFolderButNoLeadingSlash() throws Exception {
@@ -288,5 +287,23 @@ public class DefaultContextPathStrategyTest extends TestCase {
 		Bundle bundle = new MockBundle(headers);
 		String path = strategy.getContextPath(bundle);
 		assertEquals(value.trim(), path);
+	}
+
+	public void testWebContextWithNestedPath() throws Exception {
+		String value = "/web/my/app";
+		Dictionary headers = new Properties();
+		headers.put("Web-ContextPath", value);
+		Bundle bundle = new MockBundle(headers);
+		String path = strategy.getContextPath(bundle);
+		assertEquals(value, path);
+	}
+
+	public void testWebContextWithNestedPathAndMultipleSlashes() throws Exception {
+		String value = "/web/my/super/uber-nice/app/";
+		Dictionary headers = new Properties();
+		headers.put("Web-ContextPath", value);
+		Bundle bundle = new MockBundle(headers);
+		String path = strategy.getContextPath(bundle);
+		assertEquals(value, path);
 	}
 }
