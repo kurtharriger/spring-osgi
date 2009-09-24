@@ -55,6 +55,7 @@
     <module>configuration.test.bundle</module>
     <module>extender.version.bundle</module>
     <module>config.bundle</module>
+    <module>tccl.intf.bundle</module>    
     <module>tccl.bundle</module>
     <module>config.file.with.dots.bundle</module>
     <module>proxy.creator.bundle</module>
