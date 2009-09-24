@@ -101,13 +101,15 @@ public class PublishingServiceFactory implements ServiceFactory {
 			// check proxy cache
 			synchronized (proxyCache) {
 				WeakReference<Object> value = proxyCache.get(bn);
-				if (value == null) {
-					Object proxy = createCLLProxy(bn);
-					proxyCache.put(bn, new WeakReference<Object>(proxy));
-					bn = proxy;
-				} else {
-					bn = value.get();
+				Object proxy = null;
+				if (value != null) {
+					proxy = value.get();
 				}
+				if (proxy == null) {
+					proxy = createCLLProxy(bn);
+					proxyCache.put(bn, new WeakReference<Object>(proxy));
+				}
+				bn = proxy;
 			}
 		}
 
