@@ -16,7 +16,6 @@
 
 package org.springframework.osgi.iandt.servicedependency;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.osgi.framework.AdminPermission;
@@ -30,8 +29,7 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.util.Assert;
 
 /**
- * Integration test with multiple imports that are hooked inside the same
- * exporter.
+ * Integration test with multiple imports that are hooked inside the same exporter.
  * 
  * @author Costin Leau
  * 
@@ -44,16 +42,16 @@ public class SingleExportDependingOnMultipleImportTest extends BaseIntegrationTe
 
 	private static final String SERVICE_2_SYM_NAME = "org.springframework.osgi.iandt.simpleservice2";
 
-
 	protected String[] getConfigLocations() {
 		return new String[] { "org/springframework/osgi/iandt/servicedependency/single-export-multi-import.xml" };
 	}
 
 	protected String[] getTestBundlesNames() {
 		// load the tccl bundle, plus simple.service + simple.service.2
-		return new String[] { "org.springframework.osgi.iandt, tccl," + getSpringDMVersion(),
-			"org.springframework.osgi.iandt, simple.service," + getSpringDMVersion(),
-			"org.springframework.osgi.iandt, simple.service2," + getSpringDMVersion() };
+		return new String[] { "org.springframework.osgi.iandt,tccl.intf," + getSpringDMVersion(),
+				"org.springframework.osgi.iandt, tccl," + getSpringDMVersion(),
+				"org.springframework.osgi.iandt, simple.service," + getSpringDMVersion(),
+				"org.springframework.osgi.iandt, simple.service2," + getSpringDMVersion() };
 	}
 
 	public void testOneImporterCGoesDownAndThenUpAgain() throws Exception {

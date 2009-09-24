@@ -39,15 +39,15 @@ public class CollectionImporterTest extends BaseIntegrationTest {
 
 	private static final String SERVICE_SYM_NAME = "org.springframework.osgi.iandt.simpleservice";
 
-
 	protected String[] getConfigLocations() {
 		return new String[] { "org/springframework/osgi/iandt/servicedependency/multi-export-multi-collection-import.xml" };
 	}
 
 	protected String[] getTestBundlesNames() {
 		// load the tccl bundle, plus simple.service
-		return new String[] { "org.springframework.osgi.iandt, tccl," + getSpringDMVersion(),
-			"org.springframework.osgi.iandt, simple.service," + getSpringDMVersion() };
+		return new String[] { "org.springframework.osgi.iandt,tccl.intf," + getSpringDMVersion(),
+				"org.springframework.osgi.iandt, tccl," + getSpringDMVersion(),
+				"org.springframework.osgi.iandt, simple.service," + getSpringDMVersion() };
 	}
 
 	public void testExporterAWhenImporterAGoesDownAndUp() throws Exception {

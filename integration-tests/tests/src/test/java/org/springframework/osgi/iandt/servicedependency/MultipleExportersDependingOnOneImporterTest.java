@@ -24,13 +24,12 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.tccl.TCCLService;
-import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.util.Assert;
 
 /**
- * Integration test for the dependency between exporters and importers. Tests
- * multiple exports relying on the same importer.
+ * Integration test for the dependency between exporters and importers. Tests multiple exports relying on the same
+ * importer.
  * 
  * @author Costin Leau
  * 
@@ -39,10 +38,10 @@ public class MultipleExportersDependingOnOneImporterTest extends BaseIntegration
 
 	private static final String DEP_SYN_NAME = "org.springframework.osgi.iandt.tccl";
 
-
 	protected String[] getTestBundlesNames() {
 		// load the tccl bundle as it exposes a simple service
-		return new String[] { "org.springframework.osgi.iandt,tccl," + getSpringDMVersion() };
+		return new String[] { "org.springframework.osgi.iandt,tccl.intf," + getSpringDMVersion(),
+				"org.springframework.osgi.iandt,tccl," + getSpringDMVersion() };
 	}
 
 	protected synchronized String[] getConfigLocations() {
@@ -102,8 +101,8 @@ public class MultipleExportersDependingOnOneImporterTest extends BaseIntegration
 
 		// double check the service space
 		assertNull("exporterA service should be unregistered", bundleContext.getServiceReference(Map.class.getName()));
-		assertNull("exporterB service should be unregistered",
-			bundleContext.getServiceReference(SimpleBean.class.getName()));
+		assertNull("exporterB service should be unregistered", bundleContext.getServiceReference(SimpleBean.class
+				.getName()));
 
 		dependency.start();
 		waitOnContextCreation(DEP_SYN_NAME);

@@ -177,7 +177,7 @@
         
         <dependency>
             <groupId>org.springframework.osgi.iandt</groupId>
-            <artifactId>tccl</artifactId>
+            <artifactId>tccl.intf</artifactId>
             <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
