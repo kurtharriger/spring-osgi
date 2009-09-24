@@ -21,37 +21,42 @@ import java.net.URLClassLoader;
 import java.util.List;
 
 import org.osgi.framework.AdminPermission;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleException;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.tccl.TCCLService;
+import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
- * Test for TCCL handling only on the client side. That is the service doesn't
- * provide any handling.
+ * Test for TCCL handling only on the client side. That is the service doesn't provide any handling.
  * 
  * @author Costin Leau
  * 
  */
 public class ClientOnlyTcclTest extends BaseIntegrationTest {
 
-	private static final String CLIENT_RESOURCE = "/org/springframework/osgi/iandt/tcclManagement/client-resource.properties";
+	private static final String CLIENT_RESOURCE =
+			"/org/springframework/osgi/iandt/tcclManagement/client-resource.properties";
 
-	private static final String SERVICE_RESOURCE = "/org/springframework/osgi/iandt/tccl/internal/internal-resource.file";
+	private static final String SERVICE_RESOURCE =
+			"/org/springframework/osgi/iandt/tccl/internal/internal-resource.file";
 
 	private static final String SERVICE_PUBLIC_RESOURCE = "/org/springframework/osgi/iandt/tccl/service-resource.file";
 
 	private static final String CLIENT_CLASS = "org.springframework.osgi.iandt.tcclManagement.ClientOnlyTcclTest";
 
-	private static final String SERVICE_CLASS = "org.springframework.osgi.iandt.tccl.internal.PrivateTCCLServiceImplementation";
+	private static final String SERVICE_CLASS =
+			"org.springframework.osgi.iandt.tccl.internal.PrivateTCCLServiceImplementation";
 
 	private static final String SERVICE_PUBLIC_CLASS = "org.springframework.osgi.iandt.tccl.TCCLService";
-
 
 	protected String[] getConfigLocations() {
 		return new String[] { "/org/springframework/osgi/iandt/tcclManagement/client-context.xml" };
 	}
 
 	protected String[] getTestBundlesNames() {
-		return new String[] { "org.springframework.osgi.iandt,tccl," + getSpringDMVersion() };
+		return new String[] { "org.springframework.osgi.iandt,tccl.intf," + getSpringDMVersion(),
+				"org.springframework.osgi.iandt,tccl," + getSpringDMVersion() };
 	}
 
 	public void testTCCLUnmanaged() throws Exception {
@@ -66,8 +71,7 @@ public class ClientOnlyTcclTest extends BaseIntegrationTest {
 			Thread.currentThread().setContextClassLoader(null);
 			ClassLoader cl = getUnmanagedTCCL().getTCCL();
 			assertNull(cl);
-		}
-		finally {
+		} finally {
 			Thread.currentThread().setContextClassLoader(previous);
 		}
 	}
@@ -80,8 +84,7 @@ public class ClientOnlyTcclTest extends BaseIntegrationTest {
 			Thread.currentThread().setContextClassLoader(dummyCL);
 			ClassLoader cl = getUnmanagedTCCL().getTCCL();
 			assertSame(dummyCL, cl);
-		}
-		finally {
+		} finally {
 			Thread.currentThread().setContextClassLoader(previous);
 		}
 	}
@@ -108,13 +111,12 @@ public class ClientOnlyTcclTest extends BaseIntegrationTest {
 	}
 
 	public void testClientTCCLWithServiceResource() throws Exception {
-		assertNotNull(getClientTCCL().getTCCL().getResource(SERVICE_PUBLIC_RESOURCE));
 		assertNull(getClientTCCL().getTCCL().getResource(SERVICE_RESOURCE));
 	}
 
 	public void testServiceProvidedTCCLOnClasses() throws Exception {
+		refreshTCCLBundle();
 		ClassLoader cl = getServiceProviderTCCL().getTCCL();
-
 		cl.loadClass(SERVICE_PUBLIC_CLASS);
 		cl.loadClass(SERVICE_CLASS);
 	}
@@ -135,8 +137,7 @@ public class ClientOnlyTcclTest extends BaseIntegrationTest {
 		try {
 			cl.loadClass(className);
 			fail("shouldn't be able to load class " + className);
-		}
-		catch (ClassNotFoundException cnfe) {
+		} catch (ClassNotFoundException cnfe) {
 			// expected
 		}
 	}
@@ -151,6 +152,14 @@ public class ClientOnlyTcclTest extends BaseIntegrationTest {
 
 	private TCCLService getClientTCCL() {
 		return (TCCLService) applicationContext.getBean("client");
+	}
+
+	private void refreshTCCLBundle() {
+		Bundle bundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext, "org.springframework.osgi.iandt.tccl");
+		try {
+			bundle.update();
+		} catch (BundleException be) {
+		}
 	}
 
 	protected List getTestPermissions() {

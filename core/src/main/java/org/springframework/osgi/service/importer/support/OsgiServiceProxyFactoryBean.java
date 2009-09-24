@@ -38,6 +38,7 @@ import org.springframework.osgi.service.importer.support.internal.controller.Imp
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
 import org.springframework.osgi.service.importer.support.internal.support.RetryTemplate;
 import org.springframework.osgi.util.internal.ClassUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * OSGi (single) service importer. This implementation creates a managed OSGi service proxy that handles the OSGi
@@ -131,8 +132,11 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 
 		// first create the TCCL interceptor to register its listener with the
 		// dynamic interceptor
-		final ServiceProviderTCCLInterceptor tcclAdvice = new ServiceProviderTCCLInterceptor();
-		final OsgiServiceLifecycleListener tcclListener = tcclAdvice.new ServiceProviderTCCLListener();
+		boolean serviceTccl = ImportContextClassLoaderEnum.SERVICE_PROVIDER.equals(getImportContextClassLoader());
+
+		final ServiceProviderTCCLInterceptor tcclAdvice = (serviceTccl ? new ServiceProviderTCCLInterceptor() : null);
+		final OsgiServiceLifecycleListener tcclListener =
+				(serviceTccl ? tcclAdvice.new ServiceProviderTCCLListener() : null);
 
 		Class<?> filterClass = ClassUtils.getParticularClass(getInterfaces());
 		String filterClassName = (filterClass != null ? filterClass.getName() : null);
@@ -144,7 +148,9 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 		lookupAdvice.setUseBlueprintExceptions(isUseBlueprintExceptions());
 		lookupAdvice.setSticky(sticky);
 
-		OsgiServiceLifecycleListener[] listeners = addListener(getListeners(), tcclListener);
+		OsgiServiceLifecycleListener[] listeners =
+				(serviceTccl ? (OsgiServiceLifecycleListener[]) ObjectUtils.addObjectToArray(getListeners(),
+						tcclListener) : getListeners());
 
 		lookupAdvice.setListeners(listeners);
 		synchronized (monitor) {
@@ -261,9 +267,9 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	}
 
 	/**
-	 * Sets the stickiness of this proxy. If 'true' (default), the proxy will rebind only if the backing service is no longer
-	 * available. If 'false', the rebind will occur every time a 'better' candidate appears. A better service is defined
-	 * by having either a higher ranking or the same ranking and a lower service id.
+	 * Sets the stickiness of this proxy. If 'true' (default), the proxy will rebind only if the backing service is no
+	 * longer available. If 'false', the rebind will occur every time a 'better' candidate appears. A better service is
+	 * defined by having either a higher ranking or the same ranking and a lower service id.
 	 * 
 	 * @param sticky sticky flag
 	 */

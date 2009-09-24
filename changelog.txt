@@ -70,6 +70,7 @@ Package org.springframework.osgi.service
 * added 'cache target' option on service exporter for compatible behaviour with OSGi 4.2 Blueprint spec
 * added 'reference-listener' as alias for the 'listener' reference declaration
 * fixed exporter tccl management bug caused by garbaged collected proxies
+* added several internal improvements to the importer tccl management
 
 Package org.springframework.osgi.mock
 * added specific OSGi r4.2 methods

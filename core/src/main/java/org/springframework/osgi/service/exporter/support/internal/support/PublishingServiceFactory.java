@@ -27,7 +27,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.osgi.service.util.internal.aop.ProxyUtils;
 import org.springframework.osgi.service.util.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.util.DebugUtils;
