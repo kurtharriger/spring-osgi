@@ -76,7 +76,7 @@ class ListListenerAdapter implements OsgiBundleApplicationContextListener<OsgiBu
 						Class<?> evtType =
 								GenericTypeResolver.resolveTypeArgument(listenerClass,
 										OsgiBundleApplicationContextListener.class);
-						if (evtType.isAssignableFrom(OsgiBundleApplicationContextEvent.class)) {
+						if (evtType != null && evtType.isAssignableFrom(OsgiBundleApplicationContextEvent.class)) {
 							eventCache.put(listenerClass, eventType);
 						} else {
 							eventCache.put(listenerClass, OsgiBundleApplicationContextEvent.class);
