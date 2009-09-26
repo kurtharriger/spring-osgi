@@ -19,7 +19,7 @@
 
   <properties>
     <!-- Spring version -->
-    <spring.maven.artifact.version>3.0.0.BUILD-SNAPSHOT</spring.maven.artifact.version>
+    <spring.maven.artifact.version>3.0.0.RC1</spring.maven.artifact.version>
     <spring.base.version>3.0.0</spring.base.version>
     
     <!--- Spring OSGi packages imported version (respect the OSGi naming pattern)-->
@@ -38,7 +38,7 @@
    <slf4j.version>1.5.6</slf4j.version>
    
    <!-- platform versions -->
-   <equinox.ver>3.5.0.v20090520</equinox.ver>
+   <equinox.ver>3.5.1.R35x_v20090827</equinox.ver>
    <kf.ver>3.0.0.alpha1</kf.ver>
    <felix.ver>2.0.0</felix.ver>
    
@@ -1004,7 +1004,7 @@ Ignored-Existing-Headers:
     </repository>
     <repository>
         <id>com.springsource.repository.bundles.external</id>
-        <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+        <name>SpringSource Enterprise Bundle Repository - External Bundle External</name>
         <url>http://repository.springsource.com/maven/bundles/external</url>
     </repository>
     <repository>

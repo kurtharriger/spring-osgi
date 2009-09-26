@@ -12,12 +12,12 @@
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.org.apache.commons.logging/1.5.6/com.springsource.slf4j.org.apache.commons.logging-1.5.6.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
-	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.0.v20090520/org.eclipse.osgi-3.5.0.v20090520.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.1.R35x_v20090827/org.eclipse.osgi-3.5.1.R35x_v20090827.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/2.0.0-m1-SNAPSHOT/spring-osgi-core-2.0.0-m1-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-web"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/3.0.0.BUILD-SNAPSHOT/org.springframework.context-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="/SPRING_TIGER_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.beans/3.0.0.BUILD-SNAPSHOT/org.springframework.beans-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="M2_REPO/org/springframework/org.springframework.beans/3.0.0.BUILD-SNAPSHOT/org.springframework.beans-3.0.0.BUILD-SNAPSHOT-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.core/3.0.0.BUILD-SNAPSHOT/org.springframework.core-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="/SPRING_TIGER_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/3.0.0.RC1/org.springframework.context-3.0.0.RC1.jar" sourcepath="/SPRING_TIGER_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.beans/3.0.0.RC1/org.springframework.beans-3.0.0.RC1.jar" sourcepath="M2_REPO/org/springframework/org.springframework.beans/3.0.0.RC1/org.springframework.beans-3.0.0.RC1-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.core/3.0.0.RC1/org.springframework.core-3.0.0.RC1.jar" sourcepath="/SPRING_TIGER_SRC"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-extender"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
