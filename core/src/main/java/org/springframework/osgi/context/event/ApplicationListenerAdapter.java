@@ -16,10 +16,6 @@
 
 package org.springframework.osgi.context.event;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.SmartApplicationListener;
@@ -34,11 +30,8 @@ import org.springframework.core.GenericTypeResolver;
  */
 class ApplicationListenerAdapter<E extends OsgiBundleApplicationContextEvent> implements SmartApplicationListener {
 
-	private static final Class<OsgiBundleApplicationContextListener> LISTENER_CLASS =
-			OsgiBundleApplicationContextListener.class;
-
 	private final OsgiBundleApplicationContextListener<E> osgiListener;
-	private final Class<? extends OsgiBundleApplicationContextEvent> eventType;
+	private final Class<?> eventType;
 	private final String toString;
 
 	static <E extends OsgiBundleApplicationContextEvent> ApplicationListenerAdapter<E> createAdapter(
@@ -48,46 +41,15 @@ class ApplicationListenerAdapter<E extends OsgiBundleApplicationContextEvent> im
 
 	private ApplicationListenerAdapter(OsgiBundleApplicationContextListener<E> listener) {
 		this.osgiListener = listener;
-		this.eventType = getGenericEventType(listener.getClass());
+		Class<?> evtType =
+				GenericTypeResolver
+						.resolveTypeArgument(listener.getClass(), OsgiBundleApplicationContextListener.class);
+		this.eventType = (evtType == null ? OsgiBundleApplicationContextEvent.class : evtType);
+
 		toString = "ApplicationListenerAdapter for listener " + osgiListener;
 	}
 
-	static Class<? extends OsgiBundleApplicationContextEvent> getGenericEventType(
-			Class<? extends OsgiBundleApplicationContextListener> clazz) {
-		return getGenericEventType(clazz, clazz);
-	}
-
-	// taken from Spring Framework
-	private static Class<? extends OsgiBundleApplicationContextEvent> getGenericEventType(
-			Class<? extends OsgiBundleApplicationContextListener> currentClass,
-			Class<? extends OsgiBundleApplicationContextListener> ownerClass) {
-		Class<?> classToIntrospect = currentClass;
-		while (classToIntrospect != null) {
-			Type[] ifcs = classToIntrospect.getGenericInterfaces();
-			for (Type ifc : ifcs) {
-				if (ifc instanceof ParameterizedType) {
-					ParameterizedType paramIfc = (ParameterizedType) ifc;
-					Type rawType = paramIfc.getRawType();
-					if (LISTENER_CLASS.equals(rawType)) {
-						Type arg = paramIfc.getActualTypeArguments()[0];
-						if (arg instanceof TypeVariable) {
-							arg = GenericTypeResolver.resolveTypeVariable((TypeVariable) arg, ownerClass);
-						}
-						if (arg instanceof Class) {
-							return (Class) arg;
-						}
-					} else if (LISTENER_CLASS.isAssignableFrom((Class) rawType)) {
-						return getGenericEventType((Class) rawType, ownerClass);
-					}
-				} else if (LISTENER_CLASS.isAssignableFrom((Class) ifc)) {
-					return getGenericEventType((Class) ifc, ownerClass);
-				}
-			}
-			classToIntrospect = classToIntrospect.getSuperclass();
-		}
-		return OsgiBundleApplicationContextEvent.class;
-	}
-
+	@SuppressWarnings("unchecked")
 	public void onApplicationEvent(ApplicationEvent event) {
 		if (eventType.isInstance(event)) {
 			osgiListener.onOsgiApplicationEvent((E) event);
@@ -107,7 +69,7 @@ class ApplicationListenerAdapter<E extends OsgiBundleApplicationContextEvent> im
 	}
 
 	public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
-		return (eventType.isAssignableFrom(eventType));
+		return (eventType != null && eventType.isAssignableFrom(eventType));
 	}
 
 	public boolean supportsSourceType(Class<?> sourceType) {

@@ -17,6 +17,7 @@ package org.springframework.osgi.extender.internal.activator;
 
 import junit.framework.TestCase;
 
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
 import org.springframework.osgi.context.event.OsgiBundleContextClosedEvent;
@@ -41,20 +42,22 @@ public class GenericsTest extends TestCase {
 	}
 
 	public void testRawType() throws Exception {
-		assertSame(OsgiBundleApplicationContextEvent.class, ListListenerAdapter.getGenericEventType(RawListener.class));
+		assertSame(null, GenericTypeResolver.resolveTypeArgument(RawListener.class,
+				OsgiBundleApplicationContextListener.class));
 	}
 
 	public void testGenericType() throws Exception {
-		assertSame(OsgiBundleApplicationContextEvent.class, ListListenerAdapter
-				.getGenericEventType(GenericListener.class));
+		assertSame(OsgiBundleApplicationContextEvent.class, GenericTypeResolver.resolveTypeArgument(
+				GenericListener.class, OsgiBundleApplicationContextListener.class));
 	}
 
 	public void testSpecializedType() throws Exception {
-		assertSame(OsgiBundleContextClosedEvent.class, ListListenerAdapter
-				.getGenericEventType(SpecializedListener.class));
+		assertSame(OsgiBundleContextClosedEvent.class, GenericTypeResolver.resolveTypeArgument(
+				SpecializedListener.class, OsgiBundleApplicationContextListener.class));
 	}
 
 	public void testNestedListener() throws Exception {
-		assertSame(OsgiBundleContextClosedEvent.class, ListListenerAdapter.getGenericEventType(NestedListener.class));
+		assertSame(OsgiBundleContextClosedEvent.class, GenericTypeResolver.resolveTypeArgument(NestedListener.class,
+				OsgiBundleApplicationContextListener.class));
 	}
 }
