@@ -11,10 +11,10 @@
     <url>http://www.springframework.org/osgi</url>
 
     <properties>
-        <slf4j.version>1.5.0</slf4j.version>
-        <spring.maven.artifact.version>2.5.6.A</spring.maven.artifact.version>
+        <slf4j.version>1.5.6</slf4j.version>
+        <spring.maven.artifact.version>3.0.0.RC1</spring.maven.artifact.version>
         <spring.osgi.version>2.0.0-m1-SNAPSHOT</spring.osgi.version>
-        <equinox.ver>3.2.2</equinox.ver>
+        <equinox.ver>3.5.1.R35x_v20090827</equinox.ver>
     </properties>
 
     <dependencies>
@@ -141,9 +141,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>log4j.osgi</artifactId>
-            <version>1.2.15-SNAPSHOT</version>
+            <groupId>org.apache.log4j</groupId>
+            <artifactId>com.springsource.org.apache.log4j</artifactId>
+            <version>1.2.15</version>
             <scope>test</scope>
         </dependency>
 
@@ -170,7 +170,7 @@
             <plugin>
                 <groupId>com.springsource.bundlor</groupId>
                 <artifactId>com.springsource.bundlor.maven</artifactId>
-                <version>1.0.0.M2</version>
+                <version>1.0.0.M6</version>
                 <configuration>
                     <outputManifest>${basedir}/META-INF/MANIFEST.MF</outputManifest>                
                     <failOnWarnings>false</failOnWarnings>

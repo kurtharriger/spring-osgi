@@ -499,7 +499,7 @@ limitations under the License.
         <plugin>
           <groupId>com.springsource.bundlor</groupId>
           <artifactId>com.springsource.bundlor.maven</artifactId>
-          <version>1.0.0.M2</version>
+          <version>1.0.0.M6</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -1004,7 +1004,7 @@ Ignored-Existing-Headers:
     </repository>
     <repository>
         <id>com.springsource.repository.bundles.external</id>
-        <name>SpringSource Enterprise Bundle Repository - External Bundle External</name>
+        <name>SpringSource Enterprise Bundle Repository - External Bundle Release</name>
         <url>http://repository.springsource.com/maven/bundles/external</url>
     </repository>
     <repository>
