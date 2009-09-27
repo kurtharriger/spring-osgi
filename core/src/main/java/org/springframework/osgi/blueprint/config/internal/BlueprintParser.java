@@ -120,7 +120,10 @@ public class BlueprintParser {
 		// let Spring do its standard parsing
 		BeanDefinitionHolder bdHolder = parseComponentDefinitionElement(componentElement, null);
 
-		bdHolder.getBeanDefinition().setAttribute(ParsingUtils.BLUEPRINT_MARKER_NAME, Boolean.TRUE);
+		BeanDefinition bd = bdHolder.getBeanDefinition();
+		if (bd != null) {
+			bd.setAttribute(ParsingUtils.BLUEPRINT_MARKER_NAME, Boolean.TRUE);
+		}
 
 		return bdHolder;
 	}
