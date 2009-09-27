@@ -20,11 +20,11 @@
 
 	
     <!--- Spring OSGi packages imported version (respect the OSGi naming pattern)-->
-    <spring.osgi.import.version>2.0.0.m1</spring.osgi.import.version>
+    <spring.osgi.import.version>2.0.0.M1</spring.osgi.import.version>
     
     <!--- Spring OSGi packages exported version -->
-    <spring.osgi.export.version>2.0.0.m1</spring.osgi.export.version>
-    <spring.osgi.bundle.version>2.0.0.m1</spring.osgi.bundle.version>
+    <spring.osgi.export.version>2.0.0.M1</spring.osgi.export.version>
+    <spring.osgi.bundle.version>2.0.0.M1</spring.osgi.bundle.version>
 
     <spring.osgi.symbolic.name>
         org.springframework.osgi.blueprint.uber
@@ -154,7 +154,7 @@
             <plugin>
                 <groupId>com.springsource.bundlor</groupId>
                 <artifactId>com.springsource.bundlor.maven</artifactId>
-                <version>1.0.0.M2</version>
+                <version>1.0.0.M6</version>
                 <inherited>false</inherited>
                 <executions>
                   <execution>
@@ -244,4 +244,12 @@ Export-Package:
             <url>s3://maven.springframework.org/snapshot</url>
         </snapshotRepository>
     </distributionManagement>
+    
+    <repositories>
+        <repository>
+        <id>spring-milestone</id>
+        <name>Spring Portfolio Milestone Repository</name>
+        <url>http://maven.springframework.org/milestone</url>
+        </repository>
+    </repositories>
 </project>

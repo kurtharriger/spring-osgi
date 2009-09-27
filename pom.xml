@@ -675,9 +675,6 @@ Ignored-Existing-Headers:
         <osgi.test.platform>org.springframework.osgi.test.platform.EquinoxPlatform</osgi.test.platform>
         <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
-      <modules>
-        <module>blueprint/packaging</module>
-      </modules>
     </profile>
     
     <profile>
