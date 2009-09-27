@@ -24,7 +24,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
- * Adapter factory that allows translating Spring metadata into Blueprint {@link ComponentMetadata}.
+ * Adapter factory that translates Blueprint {@link ComponentMetadata} into Spring {@link BeanDefinition}s (and vice
+ * versa).
  * 
  * @author Adrian Colyer
  * @author Costin Leau

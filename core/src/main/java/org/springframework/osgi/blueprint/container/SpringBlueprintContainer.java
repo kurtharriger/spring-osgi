@@ -34,7 +34,7 @@ import org.springframework.osgi.blueprint.reflect.MetadataFactory;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Default {@link ModuleContext} implementation. Wraps a Spring's {@link ConfigurableListableBeanFactory} to the
+ * Default {@link BlueprintContainer} implementation. Wraps a Spring's {@link ConfigurableListableBeanFactory} to the
  * BlueprintContainer interface.
  * 
  * <b>Note</b>: This class does not fully implements the Blueprint contract: for example it does not fire any of the
