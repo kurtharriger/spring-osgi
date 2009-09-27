@@ -11,4 +11,4 @@ http\://www.springframework.org/schema/osgi-compendium@icon=org/springframework/
 # Tooling related information for the blueprint namespace
 http\://www.osgi.org/xmlns/blueprint/v1.0.0@name=blueprint Namespace
 http\://www.osgi.org/xmlns/blueprint/v1.0.0@prefix=bp
-http\://www.osgi.org/xmlns/blueprint/v1.0.0@icon=org/springframework/osgi/config/spring-osgi.gif
+http\://www.osgi.org/xmlns/blueprint/v1.0.0@icon=org/springframework/osgi/blueprint/config/spring-bp.gif
