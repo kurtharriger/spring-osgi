@@ -19,7 +19,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.PackageAdmin;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 /**
  * Internal utility used for internal purposes.
@@ -37,7 +36,7 @@ public abstract class BundleUtils {
 			if (service instanceof PackageAdmin) {
 				PackageAdmin pa = (PackageAdmin) service;
 				if (pa != null) {
-					return pa.getBundle(OsgiBundleXmlApplicationContext.class);
+					return pa.getBundle(BundleUtils.class);
 				}
 			}
 		}
