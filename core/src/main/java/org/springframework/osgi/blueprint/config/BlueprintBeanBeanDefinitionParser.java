@@ -23,10 +23,11 @@ import org.springframework.osgi.blueprint.config.internal.BlueprintParser;
 import org.w3c.dom.Element;
 
 /**
- * @author Costin Leau
+ * Parser handling Blueprint &lt;bean&gt; elements.
  * 
+ * @author Costin Leau
  */
-public class BlueprintBeanBeanDefinitionParser implements BeanDefinitionParser {
+class BlueprintBeanBeanDefinitionParser implements BeanDefinitionParser {
 
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		BlueprintParser parser = new BlueprintParser();

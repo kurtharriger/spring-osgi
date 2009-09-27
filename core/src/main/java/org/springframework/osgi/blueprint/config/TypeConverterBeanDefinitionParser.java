@@ -37,7 +37,7 @@ import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
- * Parser handling &lt;type-converters&gt; elements.
+ * Parser handling Blueprint &lt;type-converters&gt; elements.
  * 
  * Transforms the {@link Converter converters} into {@link PropertyEditor} through a dedicated
  * {@link PropertyEditorRegistrar registrar} that gets registers through a {@link CustomEditorConfigurer}.
@@ -47,7 +47,7 @@ import org.w3c.dom.Element;
  * @author Costin Leau
  * 
  */
-public class TypeConverterBeanDefinitionParser extends AbstractBeanDefinitionParser {
+class TypeConverterBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 	private static final String EDITOR_CONFIGURER_PROPERTY = "propertyEditorRegistrars";
 	public static final String TYPE_CONVERTERS = "type-converters";
