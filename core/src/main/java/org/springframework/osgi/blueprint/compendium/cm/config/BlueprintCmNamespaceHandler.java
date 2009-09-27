@@ -27,7 +27,7 @@ import org.springframework.osgi.compendium.config.internal.ManagedServiceFactory
  * 
  * @author Costin Leau
  */
-public class BlueprintCmNamespaceHandler extends NamespaceHandlerSupport {
+class BlueprintCmNamespaceHandler extends NamespaceHandlerSupport {
 
 	static final String MANAGED_PROPS = "managed-properties";
 	static final String MANAGED_FACTORY_PROPS = "managed-service-factory";
