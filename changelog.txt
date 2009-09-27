@@ -2,13 +2,13 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
-Changes in version 2.0.0 M1 (2009-mm-dd)
+Changes in version 2.0.0 M1 (2009-09-28)
 ----------------------------------------
 
 General
 * JDK 5.0 required for both building and running; for JDK 1.4 support use 1.2.x branch
 * upgraded to Spring Framework 3.0
-* upgraded to Equinox 3.5.0
+* upgraded to Equinox 3.5.1
 * upgraded to Knopflerfish 3.0.0.alfa1
 * upgraded to Felix 1.8.1
 * generified classes (both public and internal)
