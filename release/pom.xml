@@ -48,6 +48,7 @@
 							<descriptors>
 								<descriptor>src/assembly/no-dependencies.xml</descriptor>
 							</descriptors>
+							<attach>false</attach>
 						</configuration>
 					</execution>
 
@@ -63,10 +64,19 @@
 							<descriptors>
 								<descriptor>src/assembly/with-dependencies.xml</descriptor>
 							</descriptors>
+                            <attach>false</attach>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 
