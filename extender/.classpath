@@ -12,7 +12,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.core/3.0.0.RC1/org.springframework.core-3.0.0.RC1.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.beans/3.0.0.RC1/org.springframework.beans-3.0.0.RC1.jar" sourcepath="M2_REPO/org/springframework/org.springframework.beans/3.0.0.RC1/org.springframework.beans-3.0.0.RC1-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.org.apache.commons.logging/1.5.6/com.springsource.slf4j.org.apache.commons.logging-1.5.6.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/blueprint/api/2.0.0-m1-SNAPSHOT/api-2.0.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/blueprint/api/2.0.0.M1/api-2.0.0.M1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>

@@ -3,7 +3,7 @@
   <parent>
     <artifactId>spring-osgi</artifactId>
     <groupId>org.springframework.osgi</groupId>
-    <version>2.0.0-m1-SNAPSHOT</version>
+    <version>2.0.0.M1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi.samples.web-console</groupId>
@@ -29,13 +29,6 @@
       <artifactId>org.springframework.asm</artifactId>
       <scope>provided</scope>
       <version>${spring.maven.artifact.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>com.springsource.org.antlr</artifactId>
-      <scope>provided</scope>
-      <version>3.0.1</version>
     </dependency>
 
     <dependency>
