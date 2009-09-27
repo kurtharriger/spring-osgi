@@ -13,6 +13,7 @@ General
 * upgraded to Felix 1.8.1
 * generified classes (both public and internal)
 * updated archetype project to save locally the manifest generated during packaging
+* aligned artifacts versioning with Spring Framework by uppercasing the qualifier (m1 becomes M1)
 * added new elements to spring-osgi schema
 * align various features with the OSGi r4.2 Blueprint spec
 
