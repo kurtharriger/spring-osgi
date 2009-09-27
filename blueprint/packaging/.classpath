@@ -4,7 +4,7 @@
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.1.R35x_v20090827/org.eclipse.osgi-3.5.1.R35x_v20090827.jar" sourcepath="/EQUINOX_SRC/src.zip"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/2.0.0-m1-SNAPSHOT/spring-osgi-extender-2.0.0-m1-SNAPSHOT.jar" sourcepath="/OSGI_RFC_124/extender/src/main/java"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/rfc124/ri/extender/2.0.0-m1-SNAPSHOT/extender-2.0.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/2.0.0.M1/spring-osgi-extender-2.0.0.M1.jar" sourcepath="/OSGI_RFC_124/extender/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/rfc124/ri/extender/2.0.0.M1/extender-2.0.0.M1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
