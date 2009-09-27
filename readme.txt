@@ -54,11 +54,12 @@ this full distribution ZIP file if you want to run the sample applications and/o
 Maven 2 pom.xml are provided for building the sources.
  
 Latest info is available at the public website: http://www.springframework.org/osgi
-Project info at the SourceForge site: http://sourceforge.net/projects/springframework
+Project info at the SourceForge site: http://www.springsource.org/about
 
 Spring Dynamic Modules is released under the terms of the Apache Software License (see license.txt).
 All libraries included in the "-with-dependencies" download are subject to their respective licenses.
-This product includes software developed by the Apache Software Foundation (http://www.apache.org).
+This product includes software developed by the Apache Software Foundation (http://www.apache.org) and 
+OSGi Alliance (http://www.osgi.org).
 
 3. DISTRIBUTION JAR FILES
 

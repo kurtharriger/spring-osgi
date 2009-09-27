@@ -30,7 +30,7 @@ distribution/website before using any of them in your own applications.
 - required for building and running the framework's test suite
 
 * framework.jar
-- Knopflerfish 2.3.0 OSGi platform implementation (http://www.knopflerfish.org) 
+- Knopflerfish 3.x OSGi platform implementation (http://www.knopflerfish.org) 
 - required for building and running the framework's test suite
  
 * jcl104-over-slf4j.jar
@@ -62,20 +62,16 @@ distribution/website before using any of them in your own applications.
 - used for running the samples on JDK 1.4
 
 * org.apache.felix.main.jar
-- Apache Felix 1.4.1 OSGi platform implementation (http://felix.apache.org)
+- Apache Felix 2.x OSGi platform implementation (http://felix.apache.org)
 - required for building and running the framework's test suite
 
 * org.eclipse.osgi.jar
-- Eclipse Equinox 3.4.3 OSGi platform implementation (http://www.eclipse.org/equinox)
+- Eclipse Equinox 3.5.x OSGi platform implementation (http://www.eclipse.org/equinox)
 - required for building and running the framework's test suite
 
 * osgi_R4_compendium.jar
 - OSGi Compendium API 1.0 (http://www.osgi.org)
 - required for building and running the framework's test suite
-
-* retrotranslator-runtime.jar
-- Retrotranslator backporting library 1.2.3 (http://retrotranslator.sourceforge.net)
-- required for running the framework's test suite on JDK 1.4
 
 * servlet-api-2.5.jar
 - Servlet API version 2.5 (http://java.sun.com/products/servlet/)
