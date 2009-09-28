@@ -11,9 +11,9 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.core/3.0.0.RC1/org.springframework.core-3.0.0.RC1.jar" sourcepath="M2_REPO/org/springframework/org.springframework.core/3.0.0.RC1/org.springframework.core-3.0.0.RC1-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.beans/3.0.0.RC1/org.springframework.beans-3.0.0.RC1.jar" sourcepath="M2_REPO/org/springframework/org.springframework.beans/3.0.0.RC1/org.springframework.beans-3.0.0.RC1-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/2.0.0.M1/spring-osgi-mock-2.0.0.M1.jar" sourcepath="/OSGI_MOCK"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/2.0.0.M1/spring-osgi-core-2.0.0.M1.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/2.0.0.M1/spring-osgi-extender-2.0.0.M1.jar" sourcepath="/OSGI_SRC_ROOT/extender/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/2.0.0.M2-SNAPSHOT/spring-osgi-mock-2.0.0.M1.jar" sourcepath="/OSGI_MOCK"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/2.0.0.M2-SNAPSHOT/spring-osgi-core-2.0.0.M1.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/2.0.0.M2-SNAPSHOT/spring-osgi-extender-2.0.0.M1.jar" sourcepath="/OSGI_SRC_ROOT/extender/src/main/java"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.api/1.5.6/com.springsource.slf4j.api-1.5.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.juli/1.5.6/com.springsource.slf4j.juli-1.5.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.aop/3.0.0.RC1/org.springframework.aop-3.0.0.RC1.jar" sourcepath="/SPRING_SRC"/>
