@@ -100,10 +100,10 @@
 
   <scm>
     <connection>
-      scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
+      scm:svn:http://anonsvn.springframework.org/svn/spring-osgi/trunk
     </connection>
     <developerConnection>
-      scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
+      scm:svn:https://src.springframework.org/svn/spring-osgi/trunk
     </developerConnection>
     <url>https://fisheye.springframework.org/browse/spring-osgi</url>
   </scm>
