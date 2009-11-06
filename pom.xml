@@ -134,10 +134,10 @@
 
   <scm>
     <connection>
-      scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-osgi/branches/1.2
+      scm:svn:http://anonsvn.springframework.org/svn/spring-osgi/branches/spring-osgi-1.2
     </connection>
     <developerConnection>
-      scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-osgi/branches/1.2
+      scm:svn:https://src.springframework.org/svn/spring-osgi/branches/spring-osgi-1.2
     </developerConnection>
     <url>https://fisheye.springframework.org/browse/spring-osgi</url>
   </scm>
