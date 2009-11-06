@@ -24,9 +24,10 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
-import org.knopflerfish.framework.FrameworkContext;
+import org.knopflerfish.framework.FrameworkFactoryImpl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.launch.Framework;
 import org.springframework.beans.BeanUtils;
 import org.springframework.osgi.test.internal.util.IOUtils;
 import org.springframework.util.ClassUtils;
@@ -85,27 +86,10 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 	}
 
 	private static class KF3Platform implements Platform {
-		private static final Class<?> BOOT_CLASS;
-		private static final Constructor<?> CONSTRUCTOR;
-		private static final Method GET_BUNDLE_CONTEXT;
-
 		private Bundle framework;
 		private final Map properties;
 		private final Log log;
 		private FrameworkTemplate fwkTemplate;
-
-		static {
-
-			BOOT_CLASS = ClassUtils.resolveClassName(KF_3X_BOOT_CLASS, KF3Platform.class.getClassLoader());
-
-			try {
-				CONSTRUCTOR = BOOT_CLASS.getDeclaredConstructor(Map.class, BOOT_CLASS);
-			} catch (NoSuchMethodException nsme) {
-				throw new IllegalArgumentException("Invalid framework class", nsme);
-			}
-
-			GET_BUNDLE_CONTEXT = ReflectionUtils.findMethod(BOOT_CLASS, "getSystemBundleContext");
-		}
 
 		KF3Platform(Map properties, Log log) {
 			this.properties = properties;
@@ -113,17 +97,12 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 		}
 
 		public BundleContext start() {
-			FrameworkContext fwkContext = new FrameworkContext(properties, null);
-
-			Field systemBundle = ReflectionUtils.findField(fwkContext.getClass(), "systemBundle");
-			ReflectionUtils.makeAccessible(systemBundle);
-
-			framework = (Bundle) ReflectionUtils.getField(systemBundle, fwkContext);
+			framework = new FrameworkFactoryImpl().newFramework(properties);
 			fwkTemplate = new DefaultFrameworkTemplate(framework, log);
 			fwkTemplate.init();
 			fwkTemplate.start();
 
-			return (BundleContext) ReflectionUtils.invokeMethod(GET_BUNDLE_CONTEXT, fwkContext);
+			return framework.getBundleContext();
 		}
 
 		public void stop() {

@@ -5,6 +5,10 @@ http://www.springframework.org/osgi
 Changes in version 2.0.0 M2 (2009-mm-dd)
 ----------------------------------------
 
+General
+* upgraded to Felix 2.0.2
+* upgraded to Knopflerfish 3.0.0.beta3
+
 
 Changes in version 2.0.0 M1 (2009-09-28)
 ----------------------------------------
