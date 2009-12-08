@@ -15,6 +15,7 @@
  */
 package org.springframework.osgi;
 
+import java.beans.PropertyEditor;
 import java.util.Dictionary;
 
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -25,6 +26,12 @@ public class DictionaryEditorTest extends AbstractDependencyInjectionSpringConte
 
 	private Dictionary dictionary;
 
+	
+	protected void prepareTestInstance() throws Exception {
+		setAutowireMode(AbstractDependencyInjectionSpringContextTests.AUTOWIRE_BY_NAME);
+		super.prepareTestInstance();
+	}
+
 	/**
 	 * @param dictionary The dictionary to set.
 	 */
@@ -32,12 +39,16 @@ public class DictionaryEditorTest extends AbstractDependencyInjectionSpringConte
 		this.dictionary = property;
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.test.AbstractSingleSpringContextTests#customizeBeanFactory(org.springframework.beans.factory.support.DefaultListableBeanFactory)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.test.AbstractSingleSpringContextTests#customizeBeanFactory(org.springframework.beans.factory
+	 * .support.DefaultListableBeanFactory)
 	 */
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
-		beanFactory.registerCustomEditor(Dictionary.class, new PropertiesEditor());
+		// beanFactory.registerCustomEditor(Dictionary.class, new PropertiesEditor());
+		beanFactory.registerCustomEditor(Dictionary.class, PropertiesEditor.class);
 		super.customizeBeanFactory(beanFactory);
 	}
 

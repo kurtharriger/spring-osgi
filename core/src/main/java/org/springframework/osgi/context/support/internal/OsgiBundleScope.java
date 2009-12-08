@@ -231,4 +231,9 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 		destructionCallbacks.clear();
 		localBeans.clear();
 	}
+	
+	// handle Spring 3.0 expression related scope
+	public Object resolveContextualObject(String key) {
+		return null;
+	}
 }

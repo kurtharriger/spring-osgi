@@ -19,7 +19,6 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 
-
 /**
  * @author Costin Leau
  */
@@ -37,4 +36,9 @@ public class DummyApplicationEventMulticaster implements ApplicationEventMultica
 	public void removeApplicationListener(ApplicationListener arg0) {
 	}
 
+	public void addApplicationListenerBean(String str) {
+	}
+
+	public void removeApplicationListenerBean(String str) {
+	}
 }
