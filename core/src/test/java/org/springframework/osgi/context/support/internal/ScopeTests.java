@@ -65,6 +65,10 @@ public class ScopeTests extends TestCase {
 			System.out.println("destroying bean " + name);
 			return null;
 		}
+		
+		public Object resolveContextualObject(String key) {
+			return null;
+		}
 	}
 
 	private class FooScope extends AbstractScope {
