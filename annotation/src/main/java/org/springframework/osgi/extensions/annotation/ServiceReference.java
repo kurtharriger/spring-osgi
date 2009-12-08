@@ -61,7 +61,12 @@ public @interface ServiceReference {
      * Whether or not to proxy greedily in collection references.
      */
     boolean greedyProxying() default false;
-
+    
+    /**
+     * Whether or not to create a 'sticky' (singular) service reference.
+     */
+    boolean sticky() default true;
+    
     /**
 	 * filter used to narrow service matches, may be null
 	 */
