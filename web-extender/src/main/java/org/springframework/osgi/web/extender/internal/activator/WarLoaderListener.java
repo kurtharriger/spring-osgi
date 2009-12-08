@@ -45,9 +45,8 @@ import org.springframework.scheduling.timer.TimerTaskExecutor;
 import org.springframework.util.Assert;
 
 /**
- * OSGi specific listener that bootstraps web applications packed as WARs (Web
- * ARchives). Additionally, it makes the BundleContext available in the
- * ServletContext so that various components can look it up.
+ * OSGi specific listener that bootstraps web applications packed as WARs (Web ARchives). Additionally, it makes the
+ * BundleContext available in the ServletContext so that various components can look it up.
  * 
  * @author Costin Leau
  * 
@@ -67,33 +66,32 @@ public class WarLoaderListener implements BundleActivator {
 			boolean trace = log.isTraceEnabled();
 
 			switch (event.getType()) {
-				case BundleEvent.STARTED: {
-					if (trace)
-						log.trace("Processing " + OsgiStringUtils.nullSafeToString(event) + " event for bundle "
-								+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
+			case BundleEvent.STARTED: {
+				if (trace)
+					log.trace("Processing " + OsgiStringUtils.nullSafeToString(event) + " event for bundle "
+							+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
 
-					maybeDeployWar(bundle);
+				maybeDeployWar(bundle);
 
-					break;
-				}
-				case BundleEvent.STOPPING: {
-					if (trace)
-						log.trace("Processing " + OsgiStringUtils.nullSafeToString(event) + " event for bundle "
-								+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
+				break;
+			}
+			case BundleEvent.STOPPING: {
+				if (trace)
+					log.trace("Processing " + OsgiStringUtils.nullSafeToString(event) + " event for bundle "
+							+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
 
-					maybeUndeployWar(bundle);
+				maybeUndeployWar(bundle);
 
-					break;
-				}
-				default:
-					break;
+				break;
+			}
+			default:
+				break;
 			}
 		}
 	}
 
 	/**
-	 * Simple WAR deployment manager. Handles the IO process involved in
-	 * deploying and undeploying the war.
+	 * Simple WAR deployment manager. Handles the IO process involved in deploying and undeploying the war.
 	 */
 	private class DeploymentManager implements DisposableBean {
 
@@ -108,7 +106,6 @@ public class WarLoaderListener implements BundleActivator {
 		private final TimerTaskExecutor executor = new TimerTaskExecutor();
 		/** on-going task monitor */
 		final Counter onGoingTask = new Counter("ongoing-task");
-
 
 		public DeploymentManager() {
 			executor.afterPropertiesSet();
@@ -170,8 +167,7 @@ public class WarLoaderListener implements BundleActivator {
 					Thread thread = new Thread(undeployBundlesRunnable, "Spring-DM WebExtender[" + extenderVersion
 							+ "] war undeployment thread");
 					thread.start();
-				}
-				else {
+				} else {
 					// if there's a task currently on going, wait for it
 					if (onGoingTask.waitForZero(SHUTDOWN_WAIT_TIME)) {
 						log.debug("An on-going deploy/undeploy task did not finish in time; continuing shutdown...");
@@ -181,7 +177,6 @@ public class WarLoaderListener implements BundleActivator {
 			}
 		}
 
-
 		private abstract class BaseTask implements Runnable {
 
 			/** bundle to deploy */
@@ -190,7 +185,6 @@ public class WarLoaderListener implements BundleActivator {
 			final String bundleName;
 			/** work monitor */
 			final Counter counter;
-
 
 			/**
 			 * Constructs a new <code>BaseTask</code> instance.
@@ -208,8 +202,7 @@ public class WarLoaderListener implements BundleActivator {
 			/**
 			 * {@inheritDoc}
 			 * 
-			 * Add counter to prevent shutting down while tasks are still
-			 * running.
+			 * Add counter to prevent shutting down while tasks are still running.
 			 */
 			public final void run() {
 				counter.increment();
@@ -220,8 +213,7 @@ public class WarLoaderListener implements BundleActivator {
 
 				try {
 					doRun();
-				}
-				finally {
+				} finally {
 					counter.decrement();
 					if (trace)
 						log.trace("Decrementing work counter for " + toString());
@@ -239,7 +231,6 @@ public class WarLoaderListener implements BundleActivator {
 
 			private final String contextPath;
 
-
 			public DeployTask(Bundle bundle, String contextPath, Counter counter) {
 				super(bundle, counter);
 				this.contextPath = contextPath;
@@ -254,11 +245,19 @@ public class WarLoaderListener implements BundleActivator {
 						}
 					}
 
+					// check if the bundle has been already deployed
+					if (bundlesToDeployments.containsKey(bundle)) {
+						if (log.isDebugEnabled()) {
+							log.debug("Bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle)
+									+ " is already deployed; ignoring...");
+						}
+						return;
+					}
+
 					WarDeployment deployment = warDeployer.deploy(bundle, contextPath);
-					// deploy the bundle 
+					// deploy the bundle
 					bundlesToDeployments.put(bundle, deployment);
-				}
-				catch (OsgiWarDeploymentException ex) {
+				} catch (OsgiWarDeploymentException ex) {
 					// log exception
 					log.error("War deployment of bundle " + bundleName + " failed", ex);
 				}
@@ -278,15 +277,13 @@ public class WarLoaderListener implements BundleActivator {
 				if (deployment != null)
 					try {
 						deployment.undeploy();
-					}
-					catch (OsgiWarDeploymentException ex) {
+					} catch (OsgiWarDeploymentException ex) {
 						// log exception
 						log.error("War undeployment of bundle " + bundleName + " failed", ex);
 					}
 			}
 		}
 	}
-
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(WarLoaderListener.class);
@@ -327,7 +324,6 @@ public class WarLoaderListener implements BundleActivator {
 	/** flag indicated whether the extender has been stopped */
 	private boolean destroyed = false;
 
-
 	/**
 	 * Constructs a new <code>WarLoaderListener</code> instance.
 	 * 
@@ -340,9 +336,8 @@ public class WarLoaderListener implements BundleActivator {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * Bootstrapping procedure. Monitors deployed bundles and will scan for WARs
-	 * known locations. Once such a war is detected, the web application will be
-	 * deployed through a specific web deployer.
+	 * Bootstrapping procedure. Monitors deployed bundles and will scan for WARs known locations. Once such a war is
+	 * detected, the web application will be deployed through a specific web deployer.
 	 */
 	public void start(final BundleContext context) throws Exception {
 		synchronized (lock) {
@@ -376,8 +371,7 @@ public class WarLoaderListener implements BundleActivator {
 							// register war listener
 							warListener = new WarBundleListener();
 							context.addBundleListener(warListener);
-						}
-						else {
+						} else {
 							// clean up the configuration
 							config.destroy();
 						}
@@ -395,13 +389,11 @@ public class WarLoaderListener implements BundleActivator {
 							maybeDeployWar(bundle);
 						}
 					}
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					log.error("Cannot property start Spring DM WebExtender; stopping bundle...", ex);
 					try {
 						context.getBundle().stop();
-					}
-					catch (Exception excep) {
+					} catch (Exception excep) {
 						log.debug("Stopping of the extender bundle failed", excep);
 					}
 				}
@@ -448,8 +440,7 @@ public class WarLoaderListener implements BundleActivator {
 
 			if (webXML != null) {
 				msg = msg + "web.xml found at [" + webXML + "])";
-			}
-			else
+			} else
 				msg = msg + "no web.xml detected)";
 
 			log.info(msg);

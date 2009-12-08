@@ -12,6 +12,9 @@ General
 Package org.springframework.osgi.bundle
 * added sticky attribute to ServiceReference annotation
 
+Package org.springframework.osgi.web
+* added check to prevent deployed WARs from being redeployed (which can cause problems in some containers)
+
 
 Changes in version 2.0.0 M1 (2009-09-28)
 ----------------------------------------
