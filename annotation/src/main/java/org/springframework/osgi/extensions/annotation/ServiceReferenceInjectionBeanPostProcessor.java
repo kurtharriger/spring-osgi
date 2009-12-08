@@ -93,6 +93,12 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
                 ((OsgiServiceCollectionProxyFactoryBean) importer).setGreedyProxying(greedy);
             }
         }
+        
+        static void setSticky(Object importer, boolean sticky) {
+            if (importer instanceof OsgiServiceProxyFactoryBean) {
+                ((OsgiServiceProxyFactoryBean) importer).setSticky(sticky);
+            }
+        }
 
 		static void afterPropertiesSet(Object importer) throws Exception {
 			((InitializingBean) importer).afterPropertiesSet();
@@ -234,6 +240,7 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 			ImporterCallAdapter.setInterfaces(pfb, s.serviceTypes());
 		}
 		ImporterCallAdapter.setCardinality(pfb, s.cardinality().toCardinality());
+		ImporterCallAdapter.setSticky(pfb, s.sticky());
 		ImporterCallAdapter.setContextClassLoader(pfb, s.contextClassLoader().toImportContextClassLoader());
 		ImporterCallAdapter.setBundleContext(pfb, bundleContext);
 
