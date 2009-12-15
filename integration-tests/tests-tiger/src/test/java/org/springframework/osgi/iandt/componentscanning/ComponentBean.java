@@ -32,7 +32,7 @@ public class ComponentBean {
 
 	private Shape constructorInjection;
 	@Autowired
-	private Cloneable fieldInjection;
+	private Shape fieldInjection;
 
 	private Shape setterInjection;
 
@@ -60,7 +60,7 @@ public class ComponentBean {
 	 * 
 	 * @return Returns the fieldInjection
 	 */
-	public Cloneable getFieldInjection() {
+	public Shape getFieldInjection() {
 		return fieldInjection;
 	}
 
