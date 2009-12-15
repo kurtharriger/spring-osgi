@@ -15,7 +15,7 @@
  */
 package org.springframework.osgi.iandt.testingFramework;
 
-import java.io.Serializable;
+import java.util.HashMap;
 
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 
@@ -28,15 +28,15 @@ import org.springframework.osgi.iandt.BaseIntegrationTest;
  */
 public class AppCtxInjectionTest extends BaseIntegrationTest {
 
-	private Serializable serializable;
+	private HashMap map;
 
-	public void setSerializable(Serializable serializable) {
-		this.serializable = serializable;
+	public void setMap(HashMap map) {
+		this.map = map;
 	}
 
 	public void testInjection() throws Exception {
-		assertNotNull(serializable);
-		assertEquals(applicationContext.getBean("injected-bean"), serializable);
+		assertNotNull(map);
+		assertEquals(applicationContext.getBean("injected-bean"), map);
 	}
 
 	protected String[] getConfigLocations() {
