@@ -2,7 +2,7 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
-Changes in version 2.0.0 M2 (2009-mm-dd)
+Changes in version 2.0.0 M2 (2010-mm-dd)
 ----------------------------------------
 
 General
@@ -11,6 +11,9 @@ General
 
 Package org.springframework.osgi.bundle
 * added sticky attribute to ServiceReference annotation
+
+Package org.springframework.osgi.test
+* added check for unresolved fragments during test startup
 
 Package org.springframework.osgi.web
 * added check to prevent deployed WARs from being redeployed (which can cause problems in some containers)
