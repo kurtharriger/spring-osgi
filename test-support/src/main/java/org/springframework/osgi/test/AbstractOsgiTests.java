@@ -41,8 +41,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Base test for OSGi environments. Takes care of configuring the chosen OSGi platform, starting it, installing a number
- * of bundles and delegating the test execution to a test copy that runs inside OSGi.
+ * Base test for OSGi environments. Takes care of configuring the chosen OSGi
+ * platform, starting it, installing a number of bundles and delegating the test
+ * execution to a test copy that runs inside OSGi.
  * 
  * @author Costin Leau
  */
@@ -72,15 +73,18 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	protected ResourceLoader resourceLoader;
 
 	/**
-	 * Hook for JUnit infrastructures which can't reuse this class hierarchy. This instance represents the test which
-	 * will be executed by AbstractOsgiTests & co.
+	 * Hook for JUnit infrastructures which can't reuse this class hierarchy.
+	 * This instance represents the test which will be executed by
+	 * AbstractOsgiTests & co.
 	 */
 	private TestCase osgiJUnitTest = this;
 
 	private static final String ACTIVATOR_REFERENCE = "org.springframework.osgi.test.JUnitTestActivator";
 
+
 	/**
-	 * Default constructor. Constructs a new <code>AbstractOsgiTests</code> instance.
+	 * Default constructor. Constructs a new <code>AbstractOsgiTests</code>
+	 * instance.
 	 */
 	public AbstractOsgiTests() {
 		super();
@@ -96,8 +100,9 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	/**
-	 * Returns the test framework bundles (part of the test setup). Used by the test infrastructure. Override this
-	 * method <i>only</i> if you want to change the jars used by default, by the testing infrastructure.
+	 * Returns the test framework bundles (part of the test setup). Used by the
+	 * test infrastructure. Override this method <i>only</i> if you want to
+	 * change the jars used by default, by the testing infrastructure.
 	 * 
 	 * User subclasses should use {@link #getTestBundles()} instead.
 	 * 
@@ -121,11 +126,13 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	protected abstract OsgiPlatform createPlatform() throws Exception;
 
 	/**
-	 * Pre-processes the bundle context. This call back gives access to the platform bundle context before any bundles
-	 * have been installed. The method is invoked <b>after</b> starting the OSGi environment but <b>before</b> any
-	 * bundles are installed in the OSGi framework.
+	 * Pre-processes the bundle context. This call back gives access to the
+	 * platform bundle context before any bundles have been installed. The
+	 * method is invoked <b>after</b> starting the OSGi environment but
+	 * <b>before</b> any bundles are installed in the OSGi framework.
 	 * 
-	 * <p/> Normally, this method is called only once during the lifecycle of a test suite.
+	 * <p/> Normally, this method is called only once during the lifecycle of a
+	 * test suite.
 	 * 
 	 * @param platformBundleContext the platform bundle context
 	 * @throws Exception if processing the bundle context fails
@@ -136,13 +143,17 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	/**
-	 * Post-processes the bundle context. This call back gives access to the platform bundle context after the critical
-	 * test infrastructure bundles have been installed and started. The method is invoked <b>after</b> preparing the
-	 * OSGi environment for the test execution but <b>before</b> any test is executed.
+	 * Post-processes the bundle context. This call back gives access to the
+	 * platform bundle context after the critical test infrastructure bundles
+	 * have been installed and started. The method is invoked <b>after</b>
+	 * preparing the OSGi environment for the test execution but <b>before</b>
+	 * any test is executed.
 	 * 
-	 * The given <code>BundleContext</code> belongs to the underlying OSGi framework.
+	 * The given <code>BundleContext</code> belongs to the underlying OSGi
+	 * framework.
 	 * 
-	 * <p/> Normally, this method is called only one during the lifecycle of a test suite.
+	 * <p/> Normally, this method is called only one during the lifecycle of a
+	 * test suite.
 	 * 
 	 * @param platformBundleContext the platform bundle context
 	 * @see #preProcessBundleContext(BundleContext)
@@ -157,8 +168,9 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <p/> Replacement run method. Gets a hold of the TestRunner used for running this test so it can populate it with
-	 * the results retrieved from OSGi.
+	 * <p/> Replacement run method. Gets a hold of the TestRunner used for
+	 * running this test so it can populate it with the results retrieved from
+	 * OSGi.
 	 */
 	public final void run(TestResult result) {
 
@@ -186,13 +198,15 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			logger.warn("**** " + getClass().getName() + "." + getName() + " disabled in this environment: "
 					+ "Total disabled tests=" + getDisabledTestCount());
 			return;
-		} else {
+		}
+		else {
 			prepareTestExecution();
 			try {
 				// invoke OSGi test run
 				invokeOSGiTestExecution();
 				readTestResult();
-			} finally {
+			}
+			finally {
 				// nothing to clean up
 			}
 		}
@@ -203,7 +217,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	//
 
 	/**
-	 * Starts the OSGi platform and install/start the bundles (happens once for the all test runs)
+	 * Starts the OSGi platform and install/start the bundles (happens once for
+	 * the all test runs)
 	 * 
 	 * @throws Exception
 	 */
@@ -299,7 +314,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 		try {
 			bundleLocation = URLDecoder.decode(location.getURL().toExternalForm(), UTF_8_CHARSET);
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			// the URL cannot be created, fall back to the description
 			bundleLocation = location.getDescription();
 		}
@@ -323,17 +339,15 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 				logger.debug("Starting " + info);
 			try {
 				bundle.start();
-			} catch (BundleException ex) {
+			}
+			catch (BundleException ex) {
 				logger.error("cannot start bundle " + info, ex);
 				throw ex;
 			}
-		} else {
-			if (OsgiBundleUtils.isBundleResolved(bundle)) {
-				logger.error("fragment not resolved: " + info);
-				throw new BundleException("Unable to resolve fragment: " + info);
-			} else if (debug)
-				logger.debug(info + " is a fragment; start not invoked");
 		}
+
+		else if (debug)
+			logger.debug(info + " is a fragment; start not invoked");
 	}
 
 	//
@@ -342,7 +356,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 	// runs outside OSGi
 	/**
-	 * Prepares test execution - the OSGi platform will be started (if needed) and cached for the test suite execution.
+	 * Prepares test execution - the OSGi platform will be started (if needed)
+	 * and cached for the test suite execution.
 	 */
 	private void prepareTestExecution() throws Exception {
 
@@ -357,7 +372,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		// start OSGi platform (the caching is done inside the method).
 		try {
 			startup();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			logger.debug("Caught exception starting up", e);
 			throw e;
 		}
@@ -379,7 +395,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		Assert.notNull(serviceTrigger, "no executeTest() method found on: " + service.getClass());
 		try {
 			serviceTrigger.invoke(service, null);
-		} catch (InvocationTargetException ex) {
+		}
+		catch (InvocationTargetException ex) {
 			Throwable th = ex.getCause();
 			if (th instanceof Exception)
 				throw ((Exception) th);
@@ -389,7 +406,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	/**
-	 * Determines through reflection the methods used for invoking the TestRunnerService.
+	 * Determines through reflection the methods used for invoking the
+	 * TestRunnerService.
 	 * 
 	 * @throws Exception
 	 */
@@ -413,8 +431,9 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	/**
-	 * Tries to get the bundle context for spring-osgi-test-support bundle. This is useful on platform where the
-	 * platformContext or system BundleContext doesn't behave like a normal context.
+	 * Tries to get the bundle context for spring-osgi-test-support bundle. This
+	 * is useful on platform where the platformContext or system BundleContext
+	 * doesn't behave like a normal context.
 	 * 
 	 * Will fallback to {@link #platformContext}.
 	 * 
@@ -429,7 +448,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		if (id != null)
 			try {
 				ctx = OsgiBundleUtils.getBundleContext(platformContext.getBundle(id.longValue()));
-			} catch (RuntimeException ex) {
+			}
+			catch (RuntimeException ex) {
 				logger.trace("cannot determine bundle context for bundle " + id, ex);
 			}
 
@@ -472,7 +492,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		if (osgiPlatform != null) {
 			try {
 				osgiPlatform.stop();
-			} catch (Exception ex) {
+			}
+			catch (Exception ex) {
 				// swallow
 				logger.warn("Shutdown procedure threw exception " + ex);
 			}
@@ -487,7 +508,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	/**
 	 * Set the bundle context to be used by this test.
 	 * 
-	 * <p/> This method is called automatically by the test infrastructure after the OSGi platform is being setup.
+	 * <p/> This method is called automatically by the test infrastructure after
+	 * the OSGi platform is being setup.
 	 */
 	private void injectBundleContext(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
@@ -498,7 +520,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	/**
 	 * Set the underlying OsgiJUnitTest used for the test delegation.
 	 * 
-	 * <p/> This method is called automatically by the test infrastructure after the OSGi platform is being setup.
+	 * <p/> This method is called automatically by the test infrastructure after
+	 * the OSGi platform is being setup.
 	 * 
 	 * @param test
 	 */
