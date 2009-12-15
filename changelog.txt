@@ -32,9 +32,6 @@ Package org.springframework.osgi.service
 Package org.springframework.osgi.mock
 * added case insensitive filter comparison to avoid different behaviours between OSGi platforms
 
-Package org.springframework.osgi.test
-* added check for unresolved fragments during test startup
-
 Package org.springframework.osgi.web
 * improved encoding of nested context paths
 * added check to prevent deployed WARs from being redeployed (which can cause problems in some containers)
