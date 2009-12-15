@@ -398,15 +398,13 @@ Fragment-Host: org.springframework.osgi.web.extender</programlisting>
 			
 			<para>Since Jetty is OSGi-ready by default, the official distribution can be installed without any transformation/processing on the OSGi platform. However,
 			since there is no activator, Spring DM provides one, similar in functionality to the one available for Tomcat. The activator has 
-			<literal>jetty.start.osgi</literal> as artifact id. Just like the Tomcat case, a default configuration is included which starts a Jetty
-			instance on <literal>localhost</literal>, port <literal>8080</literal>. To change the defaults, place your Jetty configuration under 
-			<literal>etc/jetty.xml</literal> location.</para>			 
+			<literal>jetty.start.osgi</literal> as artifact id. Similar to the Tomcat case, a default configuration bundle (named <literal>jetty.etc.osgi</literal>) is provided for starting a Jetty instance on <literal>localhost</literal>, port <literal>8080</literal>. To change the defaults, place your Jetty configuration under <literal>etc/jetty.xml</literal> location (either by updating the provided bundle by using a custom one).</para>			 
 			
 			<para>To attach <link linkend="appendix-tips:fragments">fragments</link> to the Jetty activator, specify the following host name in the fragment manifest:</para>
 			<programlisting><![CDATA[Fragment-Host: org.springframework.osgi.jetty.start.osgi]]></programlisting>
 		</section>
 		
-		<para>Just like the extender, each activator uses a default configuration if the user doesn't provide one. For the latter case, one should use fragments 
+		<para>Just like the extender, each activator uses a default configuration which can be overridden by the user. For the latter case, one should use fragments 
 		(as mentioned above) to provide a customized configuration and to avoid modifying the distribution jar.</para>
 		</section>
 
