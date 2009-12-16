@@ -328,10 +328,10 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 				throw ex;
 			}
 		} else {
-			if (OsgiBundleUtils.isBundleResolved(bundle)) {
-				logger.error("fragment not resolved: " + info);
-				throw new BundleException("Unable to resolve fragment: " + info);
-			} else if (debug)
+//			if (!OsgiBundleUtils.isBundleResolved(bundle)) {
+//				logger.error("fragment not resolved: " + info);
+//				throw new BundleException("Unable to resolve fragment: " + info);
+//			} else if (debug)
 				logger.debug(info + " is a fragment; start not invoked");
 		}
 	}
