@@ -41,7 +41,7 @@
 		<section id="get-started:first-steps:blueprint">
 			<title>Quick start - OSGi 4.2 Blueprint Container</title>
 			<para>As an alternative to the recommended Spring documentation, if OSGi 4.2 is an option, one can read the Blueprint Container specification
-			for a quick introdution to dependency injection and Spring DM functionality. Note that Blueprint is a subset of Spring and Spring DM and we recommend
+			for a quick introduction to dependency injection and Spring DM functionality. Note that Blueprint is a subset of Spring and Spring DM and we recommend
 			the official documentation to get access to the whole set of features.
 			</para>
 		</section>		

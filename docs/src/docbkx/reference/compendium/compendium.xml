@@ -317,8 +317,8 @@ public class SelfManagedBean {
 		</programlistingco>	
 		
 		<para>In its simplest form, the <literal>managed-service-factory</literal> requires the <emphasis>factory pid</emphasis>, a <emphasis>bean definition</emphasis>
-		used as a template and some information on how possible bean instances are published as services. Basically, the definition above instructs Spring DM to
-		to monitor the given factory pid (through a dedicated <interfacename>ManagedServiceFactory</interfacename> implementation (see the Compendium Spec for 
+		used as a template and some information on how possible bean instances are published as services. Basically, the definition above instructs 
+		Spring DM to monitor the given factory pid (through a dedicated <interfacename>ManagedServiceFactory</interfacename> implementation (see the Compendium Spec for 
 		more info)) and for every <interfacename>Configuration</interfacename> object associated with the factory pid, to create a new, anonymous instance of 
 		the nested bean declared and export that instance as an OSGi service. The lifecycle of these beans instances is tied to the lifecycle of the 
 		associated <interfacename>Configuration</interfacename> objects. If a new configuration is added, a new bean is created and exported.

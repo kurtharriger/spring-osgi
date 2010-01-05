@@ -1971,8 +1971,8 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
     <section id="service-registry:refs:invoker-bundle-context">
       <title>Accessing The Caller <interfacename>BundleContext</interfacename></title>
       
-      <para>It is sometime useful for an imported service to know which bundle is using it
-      at a certain time. To help with this scenarion, in Spring DM imported services publish
+      <para>It is sometimes useful for an imported service to know which bundle is using it
+      at a certain time. To help with this scenario, in Spring DM imported services publish
       the importing bundle <interfacename>BundleContext</interfacename> through 
       <classname>LocalBundleContext</classname> class. Each time a method on the importer is invoked,
       the caller <interfacename>BundleContext</interfacename> will be made available, using

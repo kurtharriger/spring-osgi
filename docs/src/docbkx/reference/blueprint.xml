@@ -69,9 +69,9 @@
             <tbody>
               <row>
                 <entry>Namespace Declaration</entry>
-                <entry><literal>http://www.osgi.org/xmlns/blueprint/v1.0.0</literal></entry>
                 <entry><para><literal>http://www.springframework.org/schema/beans</literal></para> 
                 <para>or <literal>http://www.springframework.org/schema/osgi</literal></para></entry>
+                <entry><literal>http://www.osgi.org/xmlns/blueprint/v1.0.0</literal></entry>
               </row>
               <row>
                 <entry>Root Element</entry>
