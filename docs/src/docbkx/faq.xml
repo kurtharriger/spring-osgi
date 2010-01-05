@@ -506,6 +506,15 @@
      	the system property <literal>org.knopflerfish.framework.strictbootclassloading</literal> to <literal>true</literal> before starting up the Knopflerfish
      	platform to prevent this from happening. See Knopflerfish 2.3.x release <ulink url="http://www.knopflerfish.org/release_notes_2.3.html">notes</ulink> for more
      	information.</para>
-     </section>     
+     </section>
+     <section id="pde-cycles">
+     	<title>I'm using Spring DM and Spring jars inside Eclipse PDE but I get an error about cycle dependency errors. What's wrong?</title>
+     	
+     	<para>Some of the Spring jars (optionally) import each other packages for bootstrapping reasons. While cycles between jars are allowed and
+     	supported by the OSGi platform, by default, Eclipse PDE complains about them. Since Eclipse Galileo, it is possible to enable binary cycles
+     	in a target platform. allowing the build to compile. For more information, see 
+     	<ulink url="http://help.eclipse.org/galileo/index.jsp?topic=/org.eclipse.pde.doc.user/guide/tools/export_wizards/export_plugins.htm">this</ulink> 
+     	entry from the Eclipse Reference Guide.</para>
+     </section>          
     </chapter>
 </book>
