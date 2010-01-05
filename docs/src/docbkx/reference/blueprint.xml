@@ -151,7 +151,7 @@
               <row>
                 <entry>Factory Method</entry>
                 <entry><literal>factory-method</literal></entry>
-                <entry><literal>factory-bean</literal></entry>
+                <entry><literal>factory-method</literal></entry>
               </row>
               <row>
                 <entry>Factory Bean</entry>
