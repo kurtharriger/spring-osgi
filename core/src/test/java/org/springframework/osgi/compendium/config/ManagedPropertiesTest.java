@@ -33,7 +33,6 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.compendium.internal.cm.ManagedServiceInstanceTrackerPostProcessor;
-import org.springframework.osgi.compendium.internal.cm.UpdateStrategy;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceRegistration;
@@ -47,7 +46,6 @@ public class ManagedPropertiesTest extends TestCase {
 	private GenericApplicationContext appContext;
 	private int unregistrationCounter;
 	private int registrationCounter;
-
 
 	protected void setUp() throws Exception {
 
@@ -102,8 +100,8 @@ public class ManagedPropertiesTest extends TestCase {
 	}
 
 	private ManagedServiceInstanceTrackerPostProcessor getTrackerForBean(String beanName) {
-		return (ManagedServiceInstanceTrackerPostProcessor) appContext.getBean(ManagedServiceInstanceTrackerPostProcessor.class.getName()
-				+ "#0#" + beanName);
+		return (ManagedServiceInstanceTrackerPostProcessor) appContext
+				.getBean(ManagedServiceInstanceTrackerPostProcessor.class.getName() + "#0#" + beanName);
 	}
 
 	public void testSimpleBeanTrackingBpp() throws Exception {
@@ -114,7 +112,8 @@ public class ManagedPropertiesTest extends TestCase {
 	}
 
 	public void testSimpleBeanWithNoNameTrackingBpp() throws Exception {
-		ManagedServiceInstanceTrackerPostProcessor bpp = getTrackerForBean("org.springframework.osgi.compendium.OneSetter#0");
+		ManagedServiceInstanceTrackerPostProcessor bpp =
+				getTrackerForBean("org.springframework.osgi.compendium.OneSetter#0");
 		assertEquals("non-name", TestUtils.getFieldValue(bpp, "pid"));
 		assertNull(TestUtils.getFieldValue(bpp, "updateMethod"));
 		assertNull(TestUtils.getFieldValue(bpp, "updateStrategy"));
@@ -130,20 +129,27 @@ public class ManagedPropertiesTest extends TestCase {
 		ManagedServiceInstanceTrackerPostProcessor bpp = getTrackerForBean("multipleWUpdate");
 		assertEquals("multiple", TestUtils.getFieldValue(bpp, "pid"));
 		assertNull(TestUtils.getFieldValue(bpp, "updateMethod"));
-		assertEquals(UpdateStrategy.CONTAINER_MANAGED, TestUtils.getFieldValue(bpp, "updateStrategy"));
+		assertEquals(true, TestUtils.getFieldValue(bpp, "autowireOnUpdate"));
 	}
 
 	public void testBeanManagedTrackingBpp() throws Exception {
 		ManagedServiceInstanceTrackerPostProcessor bpp = getTrackerForBean("beanManaged");
 		assertEquals("bean-managed", TestUtils.getFieldValue(bpp, "pid"));
 		assertEquals("update", TestUtils.getFieldValue(bpp, "updateMethod"));
-		assertEquals(UpdateStrategy.BEAN_MANAGED, TestUtils.getFieldValue(bpp, "updateStrategy"));
+		assertEquals(false, TestUtils.getFieldValue(bpp, "autowireOnUpdate"));
+	}
+	
+	public void testMixedManagedTrackingBpp() throws Exception {
+		ManagedServiceInstanceTrackerPostProcessor bpp = getTrackerForBean("mixedManaged");
+		assertEquals("bean-managed", TestUtils.getFieldValue(bpp, "pid"));
+		assertEquals("update", TestUtils.getFieldValue(bpp, "updateMethod"));
+		assertEquals(true, TestUtils.getFieldValue(bpp, "autowireOnUpdate"));
 	}
 
 	public void testTrackingCleanup() throws Exception {
-		assertEquals(5, registrationCounter);
+		assertEquals(6, registrationCounter);
 		assertEquals(0, unregistrationCounter);
 		appContext.close();
-		assertEquals(5, unregistrationCounter);
+		assertEquals(6, unregistrationCounter);
 	}
 }

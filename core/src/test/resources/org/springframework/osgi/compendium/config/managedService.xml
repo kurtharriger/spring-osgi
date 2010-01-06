@@ -19,16 +19,21 @@
 	</bean>
 	
 	<bean id="simpleWUpdate" class="org.springframework.osgi.compendium.OneSetter">
-		<osgix:managed-properties persistent-id="simple" update-strategy="container-managed"/>
+		<osgix:managed-properties persistent-id="simple" autowire-on-update="true"/>
 	</bean>
 	
 	<bean id="multipleWUpdate" class="org.springframework.osgi.compendium.MultipleSetters">
-		<osgix:managed-properties persistent-id="multiple" update-strategy="container-managed"/>
+		<osgix:managed-properties persistent-id="multiple" autowire-on-update="true"/>
 		<property name="integer" value="23"/>
 	</bean>
 
 	<bean id="beanManaged" class="org.springframework.osgi.compendium.BeanManaged">
-		<osgix:managed-properties persistent-id="bean-managed" update-strategy="bean-managed" update-method="update"/>
+		<osgix:managed-properties persistent-id="bean-managed" update-method="update"/>
+		<property name="integer" value="23"/>
+	</bean>
+	
+	<bean id="mixedManaged" class="org.springframework.osgi.compendium.BeanManaged">
+		<osgix:managed-properties persistent-id="bean-managed" autowire-on-update="true" update-method="update"/>
 		<property name="integer" value="23"/>
 	</bean>
 	

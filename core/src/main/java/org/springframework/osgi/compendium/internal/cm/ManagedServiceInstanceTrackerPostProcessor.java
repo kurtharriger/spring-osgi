@@ -27,9 +27,8 @@ import org.springframework.beans.factory.config.DestructionAwareBeanPostProcesso
 import org.springframework.osgi.context.BundleContextAware;
 
 /**
- * Post processor tracking the creation and destruction of managed service
- * instances. The instances tracked are subject to Configuration Admin based
- * injection.
+ * Post processor tracking the creation and destruction of managed service instances. The instances tracked are subject
+ * to Configuration Admin based injection.
  * 
  * @author Costin Leau
  * 
@@ -41,10 +40,9 @@ public class ManagedServiceInstanceTrackerPostProcessor implements BeanFactoryAw
 	private DefaultManagedServiceBeanManager managedServiceManager;
 	private String pid;
 	private String updateMethod;
-	private UpdateStrategy updateStrategy;
+	private boolean autowireOnUpdate = false;
 	private BundleContext bundleContext;
 	private BeanFactory beanFactory;
-
 
 	public ManagedServiceInstanceTrackerPostProcessor(String beanNameToTrack) {
 		this.trackedBean = beanNameToTrack;
@@ -52,7 +50,7 @@ public class ManagedServiceInstanceTrackerPostProcessor implements BeanFactoryAw
 
 	public void afterPropertiesSet() throws Exception {
 		ConfigurationAdminManager cam = new ConfigurationAdminManager(pid, bundleContext);
-		managedServiceManager = new DefaultManagedServiceBeanManager(updateStrategy, updateMethod, cam, beanFactory);
+		managedServiceManager = new DefaultManagedServiceBeanManager(autowireOnUpdate, updateMethod, cam, beanFactory);
 	}
 
 	public void destroy() throws Exception {
@@ -95,20 +93,20 @@ public class ManagedServiceInstanceTrackerPostProcessor implements BeanFactoryAw
 	}
 
 	/**
+	 * Sets whether autowire on update should be performed automatically or not.
+	 * 
+	 * @param autowireOnUpdate
+	 */
+	public void setAutowireOnUpdate(boolean autowireOnUpdate) {
+		this.autowireOnUpdate = autowireOnUpdate;
+	}
+
+	/**
 	 * Sets the method name, for bean-managed update strategy.
 	 * 
 	 * @param updateMethod The updateMethod to set.
 	 */
 	public void setUpdateMethod(String methodName) {
 		this.updateMethod = methodName;
-	}
-
-	/**
-	 * Sets the update strategy.
-	 * 
-	 * @param updateStrategy The updateStrategy to set.
-	 */
-	public void setUpdateStrategy(UpdateStrategy updateStrategy) {
-		this.updateStrategy = updateStrategy;
 	}
 }

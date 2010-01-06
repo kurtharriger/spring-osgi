@@ -159,10 +159,6 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	private BeanFactory owningBeanFactory;
 	/** configuration watcher registration */
 	private ServiceRegistration configurationWatcher;
-
-	/** update callback */
-	private UpdateCallback updateCallback;
-
 	/** inner bean service registrations */
 	private final DynamicCollection serviceRegistrations = new DynamicCollection(8);
 	/** read-only view of the registration */
@@ -183,10 +179,11 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	private Class<?>[] interfaces;
 	/** class loader */
 	private ClassLoader classLoader;
-
-	// update configuration
-	private UpdateStrategy updateStrategy;
+	private boolean autowireOnUpdate = false;
 	private String updateMethod;
+	/** update callback */
+	private UpdateCallback updateCallback;
+
 
 	// this fields gets set by the CF
 	// no synch is needed since the CF is guaranteed to be called sequentially
@@ -217,7 +214,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		processTemplateDefinition();
 		createEmbeddedBeanFactory();
 
-		updateCallback = CMUtils.createCallback(updateStrategy, updateMethod, beanFactory);
+		updateCallback = CMUtils.createCallback(autowireOnUpdate, updateMethod, beanFactory);
 
 		registerService();
 	}
@@ -479,10 +476,12 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	}
 
 	/**
-	 * @param updateStrategy The updateStrategy to set.
+	 * Sets whether autowire on update should be performed automatically or not.
+	 * 
+	 * @param autowireOnUpdate
 	 */
-	public void setUpdateStrategy(UpdateStrategy updateStrategy) {
-		this.updateStrategy = updateStrategy;
+	public void setAutowireOnUpdate(boolean autowireOnUpdate) {
+		this.autowireOnUpdate = autowireOnUpdate;
 	}
 
 	/**

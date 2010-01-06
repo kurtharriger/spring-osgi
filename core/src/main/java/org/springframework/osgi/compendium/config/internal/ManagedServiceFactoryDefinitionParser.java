@@ -42,7 +42,6 @@ public class ManagedServiceFactoryDefinitionParser extends AbstractSimpleBeanDef
 	private static final String LISTENER = "registration-listener";
 	private static final String LISTENERS_PROP = "listeners";
 
-
 	protected Class<?> getBeanClass(Element element) {
 		return ManagedServiceFactoryFactoryBean.class;
 	}
@@ -53,9 +52,8 @@ public class ManagedServiceFactoryDefinitionParser extends AbstractSimpleBeanDef
 
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
-		// do conversion for some of them (mainly enums) 
-		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback[] { new ServiceAttributeCallback(),
-			new UpdateStrategyAttributeCallback() });
+		// do conversion for some of them (mainly enums)
+		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback[] { new ServiceAttributeCallback() });
 
 		// get nested elements
 		NodeList children = element.getChildNodes();
@@ -84,7 +82,9 @@ public class ManagedServiceFactoryDefinitionParser extends AbstractSimpleBeanDef
 					// it's a Spring Bean
 					if ((ns == null && name.equals(BeanDefinitionParserDelegate.BEAN_ELEMENT))
 							|| ns.equals(BeanDefinitionParserDelegate.BEANS_NAMESPACE_URI)) {
-						nestedDefinition = parserContext.getDelegate().parseBeanDefinitionElement(nestedElement).getBeanDefinition();
+						nestedDefinition =
+								parserContext.getDelegate().parseBeanDefinitionElement(nestedElement)
+										.getBeanDefinition();
 					}
 					// it's non Spring
 					else {

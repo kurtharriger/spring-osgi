@@ -37,7 +37,7 @@ import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
-import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Utility class for the Configuration Admin package.
@@ -47,9 +47,8 @@ import org.springframework.util.Assert;
 public abstract class CMUtils {
 
 	/**
-	 * Injects the properties from the given Map to the given object.
-	 * Additionally, a bean factory can be passed in for copying property
-	 * editors inside the injector.
+	 * Injects the properties from the given Map to the given object. Additionally, a bean factory can be passed in for
+	 * copying property editors inside the injector.
 	 * 
 	 * @param instance bean instance to configure
 	 * @param properties
@@ -79,16 +78,21 @@ public abstract class CMUtils {
 		}
 	}
 
-	public static UpdateCallback createCallback(UpdateStrategy strategy, String methodName, BeanFactory beanFactory) {
-		if (UpdateStrategy.BEAN_MANAGED.equals(strategy)) {
-			Assert.hasText(methodName, "method name required when using 'bean-managed' strategy");
-			return new BeanManagedUpdate(methodName);
+	public static UpdateCallback createCallback(boolean autowireOnUpdate, String methodName, BeanFactory beanFactory) {
+		UpdateCallback beanManaged = null, containerManaged = null;
+		if (autowireOnUpdate) {
+			containerManaged = new ContainerManagedUpdate(beanFactory);
 		}
-		else if (UpdateStrategy.CONTAINER_MANAGED.equals(strategy)) {
-			return new ContainerManagedUpdate(beanFactory);
+		if (StringUtils.hasText(methodName)) {
+			beanManaged = new BeanManagedUpdate(methodName);
 		}
 
-		return null;
+		// if both strategies are present, return a chain
+		if (containerManaged != null && beanManaged != null)
+			return new ChainedManagedUpdate(new UpdateCallback[] { containerManaged, beanManaged });
+
+		// otherwise return the non-null one
+		return (containerManaged != null ? containerManaged : beanManaged);
 	}
 
 	public static Map getConfiguration(BundleContext bundleContext, String pid) throws IOException {

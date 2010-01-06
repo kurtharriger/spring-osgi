@@ -8,7 +8,7 @@
             targetNamespace="http://www.springframework.org/schema/osgi-compendium"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified"
-            version="2.0.0.M1">
+            version="2.0.0.M2">
 
 	<xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"/>
@@ -25,28 +25,22 @@
 
 	<!-- internal reusable type -->
 	<xsd:attributeGroup name="updateAttributes">
-		<xsd:attribute name="update-strategy" use="optional">
+		<xsd:attribute name="autowire-on-update" use="optional" type="xsd:boolean" default="false">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-	The strategy to use when the configuration data backing the beans defined by this element is 
-	updated. The default value is 'none', meaning that any update after the initial configuration
-	of the beans is ignored. A value of 'bean-managed' means that the method specified in the
-	'update-method' attribute will be invoked. A value of 'container-managed' means that the container
-	will autowire the bean instance by name with the new property set.
+	Whether or not the container should autowire the target bean everytime an update occurs.
+	When 'true' is specified, the container will perform autowire (by name) the bean instance with the
+	newly set properties. In case 'update-method' attribute is used as well, the autowiring process will
+	take precedence.
 				]]></xsd:documentation>
 			</xsd:annotation>
-			<xsd:simpleType>
-				<xsd:restriction base="xsd:NMTOKEN">
-		            <xsd:enumeration value="none"/>
-		            <xsd:enumeration value="bean-managed"/>
-		            <xsd:enumeration value="container-managed"/>
-		        </xsd:restriction>
-			</xsd:simpleType>
 		</xsd:attribute>
 		<xsd:attribute name="update-method" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-	The update-method to invoke when using a 'bean-managed' update strategy.
+	The update-method to invoke whenever an update occurs in the configuration data. Allows the target
+	bean to process the update information itself. In case 'autowire-on-update' is also used, the 'update-method'
+	will be invoked after the autowiring takes place.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>			

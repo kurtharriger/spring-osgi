@@ -8,9 +8,13 @@ Changes in version 2.0.0 M2 (2010-mm-dd)
 General
 * upgraded to Felix 2.0.2
 * upgraded to Knopflerfish 3.0.0.beta3
+* removed 'update-strategy' attribute (spring-osgi-compendium.xsd)
 
 Package org.springframework.osgi.bundle
 * added sticky attribute to ServiceReference annotation
+
+Package org.springframework.osgi.compendium
+* improved configuration admin update handling by supporting both container and bean management on the same declaration
 
 Package org.springframework.osgi.test
 * added check for unresolved fragments during test startup

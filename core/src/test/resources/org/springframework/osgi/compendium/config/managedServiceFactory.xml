@@ -25,11 +25,11 @@
     </osgix:managed-service-factory>
 
 	<!-- update strategy specified --> 
-	<osgix:managed-service-factory id="container-update" factory-pid="my.pid" update-strategy="container-managed" auto-export="all-classes">
+	<osgix:managed-service-factory id="container-update" factory-pid="my.pid" autowire-on-update="true" auto-export="all-classes">
 		<bean class="java.lang.Object"/>
     </osgix:managed-service-factory>
 
-	<osgix:managed-service-factory id="bean-update" factory-pid="my.pid" update-strategy="bean-managed" update-method="update" auto-export="all-classes">
+	<osgix:managed-service-factory id="bean-update" factory-pid="my.pid" update-method="update" auto-export="all-classes">
 		<bean class="java.lang.Object"/>
     </osgix:managed-service-factory>
    

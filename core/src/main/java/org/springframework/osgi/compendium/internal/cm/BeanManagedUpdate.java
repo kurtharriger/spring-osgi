@@ -21,8 +21,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * BeanManaged update class. Performs the update call using a custom method on
- * the given object.
+ * BeanManaged update class. Performs the update call using a custom method on the given object.
  * 
  * @author Costin Leau
  */
@@ -32,8 +31,8 @@ class BeanManagedUpdate implements UpdateCallback {
 	// class cache = keeps track of method adapters for each given class
 	// the cache becomes useful when dealing with FactoryBean which can returns
 	// different class types on each invocation
-	private final Map classCache = new WeakHashMap(2);
-
+	private final Map<Class<?>, WeakReference<UpdateMethodAdapter>> classCache =
+			new WeakHashMap<Class<?>, WeakReference<UpdateMethodAdapter>>(2);
 
 	public BeanManagedUpdate(String methodName) {
 		this.methodName = methodName;
@@ -44,8 +43,7 @@ class BeanManagedUpdate implements UpdateCallback {
 	}
 
 	/**
-	 * Returns a (lazily created) method adapter that invokes a predefined
-	 * method on the given instance.
+	 * Returns a (lazily created) method adapter that invokes a predefined method on the given instance.
 	 * 
 	 * @param instance object instance
 	 * @return method update method adapter
@@ -54,14 +52,14 @@ class BeanManagedUpdate implements UpdateCallback {
 		UpdateMethodAdapter adapter;
 		Class<?> type = instance.getClass();
 
-		WeakReference adapterReference = (WeakReference) classCache.get(type);
+		WeakReference<UpdateMethodAdapter> adapterReference = classCache.get(type);
 		if (adapterReference != null) {
-			adapter = (UpdateMethodAdapter) adapterReference.get();
+			adapter = adapterReference.get();
 			if (adapter != null)
 				return adapter;
 		}
 		adapter = new UpdateMethodAdapter(methodName, type);
-		classCache.put(type, new WeakReference(adapter));
+		classCache.put(type, new WeakReference<UpdateMethodAdapter>(adapter));
 		return adapter;
 	}
 }

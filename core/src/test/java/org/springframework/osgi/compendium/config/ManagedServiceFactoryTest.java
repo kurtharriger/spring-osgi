@@ -33,7 +33,6 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.compendium.internal.cm.ManagedServiceFactoryFactoryBean;
-import org.springframework.osgi.compendium.internal.cm.UpdateStrategy;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.service.exporter.support.DefaultInterfaceDetector;
@@ -109,15 +108,15 @@ public class ManagedServiceFactoryTest extends TestCase {
 
 	public void testContainerUpdateAttr() throws Exception {
 		Object factory = appContext.getBean("&container-update");
-		Object strategy = TestUtils.getFieldValue(factory, "updateStrategy");
-		assertEquals(UpdateStrategy.CONTAINER_MANAGED, strategy);
+		Object strategy = TestUtils.getFieldValue(factory, "autowireOnUpdate");
+		assertEquals(true, strategy);
 	}
 
 	public void testBeanManagedUpdateAttr() throws Exception {
 		Object factory = appContext.getBean("&bean-update");
-		Object strategy = TestUtils.getFieldValue(factory, "updateStrategy");
+		Object strategy = TestUtils.getFieldValue(factory, "autowireOnUpdate");
 		Object method = TestUtils.getFieldValue(factory, "updateMethod");
-		assertEquals(UpdateStrategy.BEAN_MANAGED, strategy);
+		assertEquals(false, strategy);
 		assertEquals("update", method);
 	}
 }
