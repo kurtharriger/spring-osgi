@@ -37,14 +37,11 @@ public class DefaultManagedServiceBeanManagerTest extends TestCase {
 	private ConfigurationAdminManager cam;
 	private Map configuration;
 
-
 	protected void setUp() throws Exception {
 		cam = new ConfigurationAdminManager("bla", new MockBundleContext()) {
-
 			public Map getConfiguration() {
 				return configuration;
 			}
-
 		};
 	}
 
@@ -62,30 +59,35 @@ public class DefaultManagedServiceBeanManagerTest extends TestCase {
 	}
 
 	public void testNoUpdateStrategy() {
-		msbm = new DefaultManagedServiceBeanManager(UpdateStrategy.NONE, null, cam, null);
+		msbm = new DefaultManagedServiceBeanManager(false, null, cam, null);
 		assertNull(getUpdateCallback());
 	}
 
 	public void testBeanManagedUpdateStrategy() {
-		msbm = new DefaultManagedServiceBeanManager(UpdateStrategy.BEAN_MANAGED, "update", cam, null);
+		msbm = new DefaultManagedServiceBeanManager(false, "update", cam, null);
 		assertTrue(getUpdateCallback().getClass().getName().endsWith("BeanManagedUpdate"));
 	}
 
 	public void testContainerManagedUpdateStrategy() {
-		msbm = new DefaultManagedServiceBeanManager(UpdateStrategy.CONTAINER_MANAGED, null, cam, null);
+		msbm = new DefaultManagedServiceBeanManager(true, null, cam, null);
 		assertTrue(getUpdateCallback().getClass().getName().endsWith("ContainerManagedUpdate"));
+	}
+
+	public void testChainedManagedUpdateStrategy() {
+		msbm = new DefaultManagedServiceBeanManager(true, "update", cam, null);
+		assertTrue(getUpdateCallback().getClass().getName().endsWith("ChainedManagedUpdate"));
 	}
 
 	public void testRegister() {
 		configuration = new HashMap();
-		msbm = new DefaultManagedServiceBeanManager(UpdateStrategy.NONE, null, cam, null);
+		msbm = new DefaultManagedServiceBeanManager(false, null, cam, null);
 		Object bean = new Object();
 		assertSame(bean, msbm.register(bean));
 		assertTrue(getBeanMap().containsValue(bean));
 	}
 
 	public void testUnregister() {
-		msbm = new DefaultManagedServiceBeanManager(UpdateStrategy.NONE, null, cam, null);
+		msbm = new DefaultManagedServiceBeanManager(false, null, cam, null);
 		Object bean = new Object();
 		assertSame(bean, msbm.register(bean));
 		assertTrue(getBeanMap().containsValue(bean));
@@ -94,14 +96,14 @@ public class DefaultManagedServiceBeanManagerTest extends TestCase {
 	}
 
 	public void testUpdated() {
-		msbm = new DefaultManagedServiceBeanManager(UpdateStrategy.NONE, null, cam, null);
+		msbm = new DefaultManagedServiceBeanManager(false, null, cam, null);
 	}
 
 	public void testInjectInfoSimple() {
 		Map props = new HashMap();
 		props.put("prop", "14");
 		OneSetter instance = new OneSetter();
-		msbm = new DefaultManagedServiceBeanManager(UpdateStrategy.CONTAINER_MANAGED, null, cam, null);
+		msbm = new DefaultManagedServiceBeanManager(true, null, cam, null);
 		msbm.applyInitialInjection(instance, props);
 		assertEquals(new Long(14), instance.getProp());
 	}
@@ -114,7 +116,7 @@ public class DefaultManagedServiceBeanManagerTest extends TestCase {
 		props.put("none", "14");
 		props.put("float", "14");
 		MultipleSetters instance = new MultipleSetters();
-		msbm = new DefaultManagedServiceBeanManager(UpdateStrategy.CONTAINER_MANAGED, null, cam, null);
+		msbm = new DefaultManagedServiceBeanManager(true, null, cam, null);
 		msbm.applyInitialInjection(instance, props);
 		assertEquals(new Double(14), instance.getDbl());
 		assertEquals(14, instance.getInteger());

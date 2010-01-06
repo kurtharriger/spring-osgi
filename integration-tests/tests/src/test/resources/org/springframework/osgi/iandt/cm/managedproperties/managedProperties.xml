@@ -27,26 +27,26 @@
 	</bean>
 	
 	<bean id="simplePrototype" class="org.springframework.osgi.iandt.cm.managedproperties.TestBean" scope="prototype">
-		<osgix:managed-properties persistent-id="simplePrototype" update-strategy="none"/>
+		<osgix:managed-properties persistent-id="simplePrototype"/>
 	</bean>
 	
 	<bean id="containerManaged" class="org.springframework.osgi.iandt.cm.managedproperties.TestBean">
-		<osgix:managed-properties persistent-id="containerManaged" update-strategy="container-managed"/>
+		<osgix:managed-properties persistent-id="containerManaged" autowire-on-update="true"/>
 		<property name="clazz" value="java.lang.Object"/>
 	</bean>
 	
 	<bean id="beanManaged" class="org.springframework.osgi.iandt.cm.managedproperties.TestBean">
-		<osgix:managed-properties persistent-id="beanManaged" update-strategy="bean-managed" update-method="update"/>
+		<osgix:managed-properties persistent-id="beanManaged" update-method="update"/>
 		<property name="integer" value="23"/>
 	</bean>
 
 
 	<bean id="containerManagedWithInit" class="org.springframework.osgi.iandt.cm.managedproperties.TestBean" init-method="init">
-		<osgix:managed-properties persistent-id="containerManaged" update-strategy="container-managed"/>
+		<osgix:managed-properties persistent-id="containerManaged" autowire-on-update="true"/>
 	</bean>
 
 	<bean id="beanManagedWithInit" class="org.springframework.osgi.iandt.cm.managedproperties.TestBean" init-method="init">
-		<osgix:managed-properties persistent-id="containerManaged" update-strategy="bean-managed" update-method="update"/>
+		<osgix:managed-properties persistent-id="containerManaged" update-method="update"/>
 	</bean>
 	
 </beans>

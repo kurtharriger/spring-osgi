@@ -28,7 +28,6 @@ public class BeanManaged {
 
 
 	public void update(Map properties) {
-
 	}
 
 	/**

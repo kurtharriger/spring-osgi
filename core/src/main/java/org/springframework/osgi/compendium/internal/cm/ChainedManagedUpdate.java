@@ -13,16 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.osgi.compendium.internal.cm;
 
+import java.util.Map;
+
+import org.springframework.util.ObjectUtils;
+
 /**
- * Enum class providing the possible update strategies for managed-service beans.
+ * A chain up managed updates.
  * 
  * @author Costin Leau
- * 
  */
-public enum UpdateStrategy {
+class ChainedManagedUpdate implements UpdateCallback {
 
-	NONE, BEAN_MANAGED, CONTAINER_MANAGED;
+	private final UpdateCallback[] callbacks;
+
+	ChainedManagedUpdate(UpdateCallback[] callbacks) {
+		this.callbacks = (ObjectUtils.isEmpty(callbacks) ? new UpdateCallback[0] : callbacks);
+	}
+
+	public void update(Object instance, Map properties) {
+		for (UpdateCallback callback : callbacks) {
+			callback.update(instance, properties);
+		}
+	}
 }

@@ -17,13 +17,13 @@
 package org.springframework.osgi.compendium.internal.cm;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
-import org.springframework.core.CollectionFactory;
 
 /**
  * Default implementation for {@link ManagedServiceBeanManager}.
@@ -36,16 +36,15 @@ public class DefaultManagedServiceBeanManager implements DisposableBean, Managed
 	/** logger */
 	private static final Log log = LogFactory.getLog(DefaultManagedServiceBeanManager.class);
 
-	private final Map instanceRegistry = CollectionFactory.createConcurrentMap(8);
+	private final Map<Integer, Object> instanceRegistry = new ConcurrentHashMap<Integer, Object>(8);
 	private final UpdateCallback updateCallback;
 	private final ConfigurationAdminManager cam;
 	private final AbstractBeanFactory bf;
 
-
-	public DefaultManagedServiceBeanManager(UpdateStrategy updateStrategy, String methodName,
+	public DefaultManagedServiceBeanManager(boolean autowireOnUpdate, String methodName,
 			ConfigurationAdminManager cam, BeanFactory beanFactory) {
 
-		updateCallback = CMUtils.createCallback(updateStrategy, methodName, beanFactory);
+		updateCallback = CMUtils.createCallback(autowireOnUpdate, methodName, beanFactory);
 		bf = (beanFactory instanceof AbstractBeanFactory ? (AbstractBeanFactory) beanFactory : null);
 		this.cam = cam;
 		this.cam.setBeanManager(this);
@@ -55,7 +54,7 @@ public class DefaultManagedServiceBeanManager implements DisposableBean, Managed
 		int hashCode = System.identityHashCode(bean);
 		if (log.isTraceEnabled())
 			log.trace("Start tracking instance " + bean.getClass().getName() + "@" + hashCode);
-		instanceRegistry.put(new Integer(hashCode), bean);
+		instanceRegistry.put(Integer.valueOf(hashCode), bean);
 		applyInitialInjection(bean, cam.getConfiguration());
 		return bean;
 	}
