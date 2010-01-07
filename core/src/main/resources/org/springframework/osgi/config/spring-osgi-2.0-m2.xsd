@@ -25,7 +25,7 @@
     		</xsd:documentation>
     	</xsd:annotation>
     	<!-- attributes -->
-    	<xsd:attribute name="default-timeout" type="xsd:long" default="30000">
+    	<xsd:attribute name="default-timeout" type="xsd:nonNegativeInteger" default="30000">
     		<xsd:annotation>
     			<xsd:documentation><![CDATA[
     Default timeout (in milliseconds) for all reference (service importers) elements that do not explicitly specify one.
@@ -257,7 +257,7 @@
                       	]]></xsd:documentation>
                       </xsd:annotation>
                 </xsd:attribute>
-				<xsd:attribute name="timeout" use="optional" type="xsd:long">
+				<xsd:attribute name="timeout" use="optional" type="xsd:nonNegativeInteger">
                     <xsd:annotation>
                       	<xsd:documentation><![CDATA[
     For a 'reference' element, the amount of time (in milliseconds) to wait for a backing service to be 

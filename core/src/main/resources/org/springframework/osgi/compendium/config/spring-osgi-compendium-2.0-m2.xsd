@@ -155,8 +155,27 @@
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
 	Specifies whether changes to the Configuration Admin service will be reflected by the properties.
-	Default is "false": the properties will be lazily resolved from the Configuration Admin and will not change.
-	If set to "true", the properties object content will update accordingly to the changes in the Configuration Admin.
+	Default is "false": once resolved from the Configuration Admin, the properties will not change.
+	If set to "true", the properties object content will update accordingly (after initialization) to the changes in the Configuration Admin.
+							]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="init-lazy" type="xsd:boolean" default="true">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+	Specifies whether the properties reflecting the Configuration Admin service entry will be initialized lazy or not.
+	Default is "true": meaning the properties will be initialized just before being requested (from the factory) for the first time. This is
+	the common case as it allows the most recent entry to be used.
+	If set to "false", the properties object will be initialized at startup, along with the bean factory.
+							]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="init-timeout" type="xsd:nonNegativeInteger" default="0">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+	Specifies the amount of time (in milliseconds) the bean factory will wait for the Configuration Admin entry to
+	be initialized (return a non-null value). If the entry is not null at startup, no waiting will be performed.
+	Similar to the other timeout options, a value of '0' means no waiting. By default, no waiting (0) is performed.
 							]]></xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>

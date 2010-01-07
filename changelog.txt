@@ -10,12 +10,15 @@ General
 * upgraded to Knopflerfish 3.0.0.beta3
 * upgraded to CGLib 2.2.0
 * removed 'update-strategy' attribute (spring-osgi-compendium.xsd)
+* improved timeout schema types to improve declaration validation
+* added two extra attributes to 'cm-properties' element (spring-osgi-compendium.xsd)
 
 Package org.springframework.osgi.bundle
 * added sticky attribute to ServiceReference annotation
 
 Package org.springframework.osgi.compendium
 * improved configuration admin update handling by supporting both container and bean management on the same declaration
+* introduced initialization timeout option to cm-properties
 
 Package org.springframework.osgi.test
 * added check for unresolved fragments during test startup
