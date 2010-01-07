@@ -43,7 +43,7 @@
 	will be invoked after the autowiring takes place.
 				]]></xsd:documentation>
 			</xsd:annotation>
-		</xsd:attribute>			
+		</xsd:attribute>
 	</xsd:attributeGroup>
     
     
@@ -55,7 +55,6 @@
     		]]></xsd:documentation>
     	</xsd:annotation>
     	<xsd:complexType>
-	       	<xsd:attributeGroup ref="updateAttributes"/>
 		    <xsd:attribute name="persistent-id" type="xsd:string" use="required">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
@@ -64,6 +63,7 @@
 					]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
+	       	<xsd:attributeGroup ref="updateAttributes"/>
 		</xsd:complexType>
 	</xsd:element>
 	
