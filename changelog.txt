@@ -8,6 +8,7 @@ Changes in version 2.0.0 M2 (2010-mm-dd)
 General
 * upgraded to Felix 2.0.2
 * upgraded to Knopflerfish 3.0.0.beta3
+* upgraded to CGLib 2.2.0
 * removed 'update-strategy' attribute (spring-osgi-compendium.xsd)
 
 Package org.springframework.osgi.bundle
