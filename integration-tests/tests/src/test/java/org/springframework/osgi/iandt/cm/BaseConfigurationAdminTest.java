@@ -30,6 +30,8 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ConfigurationEvent;
+import org.osgi.service.cm.ConfigurationListener;
 import org.osgi.service.cm.ConfigurationPermission;
 import org.osgi.service.cm.ConfigurationPlugin;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -49,7 +51,6 @@ public abstract class BaseConfigurationAdminTest extends BaseIntegrationTest {
 	protected ConfigurationAdmin cm;
 	private final static String CONFIG_DIR = "test-config";
 
-
 	protected static void initializeDirectory(String dir) {
 		File directory = new File(dir);
 		remove(directory);
@@ -63,8 +64,7 @@ public abstract class BaseConfigurationAdminTest extends BaseIntegrationTest {
 				File file = files[i];
 				if (file.isDirectory()) {
 					remove(file);
-				}
-				else {
+				} else {
 					assertTrue(file + " deleted", file.delete());
 				}
 			}
@@ -79,15 +79,14 @@ public abstract class BaseConfigurationAdminTest extends BaseIntegrationTest {
 	}
 
 	protected ConfigurableApplicationContext createApplicationContext(String[] locations) {
-		ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(bundleContext,
-			ConfigurationAdmin.class.getName(), null);
+		ServiceReference ref =
+				OsgiServiceReferenceUtils.getServiceReference(bundleContext, ConfigurationAdmin.class.getName(), null);
 		Assert.notNull(ref, "Configuration Admin not present");
 		ConfigurationAdmin ca = (ConfigurationAdmin) bundleContext.getService(ref);
 
 		try {
 			prepareConfiguration(ca);
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			throw new RuntimeException("Cannot prepare Configuration Admin service", ex);
 		}
 
@@ -96,7 +95,7 @@ public abstract class BaseConfigurationAdminTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
 		// felix configuration admin implementation
-		return new String[] { "org.apache.felix, org.apache.felix.configadmin, 1.0.10" };
+		return new String[] { "org.apache.felix, org.apache.felix.configadmin, 1.2.4" };
 	}
 
 	protected String[] getBundleContentPattern() {
@@ -107,8 +106,8 @@ public abstract class BaseConfigurationAdminTest extends BaseIntegrationTest {
 	}
 
 	protected void onSetUp() throws Exception {
-		ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(bundleContext,
-			ConfigurationAdmin.class.getName(), null);
+		ServiceReference ref =
+				OsgiServiceReferenceUtils.getServiceReference(bundleContext, ConfigurationAdmin.class.getName(), null);
 		Assert.notNull(ref, "Configuration Admin not present");
 		cm = (ConfigurationAdmin) bundleContext.getService(ref);
 	}
@@ -124,8 +123,8 @@ public abstract class BaseConfigurationAdminTest extends BaseIntegrationTest {
 	}
 
 	/**
-	 * Template method for initializing the Configuration Admin service
-	 * <b>before</b> the test application context gets created.
+	 * Template method for initializing the Configuration Admin service <b>before</b> the test application context gets
+	 * created.
 	 * 
 	 * @throws Exception
 	 */
@@ -149,7 +148,14 @@ public abstract class BaseConfigurationAdminTest extends BaseIntegrationTest {
 		// the current implementation of configuration admin seems to be prone to threading errors
 		// (especially race conditions where event for updates are cumulated and not propagated properly
 		// due to the asynch nature) so this plugin only expects one event really without checking the source
-		ConfigurationPlugin cp = new ConfigurationPlugin() {
+		ConfigurationListener cp = new ConfigurationListener() {
+
+			public void configurationEvent(ConfigurationEvent event) {
+				synchronized (monitor) {
+					receivedEvent[0] = true;
+					monitor.notify();
+				}
+			}
 
 			public void modifyConfiguration(ServiceReference reference, Dictionary properties) {
 				synchronized (monitor) {
@@ -162,7 +168,7 @@ public abstract class BaseConfigurationAdminTest extends BaseIntegrationTest {
 		props.setProperty(Constants.SERVICE_PID, pid);
 		props.setProperty("cm.target", pid);
 
-		bundleContext.registerService(ConfigurationPlugin.class.getName(), cp, props);
+		bundleContext.registerService(ConfigurationListener.class.getName(), cp, props);
 
 		// update configuration
 		Configuration cfg = cm.getConfiguration(pid);
@@ -171,13 +177,14 @@ public abstract class BaseConfigurationAdminTest extends BaseIntegrationTest {
 		// wait a bit since the plugin might receive the old configuration if we move too fast...
 		Thread.sleep(1000);
 
-		// wait up to 5 minutes for the even to propagate
+		// wait up to 1 minute(s) for the event to propagate
 		synchronized (monitor) {
 			if (!receivedEvent[0]) {
-				// double check if the properties have been already applied before waiting (since then the event is not propagated anymore since it's not
+				// double check if the properties have been already applied before waiting (since then the event is not
+				// propagated anymore since it's not
 				// considered new)
 
-				monitor.wait(5 * 60 * 1000);
+				monitor.wait(1 * 60 * 1000);
 				assertTrue("Configuration " + pid + " hasn't been updated in 5 minutes...", receivedEvent[0]);
 			}
 		}
