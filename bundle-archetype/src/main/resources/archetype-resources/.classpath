@@ -16,11 +16,11 @@
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.log4j/1.5.6/com.springsource.slf4j.log4j-1.5.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/log4j/com.springsource.org.apache.log4j/1.2.15/com.springsource.org.apache.log4j-1.2.15.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.1.R35x_v20090827/org.eclipse.osgi-3.5.1.R35x_v20090827.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/2.0.0.M2-SNAPSHOT/spring-osgi-test-2.0.0.M1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/2.0.0.M2-SNAPSHOT/spring-osgi-mock-2.0.0.M1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/2.0.0.M2-SNAPSHOT/spring-osgi-core-2.0.0.M1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/2.0.0.M2-SNAPSHOT/spring-osgi-extender-2.0.0.M1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/2.0.0.M2-SNAPSHOT/spring-osgi-io-2.0.0.M1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/2.0.0.M2-SNAPSHOT/spring-osgi-test-2.0.0.M2-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/2.0.0.M2-SNAPSHOT/spring-osgi-mock-2.0.0.M2-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/2.0.0.M2-SNAPSHOT/spring-osgi-core-2.0.0.M2-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/2.0.0.M2-SNAPSHOT/spring-osgi-extender-2.0.0.M2-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/2.0.0.M2-SNAPSHOT/spring-osgi-io-2.0.0.M2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/objectweb/asm/com.springsource.org.objectweb.asm/2.2.3/com.springsource.org.objectweb.asm-2.2.3.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
