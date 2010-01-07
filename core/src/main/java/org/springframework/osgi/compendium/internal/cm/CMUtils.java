@@ -37,9 +37,7 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
-import org.springframework.osgi.service.importer.support.internal.util.OsgiServiceBindingUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
-import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
@@ -126,6 +124,7 @@ public abstract class CMUtils {
 				final Object monitor = new Object();
 				Properties props = new Properties();
 				props.put(Constants.SERVICE_PID, pid);
+				
 				ServiceRegistration reg =
 						bundleContext.registerService(ConfigurationListener.class.getName(),
 								new ConfigurationListener() {

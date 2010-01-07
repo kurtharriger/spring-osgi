@@ -21,4 +21,11 @@
 		<prop key="spring">framework</prop>
 	</osgix:cm-properties>
 	
+	<!-- bean waiting up to 15 seconds for the CM to be init'ed-->
+	<osgix:cm-properties id="init-time" persistent-id="init-time" init-timeout="15000"/>
+	
+	<osgix:cm-properties id="eager-init" persistent-id="eager-init" init-lazy="false"/>
+	
+	<osgix:cm-properties id="lazy-init" persistent-id="lazy-init" init-lazy="true"/>
+	
 </beans>

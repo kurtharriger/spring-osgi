@@ -142,7 +142,7 @@
 	        				]]></xsd:documentation>
 	        			</xsd:annotation>
 	        		</xsd:attribute>
-					<xsd:attribute name="local-override" type="xsd:boolean">
+					<xsd:attribute name="local-override" type="xsd:boolean" default="false">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
 	Specifies whether local properties override properties from the Configuration Admin service.
@@ -151,7 +151,7 @@
 							]]></xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="dynamic" type="xsd:boolean">
+					<xsd:attribute name="dynamic" type="xsd:boolean" default="false">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
 	Specifies whether changes to the Configuration Admin service will be reflected by the properties.

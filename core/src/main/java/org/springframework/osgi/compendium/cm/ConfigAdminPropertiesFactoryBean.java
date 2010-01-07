@@ -116,31 +116,38 @@ public class ConfigAdminPropertiesFactoryBean implements BundleContextAware, Ini
 	private volatile ServiceRegistration registration;
 	private boolean initLazy = true;
 	private long initTimeout = 0;
+	private final Object monitor = new Object();
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.hasText(persistentId, "persistentId property is required");
 		Assert.notNull(bundleContext, "bundleContext property is required");
-		Assert.isTrue(initTimeout >=0, "a positive initTimeout is required");
+		Assert.isTrue(initTimeout >= 0, "a positive initTimeout is required");
 
-		if (dynamic) {
-			// create special Properties object
-			properties = new ChangeableProperties();
-			// init properties
-			// copy config admin properties
-			try {
-				initProperties(properties, CMUtils.getConfiguration(bundleContext, persistentId, initTimeout));
-			} catch (IOException ioe) {
-				throw new BeanInitializationException("Cannot retrieve configuration for pid=" + persistentId, ioe);
-			}
-
-			// perform eager registration
-			registration = CMUtils.registerManagedService(bundleContext, new ConfigurationWatcher(), persistentId);
+		if (!initLazy) {
+			createProperties();
 		}
 	}
 
 	public void destroy() throws Exception {
 		OsgiServiceUtils.unregisterService(registration);
 		registration = null;
+	}
+
+	private void createProperties() {
+		if (properties == null) {
+			properties = (dynamic ? new ChangeableProperties() : new Properties());
+			// init properties by copying config admin properties
+			try {
+				initProperties(properties, CMUtils.getConfiguration(bundleContext, persistentId, initTimeout));
+			} catch (IOException ioe) {
+				throw new BeanInitializationException("Cannot retrieve configuration for pid=" + persistentId, ioe);
+			}
+
+			if (dynamic) {
+				// perform eager registration
+				registration = CMUtils.registerManagedService(bundleContext, new ConfigurationWatcher(), persistentId);
+			}
+		}
 	}
 
 	/**
@@ -170,14 +177,12 @@ public class ConfigAdminPropertiesFactoryBean implements BundleContextAware, Ini
 	}
 
 	public Properties getObject() throws Exception {
-		// if static, perform lazy initialization
+		// perform lazy initialization (if needed)
 		if (properties == null) {
-			try {
-				properties =
-						initProperties(new Properties(), CMUtils.getConfiguration(bundleContext, persistentId,
-								initTimeout));
-			} catch (IOException ioe) {
-				throw new BeanInitializationException("Cannot retrieve configuration for pid=" + persistentId, ioe);
+			synchronized (monitor) {
+				if (properties == null) {
+					createProperties();
+				}
 			}
 		}
 

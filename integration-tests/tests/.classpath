@@ -3,7 +3,7 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.1.R35x_v20090827/org.eclipse.osgi-3.5.1.R35x_v20090827.jar" sourcepath="/M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.4.3/org.eclipse.osgi-3.4.3-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/3.0.0.alpha1/framework-3.0.0.alpha1.jar" sourcepath="/KF3_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/3.0.0.beta3/framework-3.0.0.beta3.jar" sourcepath="/KF3_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/3.0.0.RELEASE/org.springframework.context-3.0.0.RELEASE.jar" sourcepath="/M2_REPO/org/springframework/org.springframework.context/3.0.0.RELEASE/org.springframework.context-3.0.0.RELEASE-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.aop/3.0.0.RELEASE/org.springframework.aop-3.0.0.RELEASE.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/aopalliance/com.springsource.org.aopalliance/1.0.0/com.springsource.org.aopalliance-1.0.0.jar"/>
@@ -14,11 +14,11 @@
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.org.apache.commons.logging/1.5.6/com.springsource.slf4j.org.apache.commons.logging-1.5.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.log4j/1.5.6/com.springsource.slf4j.log4j-1.5.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/lifecycle/2.0.0.M2-SNAPSHOT/lifecycle-2.0.0.M2-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/service.listener/2.0.0.M2-SNAPSHOT/service.listener-2.0.0.M2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/simple.service/2.0.0.M2-SNAPSHOT/simple.service-2.0.0.M2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/service.listener/2.0.0.M2-SNAPSHOT/service.listener-2.0.0.M2-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/simple.service/2.0.0.M2-SNAPSHOT/simple.service-2.0.0.M2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/net/sourceforge/cglib/com.springsource.net.sf.cglib/2.2.0/com.springsource.net.sf.cglib-2.2.0.jar" sourcepath="/CGLIB_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/junit/com.springsource.junit/3.8.2/com.springsource.junit-3.8.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.apache.felix.main/2.0.0/org.apache.felix.main-2.0.0.jar" sourcepath="/FELIX_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.apache.felix.main/2.0.2/org.apache.felix.main-2.0.2.jar" sourcepath="/FELIX_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/2.0.0.M2-SNAPSHOT/spring-osgi-core-2.0.0.M2-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/2.0.0.M2-SNAPSHOT/spring-osgi-test-2.0.0.M2-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/test-support/src/main/java"/>
@@ -40,7 +40,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/annotation.dependencies/2.0.0.M2-SNAPSHOT/annotation.dependencies-2.0.0.M2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/annotation.proxy/2.0.0.M2-SNAPSHOT/annotation.proxy-2.0.0.M2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/component.scan.bundle/2.0.0.M2-SNAPSHOT/component.scan.bundle-2.0.0.M2-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/blueprint/api/2.0.0.M2-SNAPSHOT/api-2.0.0.M2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/proxy.listener/2.0.0.M2-SNAPSHOT/proxy.listener-2.0.0.M2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/log4j/com.springsource.org.apache.log4j/1.2.15/com.springsource.org.apache.log4j-1.2.15.jar"/>
 	<classpathentry kind="output" path="target/test-classes"/>
