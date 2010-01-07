@@ -19,6 +19,7 @@ package org.springframework.osgi.compendium.internal.cm;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -29,12 +30,17 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ConfigurationEvent;
+import org.osgi.service.cm.ConfigurationListener;
 import org.osgi.service.cm.ManagedService;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
+import org.springframework.osgi.service.importer.support.internal.util.OsgiServiceBindingUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.osgi.util.OsgiServiceReferenceUtils;
+import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
 import org.springframework.util.StringUtils;
@@ -95,12 +101,67 @@ public abstract class CMUtils {
 		return (containerManaged != null ? containerManaged : beanManaged);
 	}
 
-	public static Map getConfiguration(BundleContext bundleContext, String pid) throws IOException {
+	/**
+	 * Returns a map containing the Configuration Admin entry with given pid. Waits until a non-null (initialized)
+	 * object is returned if initTimeout is bigger then 0.
+	 * 
+	 * @param bundleContext
+	 * @param pid
+	 * @param initTimeout
+	 * @return
+	 * @throws IOException
+	 */
+	public static Map getConfiguration(BundleContext bundleContext, final String pid, long initTimeout)
+			throws IOException {
 		ServiceReference ref = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
 		if (ref != null) {
 			ConfigurationAdmin cm = (ConfigurationAdmin) bundleContext.getService(ref);
 			if (cm != null) {
-				return new MapBasedDictionary(cm.getConfiguration(pid).getProperties());
+				Dictionary dict = cm.getConfiguration(pid).getProperties();
+				// if there are properties or no timeout, return as is
+				if (dict != null || initTimeout == 0) {
+					return new MapBasedDictionary(dict);
+				}
+				// no valid props, register a listener and start waiting
+				final Object monitor = new Object();
+				Properties props = new Properties();
+				props.put(Constants.SERVICE_PID, pid);
+				ServiceRegistration reg =
+						bundleContext.registerService(ConfigurationListener.class.getName(),
+								new ConfigurationListener() {
+									public void configurationEvent(ConfigurationEvent event) {
+										if (ConfigurationEvent.CM_UPDATED == event.getType()
+												&& pid.equals(event.getPid())) {
+											synchronized (monitor) {
+												monitor.notify();
+											}
+										}
+									}
+								}, props);
+
+				try {
+					// try to get the configuration one more time (in case the update was fired before the service was
+					// registered)
+					dict = cm.getConfiguration(pid).getProperties();
+					if (dict != null) {
+						return new MapBasedDictionary(dict);
+					}
+
+					// start waiting
+					synchronized (monitor) {
+						try {
+							monitor.wait(initTimeout);
+						} catch (InterruptedException ie) {
+							// consider the timeout has passed
+						}
+					}
+
+					// return whatever is available (either we timed out or an update occured)
+					return new MapBasedDictionary(cm.getConfiguration(pid).getProperties());
+
+				} finally {
+					OsgiServiceUtils.unregisterService(reg);
+				}
 			}
 		}
 		return Collections.EMPTY_MAP;

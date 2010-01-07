@@ -32,8 +32,8 @@ import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
 
 /**
- * Class responsible for interacting with the Configuration Admin service. It
- * handles the retrieval and updates for a given persistent id.
+ * Class responsible for interacting with the Configuration Admin service. It handles the retrieval and updates for a
+ * given persistent id.
  * 
  * @author Costin Leau
  * @see org.osgi.service.cm.ConfigurationAdmin
@@ -63,7 +63,6 @@ class ConfigurationAdminManager implements DisposableBean {
 		}
 	}
 
-
 	/** logger */
 	private static final Log log = LogFactory.getLog(ConfigurationAdminManager.class);
 
@@ -76,7 +75,6 @@ class ConfigurationAdminManager implements DisposableBean {
 	private final Object monitor = new Object();
 
 	private ServiceRegistration registration;
-
 
 	/**
 	 * Constructs a new <code>ConfigurationAdminManager</code> instance.
@@ -106,9 +104,8 @@ class ConfigurationAdminManager implements DisposableBean {
 	}
 
 	/**
-	 * Initializes the conversation with the configuration admin. This method
-	 * allows for lazy service registration to avoid notification being sent w/o
-	 * any beans requesting it.
+	 * Initializes the conversation with the configuration admin. This method allows for lazy service registration to
+	 * avoid notification being sent w/o any beans requesting it.
 	 */
 	private void initialize() {
 		synchronized (monitor) {
@@ -132,9 +129,9 @@ class ConfigurationAdminManager implements DisposableBean {
 
 	private void initProperties() {
 		try {
-			properties = CMUtils.getConfiguration(bundleContext, pid);
-		}
-		catch (IOException ioe) {
+			//TODO: allow timeout for managed-properties as well
+			properties = CMUtils.getConfiguration(bundleContext, pid, 0);
+		} catch (IOException ioe) {
 			// FIXME: consider adding a custom/different exception
 			throw new BeanInitializationException("Cannot retrieve configuration for pid=" + pid, ioe);
 		}
