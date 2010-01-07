@@ -15,9 +15,9 @@
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.1.R35x_v20090827/org.eclipse.osgi-3.5.1.R35x_v20090827.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/2.0.0.M2-SNAPSHOT/spring-osgi-core-2.0.0.M2-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-web"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/3.0.0.RC3/org.springframework.context-3.0.0.RC3.jar" sourcepath="/SPRING_TIGER_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.beans/3.0.0.RC3/org.springframework.beans-3.0.0.RC3.jar" sourcepath="M2_REPO/org/springframework/org.springframework.beans/3.0.0.RC3/org.springframework.beans-3.0.0.RC3-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.core/3.0.0.RC3/org.springframework.core-3.0.0.RC3.jar" sourcepath="/SPRING_TIGER_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/3.0.0.RELEASE/org.springframework.context-3.0.0.RELEASE.jar" sourcepath="/SPRING_TIGER_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.beans/3.0.0.RELEASE/org.springframework.beans-3.0.0.RELEASE.jar" sourcepath="M2_REPO/org/springframework/org.springframework.beans/3.0.0.RELEASE/org.springframework.beans-3.0.0.RELEASE-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.core/3.0.0.RELEASE/org.springframework.core-3.0.0.RELEASE.jar" sourcepath="/SPRING_TIGER_SRC"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-extender"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
