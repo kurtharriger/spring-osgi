@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +34,6 @@ import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.CollectionFactory;
-import org.springframework.core.ConcurrentMap;
 import org.springframework.osgi.extender.internal.util.concurrent.Counter;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
@@ -100,7 +101,7 @@ public class WarLoaderListener implements BundleActivator {
 		private static final long SHUTDOWN_WAIT_TIME = 1000 * 60;
 
 		/** association map between a bundle and its web deployment object */
-		private final ConcurrentMap bundlesToDeployments = CollectionFactory.createConcurrentMap(16);
+		private final ConcurrentMap bundlesToDeployments = new ConcurrentHashMap(16);
 
 		/** thread for deploying/undeploying bundles */
 		private final TimerTaskExecutor executor = new TimerTaskExecutor();
@@ -164,9 +165,13 @@ public class WarLoaderListener implements BundleActivator {
 						}
 					};
 
-					Thread thread = new Thread(undeployBundlesRunnable, "Spring-DM WebExtender[" + extenderVersion
-							+ "] war undeployment thread");
+					Thread thread =
+							new Thread(undeployBundlesRunnable, "Spring-DM WebExtender[" + extenderVersion
+									+ "] war undeployment thread");
 					thread.start();
+					// wait for the wars to be undeployed
+					thread.join(SHUTDOWN_WAIT_TIME);
+					
 				} else {
 					// if there's a task currently on going, wait for it
 					if (onGoingTask.waitForZero(SHUTDOWN_WAIT_TIME)) {
@@ -329,7 +334,7 @@ public class WarLoaderListener implements BundleActivator {
 	 * 
 	 */
 	public WarLoaderListener() {
-		this.managedBundles = CollectionFactory.createConcurrentMap(16);
+		this.managedBundles = new ConcurrentHashMap(16);
 		deploymentManager = new DeploymentManager();
 	}
 
@@ -433,8 +438,9 @@ public class WarLoaderListener implements BundleActivator {
 			String contextPath = localCPS.getContextPath(bundle);
 			// make sure it doesn't contain spaces (causes subtle problems with Tomcat Jasper)
 			Assert.doesNotContain(contextPath, " ", "context path should not contain whitespaces");
-			String msg = OsgiStringUtils.nullSafeNameAndSymName(bundle)
-					+ " is a WAR, scheduling war deployment on context path [" + contextPath + "] (";
+			String msg =
+					OsgiStringUtils.nullSafeNameAndSymName(bundle)
+							+ " is a WAR, scheduling war deployment on context path [" + contextPath + "] (";
 
 			URL webXML = getWebXml(bundle);
 

@@ -26,6 +26,7 @@ Package org.springframework.osgi.test
 
 Package org.springframework.osgi.web
 * added check to prevent deployed WARs from being redeployed (which can cause problems in some containers)
+* serialized web bundles shutdown to prevent early bundle context invalidation
 
 
 Changes in version 2.0.0 M1 (2009-09-28)
