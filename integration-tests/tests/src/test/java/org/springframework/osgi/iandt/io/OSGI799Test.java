@@ -16,7 +16,6 @@
 package org.springframework.osgi.iandt.io;
 
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Arrays;
 
 import org.osgi.framework.Bundle;
@@ -96,42 +95,42 @@ public class OSGI799Test extends BaseIoTest {
 	public void testExportedCustomCP() throws Exception {
 		ResourcePatternResolver resolver = getExporterPatternLoader();
 		Resource[] resources = resolver.getResources("classpath:/some/**/*.res");
-		System.out.println(Arrays.toString(resources));
+		System.out.println(ObjectUtils.nullSafeToString(resources));
 		assertEquals(3, resources.length);
 	}
 
 	public void testImportedCustomCP() throws Exception {
 		ResourcePatternResolver resolver = getImporterPatternLoader();
 		Resource[] resources = resolver.getResources("classpath:some/**/*.res");
-		System.out.println(Arrays.toString(resources));
+		System.out.println(ObjectUtils.nullSafeToString((resources));
 		assertEquals(3, resources.length);
 	}
 	
 	public void testExportedCustomFoldersCP() throws Exception {
 		ResourcePatternResolver resolver = getExporterPatternLoader();
 		Resource[] resources = resolver.getResources("classpath:/**/path/**/*");
-		System.out.println(Arrays.toString(resources));
+		System.out.println(ObjectUtils.nullSafeToString((resources));
 		assertEquals(8, resources.length);
 	}
 	
 	public void testImporterCustomFoldersCP() throws Exception {
 		ResourcePatternResolver resolver = getImporterPatternLoader();
 		Resource[] resources = resolver.getResources("classpath:/**/path/**/*");
-		System.out.println(Arrays.toString(resources));
+		System.out.println(ObjectUtils.nullSafeToString((resources));
 		assertEquals(5, resources.length);
 	}
 
 	public void testExportedCustomPatternFoldersCP() throws Exception {
 		ResourcePatternResolver resolver = getExporterPatternLoader();
 		Resource[] resources = resolver.getResources("classpath:/**/p?th/**/*");
-		System.out.println(Arrays.toString(resources));
+		System.out.println(ObjectUtils.nullSafeToString((resources));
 		assertEquals(8, resources.length);
 	}
 	
 	public void testImporterCustomPatternFoldersCP() throws Exception {
 		ResourcePatternResolver resolver = getImporterPatternLoader();
 		Resource[] resources = resolver.getResources("classpath:/**/p?th/**/*");
-		System.out.println(Arrays.toString(resources));
+		System.out.println(ObjectUtils.nullSafeToString((resources));
 		assertEquals(5, resources.length);
 	}
 }
