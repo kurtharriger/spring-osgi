@@ -21,6 +21,9 @@ Package org.springframework.osgi.compendium
 * introduced initialization timeout option to cm-properties
 * introduced lazy initialization option to cm-properties
 
+Package org.springframework.osgi.io
+* improved pattern matching against jar entries in the bundle classpath
+
 Package org.springframework.osgi.test
 * added check for unresolved fragments during test startup
 
