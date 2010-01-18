@@ -19,7 +19,8 @@ package org.springframework.osgi.io;
 import java.io.IOException;
 import java.net.URL;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -239,18 +240,22 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		final String rootDirPath = determineFolderPattern(path);
 
 		if (System.getSecurityManager() != null) {
-			AccessController.doPrivileged(new PrivilegedAction() {
-
-				public Object run() {
-					for (int i = 0; i < importedBundles.length; i++) {
-						final ImportedBundle importedBundle = importedBundles[i];
-						if (!bundle.equals(importedBundle.getBundle())) {
-							findImportedBundleMatchingResource(importedBundle, rootDirPath, path, foundPaths);
+			try {
+				AccessController.doPrivileged(new PrivilegedExceptionAction() {
+	
+					public Object run() throws IOException {
+						for (int i = 0; i < importedBundles.length; i++) {
+							final ImportedBundle importedBundle = importedBundles[i];
+							if (!bundle.equals(importedBundle.getBundle())) {
+								findImportedBundleMatchingResource(importedBundle, rootDirPath, path, foundPaths);
+							}
 						}
+						return null;
 					}
-					return null;
-				}
-			});
+				});
+			} catch (PrivilegedActionException pe) {
+				throw (IOException) pe.getException();
+			}
 		}
 		else {
 			for (int i = 0; i < importedBundles.length; i++) {
@@ -311,7 +316,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * @param foundPaths collection of found results
 	 */
 	private void findImportedBundleMatchingResource(final ImportedBundle importedBundle, String rootPath, String path,
-			final Collection foundPaths) {
+			final Collection foundPaths) throws IOException {
 
 		final boolean trace = logger.isTraceEnabled();
 
@@ -334,8 +339,9 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 			final PathMatcher matcher = getPathMatcher();
 			// if the imported package matches the path
 			if (matcher.matchStart(path, pkg)) {
-				// start the JAR analysis
-				Enumeration entries = importedBundle.getBundle().getEntryPaths(pkg);
+				Bundle bundle = importedBundle.getBundle();
+				// 1. look at the Bundle jar root
+				Enumeration entries = bundle.getEntryPaths(pkg);
 				while (entries != null && entries.hasMoreElements()) {
 					String entry = (String) entries.nextElement();
 					if (startsWithSlash)
@@ -347,6 +353,9 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 						foundPaths.add(entry);
 					}
 				}
+				// 2. Do a Bundle-Classpath lookup (since the jar might use a different classpath)
+				Collection cpMatchingPaths = findBundleClassPathMatchingPaths(bundle, path);
+				foundPaths.addAll(cpMatchingPaths);
 			}
 		}
 	}
@@ -454,6 +463,8 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		JarInputStream jis = new JarInputStream(url.openStream());
 		Set result = new LinkedHashSet(8);
 
+		boolean patternWithFolderSlash = pattern.startsWith(FOLDER_SEPARATOR);
+		
 		// parse the jar and do pattern matching
 		try {
 			while (jis.available() > 0) {
@@ -462,9 +473,15 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 				if (jarEntry != null) {
 					String entryPath = jarEntry.getName();
 
-					// strip leading "/" if it does exist
+					// check if leading "/" is needed or not (it depends how the jar was created)
 					if (entryPath.startsWith(FOLDER_SEPARATOR)) {
-						entryPath = entryPath.substring(FOLDER_SEPARATOR.length());
+						if (!patternWithFolderSlash) {
+							entryPath = entryPath.substring(FOLDER_SEPARATOR.length());
+						}
+					} else {
+						if (patternWithFolderSlash) {
+							entryPath = FOLDER_SEPARATOR.concat(entryPath);
+						}
 					}
 					if (getPathMatcher().match(pattern, entryPath)) {
 						result.add(entryPath);
