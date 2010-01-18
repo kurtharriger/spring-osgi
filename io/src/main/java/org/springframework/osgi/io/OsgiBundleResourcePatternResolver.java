@@ -19,7 +19,8 @@ package org.springframework.osgi.io;
 import java.io.IOException;
 import java.net.URL;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -33,6 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
@@ -227,18 +229,22 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		final String rootDirPath = determineFolderPattern(path);
 
 		if (System.getSecurityManager() != null) {
-			AccessController.doPrivileged(new PrivilegedAction<Object>() {
+			try {
+				AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
 
-				public Object run() {
-					for (int i = 0; i < importedBundles.length; i++) {
-						final ImportedBundle importedBundle = importedBundles[i];
-						if (!bundle.equals(importedBundle.getBundle())) {
-							findImportedBundleMatchingResource(importedBundle, rootDirPath, path, foundPaths);
+					public Object run() throws IOException {
+						for (int i = 0; i < importedBundles.length; i++) {
+							final ImportedBundle importedBundle = importedBundles[i];
+							if (!bundle.equals(importedBundle.getBundle())) {
+								findImportedBundleMatchingResource(importedBundle, rootDirPath, path, foundPaths);
+							}
 						}
+						return null;
 					}
-					return null;
-				}
-			});
+				});
+			} catch (PrivilegedActionException pe) {
+				throw (IOException) pe.getException();
+			}
 		} else {
 			for (int i = 0; i < importedBundles.length; i++) {
 				final ImportedBundle importedBundle = importedBundles[i];
@@ -298,7 +304,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 */
 	@SuppressWarnings("unchecked")
 	private void findImportedBundleMatchingResource(final ImportedBundle importedBundle, String rootPath, String path,
-			final Collection<String> foundPaths) {
+			final Collection<String> foundPaths) throws IOException {
 
 		final boolean trace = logger.isTraceEnabled();
 
@@ -321,8 +327,9 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 			final PathMatcher matcher = getPathMatcher();
 			// if the imported package matches the path
 			if (matcher.matchStart(path, pkg)) {
-				// start the JAR analysis
-				Enumeration<String> entries = importedBundle.getBundle().getEntryPaths(pkg);
+				Bundle bundle = importedBundle.getBundle();
+				// 1. look at the Bundle jar root
+				Enumeration<String> entries = bundle.getEntryPaths(pkg);
 				while (entries != null && entries.hasMoreElements()) {
 					String entry = entries.nextElement();
 					if (startsWithSlash)
@@ -334,6 +341,9 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 						foundPaths.add(entry);
 					}
 				}
+				// 2. Do a Bundle-Classpath lookup (since the jar might use a different classpath)
+				Collection<String> cpMatchingPaths = findBundleClassPathMatchingPaths(bundle, path);
+				foundPaths.addAll(cpMatchingPaths);
 			}
 		}
 	}
