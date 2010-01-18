@@ -2,6 +2,14 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
+Changes in version 1.2.2 (2010-dd-mm)
+-------------------------------------
+
+Package org.springframework.osgi.io
+* improved pattern matching against jar entries in the bundle classpath
+* fixed pattern matching against packages imported from bundles with custom classpaths
+
+
 Changes in version 1.2.1 (2009-12-16)
 -------------------------------------
 
