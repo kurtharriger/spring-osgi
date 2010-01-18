@@ -23,6 +23,7 @@ Package org.springframework.osgi.compendium
 
 Package org.springframework.osgi.io
 * improved pattern matching against jar entries in the bundle classpath
+* fixed pattern matching against packages imported from bundles with custom classpaths
 
 Package org.springframework.osgi.test
 * added check for unresolved fragments during test startup
