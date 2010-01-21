@@ -17,12 +17,7 @@
 package org.springframework.osgi.compendium.cm;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Dictionary;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -38,14 +33,12 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.compendium.internal.cm.CMUtils;
+import org.springframework.osgi.compendium.internal.cm.util.ChangeableProperties;
+import org.springframework.osgi.compendium.internal.cm.util.PropertiesUtil;
 import org.springframework.osgi.context.BundleContextAware;
-import org.springframework.osgi.service.exporter.support.ServicePropertiesChangeEvent;
 import org.springframework.osgi.service.exporter.support.ServicePropertiesChangeListener;
-import org.springframework.osgi.service.exporter.support.ServicePropertiesListenerManager;
 import org.springframework.osgi.util.OsgiServiceUtils;
-import org.springframework.osgi.util.internal.MapBasedDictionary;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
 /**
  * FactoryBean returning the properties stored under a given persistent id in the ConfigurationAdmin service. Once
@@ -70,36 +63,10 @@ public class ConfigAdminPropertiesFactoryBean implements BundleContextAware, Ini
 				log.trace("Configuration [" + persistentId + "] has been updated with properties " + props);
 
 			// update properties
-			initProperties(properties, new MapBasedDictionary(props));
-			// inform listeners
-			((ChangeableProperties) properties).notifyListeners();
-		}
-	}
-
-	private class ChangeableProperties extends Properties implements ServicePropertiesListenerManager {
-
-		private List<ServicePropertiesChangeListener> listeners =
-				Collections.synchronizedList(new ArrayList<ServicePropertiesChangeListener>(4));
-
-		public void addListener(ServicePropertiesChangeListener listener) {
-			if (listener != null) {
-				listeners.add(listener);
-			}
-		}
-
-		public void removeListener(ServicePropertiesChangeListener listener) {
-			if (listener != null) {
-				listeners.remove(listener);
-			}
-		}
-
-		void notifyListeners() {
-			ServicePropertiesChangeEvent event = new ServicePropertiesChangeEvent(this);
-			synchronized (listeners) {
-				for (Iterator<ServicePropertiesChangeListener> iterator = listeners.iterator(); iterator.hasNext();) {
-					ServicePropertiesChangeListener listener = iterator.next();
-					listener.propertiesChange(event);
-				}
+			PropertiesUtil.initProperties(localProperties, localOverride, props, properties);
+			// inform listeners (the dynamic check is redundant but nevertheless safe)
+			if (dynamic) {
+				((ChangeableProperties) properties).notifyListeners();
 			}
 		}
 	}
@@ -138,7 +105,8 @@ public class ConfigAdminPropertiesFactoryBean implements BundleContextAware, Ini
 			properties = (dynamic ? new ChangeableProperties() : new Properties());
 			// init properties by copying config admin properties
 			try {
-				initProperties(properties, CMUtils.getConfiguration(bundleContext, persistentId, initTimeout));
+				PropertiesUtil.initProperties(localProperties, localOverride, CMUtils.getConfiguration(bundleContext,
+						persistentId, initTimeout), properties);
 			} catch (IOException ioe) {
 				throw new BeanInitializationException("Cannot retrieve configuration for pid=" + persistentId, ioe);
 			}
@@ -147,32 +115,6 @@ public class ConfigAdminPropertiesFactoryBean implements BundleContextAware, Ini
 				// perform eager registration
 				registration = CMUtils.registerManagedService(bundleContext, new ConfigurationWatcher(), persistentId);
 			}
-		}
-	}
-
-	/**
-	 * Reads the current properties in the ConfigurationAdmin.
-	 * 
-	 * @return
-	 */
-	private Properties initProperties(Properties target, Map<?, ?> cmConfig) {
-
-		synchronized (target) {
-			target.clear();
-
-			// merge the local properties (upfront)
-			if (localProperties != null && !localOverride) {
-				CollectionUtils.mergePropertiesIntoMap(localProperties, target);
-			}
-
-			target.putAll(cmConfig);
-
-			// merge local properties (if needed)
-			if (localProperties != null && localOverride) {
-				CollectionUtils.mergePropertiesIntoMap(localProperties, target);
-			}
-
-			return target;
 		}
 	}
 
