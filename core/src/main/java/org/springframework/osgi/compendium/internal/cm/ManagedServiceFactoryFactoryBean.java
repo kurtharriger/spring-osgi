@@ -340,7 +340,9 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 
 		// add properties
 		Properties props = new Properties();
-		props.putAll(serviceProperties);
+		if (serviceProperties != null) {
+			props.putAll(serviceProperties);
+		}
 		// add the service pid (to be able to identify the bean instance)
 		props.put(Constants.SERVICE_PID, beanName);
 		exporter.setServiceProperties(props);
