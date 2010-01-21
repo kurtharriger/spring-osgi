@@ -27,6 +27,7 @@ import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
 import org.springframework.osgi.config.internal.util.ServiceAttributeCallback;
 import org.springframework.osgi.config.internal.util.ServiceParsingUtils;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -41,6 +42,8 @@ public class ManagedServiceFactoryDefinitionParser extends AbstractSimpleBeanDef
 	private static final String TEMPLATE_PROP = "templateDefinition";
 	private static final String LISTENER = "registration-listener";
 	private static final String LISTENERS_PROP = "listeners";
+	private static final String LOCAL_OVERRIDE = "local-override";
+	private static final String LOCAL_OVERRIDE_PROP = "localOverride";
 
 	protected Class<?> getBeanClass(Element element) {
 		return ManagedServiceFactoryFactoryBean.class;
@@ -68,9 +71,11 @@ public class ManagedServiceFactoryDefinitionParser extends AbstractSimpleBeanDef
 				String name = nestedElement.getLocalName();
 
 				// osgi:interface
-				if (ServiceParsingUtils.parseInterfaces(element, nestedElement, parserContext, builder))
-					;
-
+				if (ServiceParsingUtils.parseInterfaces(element, nestedElement, parserContext, builder)) {
+				}
+				// osgi:service-properties
+				else if (ServiceParsingUtils.parseServiceProperties(element, nestedElement, parserContext, builder)) {
+				}
 				// osgi:registration-listener
 				else if (LISTENER.equals(name)) {
 					listeners.add(ServiceParsingUtils.parseListener(parserContext, nestedElement, builder));

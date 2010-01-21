@@ -45,10 +45,8 @@ public abstract class ServiceParsingUtils {
 	private static final String TARGET_PROP = "target";
 	private static final String INTERFACE = "interface";
 	private static final String INTERFACES_PROP = "interfaces";
-
 	private static final String INTERFACES_ID = "interfaces";
 	private static final String PROPS_ID = "service-properties";
-
 
 	public static BeanDefinition parseListener(ParserContext context, Element element, BeanDefinitionBuilder builder) {
 

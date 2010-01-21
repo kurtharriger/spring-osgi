@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -184,17 +185,16 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	/** update callback */
 	private UpdateCallback updateCallback;
 
-
-	// this fields gets set by the CF
-	// no synch is needed since the CF is guaranteed to be called sequentially
-	// Note this is needed since the CM config might have been updated (since everything is asynch)
+	// this fields gets set whenever a new CM entry is created
+	// no synch is needed since the CF is guaranteed to be called sequentially and the callback doesn't return
+	// until the bean is fully initialized and published
 	public Map initialInjectionProperties;
 
 	/**
 	 * destroyed flag - used since some CM implementations still call the service even though it was unregistered
 	 */
 	private boolean destroyed = false;
-
+	/** service properties */
 	private volatile Map serviceProperties;
 	/** special destruction invoker for managed-components/template beans */
 	private volatile DestructionInvokerCache destructionInvokerFactory;
@@ -311,18 +311,13 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 
 			beanFactory.registerBeanDefinition(pid, templateDefinition);
 			initialInjectionProperties = props;
-			// create instance
+			// create instance (causing the injection BPP to be applied)
 			Object bean = beanFactory.getBean(pid);
-
 			registerService(pid, bean);
 		}
 	}
 
 	private void registerService(String pid, Object bean) {
-		// add properties
-		Dictionary props = new Hashtable(2);
-		props.put(Constants.SERVICE_PID, pid);
-
 		OsgiServiceFactoryBean exporter = createExporter(pid, bean);
 		serviceExporters.put(pid, exporter);
 		try {
@@ -342,6 +337,13 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		exporter.setInterfaces(interfaces);
 		exporter.setListeners(listeners);
 		exporter.setTarget(bean);
+
+		// add properties
+		Properties props = new Properties();
+		props.putAll(serviceProperties);
+		// add the service pid (to be able to identify the bean instance)
+		props.put(Constants.SERVICE_PID, beanName);
+		exporter.setServiceProperties(props);
 
 		try {
 			exporter.afterPropertiesSet();

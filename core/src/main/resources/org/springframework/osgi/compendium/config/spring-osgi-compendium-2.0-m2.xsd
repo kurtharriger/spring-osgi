@@ -95,6 +95,7 @@
 	                    		]]></xsd:documentation>
 	                    	</xsd:annotation>
 	                	</xsd:element>
+	                    <xsd:element name="service-properties" type="osgi:TserviceProperties" minOccurs="0" maxOccurs="1"/>
 		            	<!-- the bean definition template -->
 	                    <xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip">
 	   				       	<xsd:annotation>
@@ -183,5 +184,4 @@
 	    	</xsd:complexContent>
     	</xsd:complexType>
     </xsd:element>
-
 </xsd:schema>
