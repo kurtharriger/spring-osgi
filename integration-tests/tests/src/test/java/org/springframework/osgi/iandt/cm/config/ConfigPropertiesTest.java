@@ -111,7 +111,8 @@ public class ConfigPropertiesTest extends BaseConfigurationAdminTest {
 		newProps.setProperty("steve", "vai");
 
 		waitForCfgChangeToPropagate(DYNAMIC_SIMPLE, newProps);
-
+		waitForCfgChangeToPropagate(DYNAMIC_SIMPLE, newProps);
+		
 		assertEquals("osgi", prop.getProperty("spring"));
 		assertEquals("vai", prop.getProperty("steve"));
 	}
@@ -129,6 +130,7 @@ public class ConfigPropertiesTest extends BaseConfigurationAdminTest {
 		newProps.setProperty("spring", "osgi");
 		newProps.setProperty("steve", "vai");
 
+		waitForCfgChangeToPropagate(DYNAMIC_OVERRIDE, newProps);
 		waitForCfgChangeToPropagate(DYNAMIC_OVERRIDE, newProps);
 
 		assertEquals("framework", prop.getProperty("spring"));
