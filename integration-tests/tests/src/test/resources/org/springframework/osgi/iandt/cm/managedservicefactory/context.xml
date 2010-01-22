@@ -13,6 +13,10 @@
 			factory-pid="org.springframework.osgi.iandt.cm.managedservicefactory.ManagedServiceFactoryTest" 
 			auto-export="interfaces">
 		<osgix:registration-listener ref="listener"/>
+		<osgix:service-properties>
+		    <entry key="service" value="property"/>
+		    <entry key="spring" value="framework"/>
+    	</osgix:service-properties>
 		<bean class="java.util.LinkedHashMap"/>
 	</osgix:managed-service-factory>
 
