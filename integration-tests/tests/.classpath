@@ -42,5 +42,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/component.scan.bundle/2.0.0.M2-SNAPSHOT/component.scan.bundle-2.0.0.M2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/proxy.listener/2.0.0.M2-SNAPSHOT/proxy.listener-2.0.0.M2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/log4j/com.springsource.org.apache.log4j/1.2.15/com.springsource.org.apache.log4j-1.2.15.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/tccl.intf/2.0.0.M2-SNAPSHOT/tccl.intf-2.0.0.M2-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/test-classes"/>
 </classpath>

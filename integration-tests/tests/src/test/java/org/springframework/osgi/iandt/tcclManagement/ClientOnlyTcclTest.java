@@ -89,13 +89,13 @@ public class ClientOnlyTcclTest extends BaseIntegrationTest {
 		}
 	}
 
-	public void testClientTCCLOnClasses() throws Exception {
+	public void testClientTCCLOnClientClasses() throws Exception {
 		ClassLoader clientCL = getClientTCCL().getTCCL();
 		assertNotNull(clientCL);
 		assertNotNull(clientCL.loadClass(CLIENT_CLASS));
 	}
 
-	public void testClientTCCLOnResources() throws Exception {
+	public void testClientTCCLOnClientResources() throws Exception {
 		ClassLoader clientCL = getClientTCCL().getTCCL();
 		assertNotNull(clientCL);
 		assertNotNull(clientCL.getResource(CLIENT_RESOURCE));

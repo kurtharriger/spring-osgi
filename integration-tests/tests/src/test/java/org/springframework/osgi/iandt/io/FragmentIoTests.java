@@ -15,7 +15,11 @@
  */
 package org.springframework.osgi.iandt.io;
 
+import java.util.Dictionary;
+
+import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
+import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -95,7 +99,8 @@ public class FragmentIoTests extends BaseIoTest {
 	}
 
 	public void testFileWithTheSameNameOnlyInAttachedFragmentsOnlyWithMatchingAtFolderLevel() throws Exception {
-		Resource[] fragmentResource = patternLoader.getResources("osgibundle:/org/springframework/**/fragment-duplicate.file");
+		Resource[] fragmentResource =
+				patternLoader.getResources("osgibundle:/org/springframework/**/fragment-duplicate.file");
 		// should find at least 2
 		assertTrue("files with the same name available in attached fragments are ignored", fragmentResource.length > 1);
 	}
@@ -164,5 +169,28 @@ public class FragmentIoTests extends BaseIoTest {
 		assertEquals(1, res.length);
 	}
 
+	public void testFragmentAndHostHeaderMerging() throws Exception {
+		Dictionary hostHeaders = bundle.getHeaders();
+		assertNull(hostHeaders.get("Fragment-Header"));
+		assertNull(hostHeaders.get("Fragment1-Header"));
+		assertNull(hostHeaders.get("Fragment2-Header"));
+	}
 
+	public void testFragment1Headers() throws Exception {
+		Bundle fragment1 =
+				OsgiBundleUtils.findBundleBySymbolicName(bundleContext, "org.springframework.osgi.iandt.io.fragment.1");
+		Dictionary fragment1Headers = fragment1.getHeaders();
+		assertNotNull(fragment1Headers.get("Fragment-Header"));
+		assertNotNull(fragment1Headers.get("Fragment1-Header"));
+		assertNull(fragment1Headers.get("Fragment2-Header"));
+	}
+	
+	public void testFragment2Headers() throws Exception {
+		Bundle fragment1 =
+				OsgiBundleUtils.findBundleBySymbolicName(bundleContext, "org.springframework.osgi.iandt.io.fragment.2");
+		Dictionary fragment1Headers = fragment1.getHeaders();
+		assertNotNull(fragment1Headers.get("Fragment-Header"));
+		assertNull(fragment1Headers.get("Fragment1-Header"));
+		assertNotNull(fragment1Headers.get("Fragment2-Header"));
+	}
 }
