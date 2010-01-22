@@ -41,7 +41,6 @@ public class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
 	private final String FPID = ManagedServiceFactoryTest.class.getName();
 	private final String FILTER = "(service.factoryPid=" + FPID + ")";
 
-
 	protected String[] getConfigLocations() {
 		return new String[] { "org/springframework/osgi/iandt/cm/managedservicefactory/context.xml" };
 	}
@@ -114,6 +113,9 @@ public class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
 		assertTrue(refs.length > 0);
 		for (int i = 0; i < refs.length; i++) {
 			ServiceReference serviceReference = refs[i];
+			// check properties
+			assertEquals("framework", serviceReference.getProperty("spring"));
+			assertEquals("property", serviceReference.getProperty("service"));
 			System.out.println(OsgiStringUtils.nullSafeToString(refs[i]));
 		}
 	}
@@ -133,14 +135,17 @@ public class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
 		try {
 			assertTrue(col.add(new Object()));
 			fail("the collection should be read-only - write operations should throw an exception");
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			// expected
 		}
 		for (Iterator iterator = col.iterator(); iterator.hasNext();) {
 			Object item = (Object) iterator.next();
 			System.out.println(item);
 			assertTrue(item instanceof ServiceRegistration);
+			// check properties
+			ServiceReference ref = ((ServiceRegistration) item).getReference();
+			assertEquals("framework", ref.getProperty("spring"));
+			assertEquals("property", ref.getProperty("service"));
 		}
 	}
 
