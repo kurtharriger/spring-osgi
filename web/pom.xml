@@ -22,7 +22,7 @@
     <catalina.osgi.version>5.5.23</catalina.osgi.version>
     
     <!-- jetty artifact version -->
-	<jetty.version>6.1.9</jetty.version>
+	<jetty.version>6.1.23</jetty.version>
 	<catalina.version>5.5.23-SNAPSHOT</catalina.version>
 
 
